@@ -1,0 +1,72 @@
+server:
+  port: 8087
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    #    url: jdbc:mysql://localhost:3306/remember_everything?useSSL=true&useUncode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    #    username: root
+    #    password: nihao206
+    url: jdbc:mysql://8.137.36.58:3306/notes-something?useSSL=true&useUncode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: admin
+    password: nihao206
+mybatis-plus:
+  type-aliases-package: com.chat.bean.po
+  configuration:
+    map-underscore-to-camel-case: true
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # ??sql
+
+---
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+  api-docs:
+    enabled: true
+    # http://127.0.0.1:8087/swagger-ui/index.html#/
+
+#redis
+spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 2051911977
+---
+spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+---
+spring:
+  datasource:
+    username: admin
+    password: nihao206
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://8.137.36.58:3306/notes-something?useUncode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    type: com.alibaba.druid.pool.DruidDataSource
+    # ????????
+    druid:
+      #   ???????
+      # ???????????????????????
+      # ???????????
+      initial-size: 10
+      min-idle: 10
+      max-active: 20
+      # ?????????????
+      max-wait: 60000
+      #???????????????????????
+      remove-abandoned-timeout: 180
+      remove-abandoned: true
+      # ???????????????????????????????
+      time-between-eviction-runs-millis: 60000
+      # ??????????????????????
+      min-evictable-idle-time-millis: 300000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      useGlobalDataSourceStat: true
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.logSlowSql=true;druid.stat.slowSqlMillis=1000;
