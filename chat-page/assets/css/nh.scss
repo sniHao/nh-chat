@@ -1,0 +1,393 @@
+/* 左外边距 */
+.ml-2 {
+  margin-left: 2px;
+}
+
+.ml-4 {
+  margin-left: 4px;
+}
+
+.ml-6 {
+  margin-left: 6px;
+}
+
+.ml-8 {
+  margin-left: 8px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.ml-12 {
+  margin-left: 12px;
+}
+
+.ml-14 {
+  margin-left: 14px;
+}
+
+.ml-16 {
+  margin-left: 16px;
+}
+
+.ml-18 {
+  margin-left: 18px;
+}
+
+.ml-20 {
+  margin-left: 20px;
+}
+
+.ml-22 {
+  margin-left: 22px;
+}
+
+.ml-24 {
+  margin-left: 24px;
+}
+
+.ml-26 {
+  margin-left: 26px;
+}
+
+/* 上外边距 */
+.mt-2 {
+  margin-top: 2px;
+}
+
+.mt-4 {
+  margin-top: 4px;
+}
+
+.mt-6 {
+  margin-top: 6px;
+}
+
+.mt-8 {
+  margin-top: 8px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-12 {
+  margin-top: 12px;
+}
+
+.mt-14 {
+  margin-top: 14px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.mt-18 {
+  margin-top: 18px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mt-22 {
+  margin-top: 22px;
+}
+
+.mt-30 {
+  margin-top: 30px;
+}
+
+/* 右外边距 */
+.mr-2 {
+  margin-right: 2px;
+}
+
+.mr-4 {
+  margin-right: 4px;
+}
+
+.mr-6 {
+  margin-right: 6px;
+}
+
+.mr-8 {
+  margin-right: 8px;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+.mr-12 {
+  margin-right: 12px;
+}
+
+.mr-14 {
+  margin-right: 14px;
+}
+
+.mr-16 {
+  margin-right: 16px;
+}
+
+.mr-18 {
+  margin-right: 18px;
+}
+
+.mr-20 {
+  margin-right: 20px;
+}
+
+.mr-22 {
+  margin-right: 22px;
+}
+
+.mr-30 {
+  margin-right: 30px;
+}
+
+/* 下外边距 */
+.mb-2 {
+  margin-bottom: 2px;
+}
+
+.mb-4 {
+  margin-bottom: 4px;
+}
+
+.mb-6 {
+  margin-bottom: 6px;
+}
+
+.mb-8 {
+  margin-bottom: 8px;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-12 {
+  margin-bottom: 12px;
+}
+
+.mb-14 {
+  margin-bottom: 14px;
+}
+
+.mb-16 {
+  margin-bottom: 16px;
+}
+
+.mb-18 {
+  margin-bottom: 18px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mb-22 {
+  margin-bottom: 22px;
+}
+
+// 内边距
+.pd-6 {
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+.pd-12 {
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.pd-18 {
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.pd-24 {
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+// 字体大小
+.ft-b {
+  font-weight: 600;
+}
+
+.ft-36 {
+  font-size: 2.25rem;
+}
+
+.ft-28 {
+  font-size: 1.75rem;
+}
+
+.ft-26 {
+  font-size: 1.625rem;
+}
+
+.ft-24 {
+  font-size: 1.5rem;
+}
+
+.ft-22 {
+  font-size: 1.375rem;
+}
+
+.ft-20 {
+  font-size: 1.25rem;
+}
+
+.ft-18 {
+  font-size: 1.125rem;
+}
+
+.ft-16 {
+  font-size: 1rem;
+}
+
+.ft-13 {
+  font-size: 0.8125rem;
+}
+
+.ft-11 {
+  font-size: 0.6875rem;
+}
+
+//  felx布局
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+}
+.flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+.flex-wrap-center {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.flex-center-zy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-center-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-center-z {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.flex-center-y {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.flex-down-center {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.flex-down-center-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.flex-down-sx-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-down-sx {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+//字体单行超出省略号
+.ft-over {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+// 字体两行超出省略号
+.ft-2-over {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+.min-h-100 {
+  min-height: 100%;
+}
+.h-100 {
+  height: 100%;
+}
+.w-100 {
+  width: 100%;
+}
+
+.move-down-2 {
+  transform: translateY(2px);
+  vertical-align: middle;
+}
+
+.boder-5 {
+  border-radius: 5px;
+}
+.boder-10 {
+  border-radius: 10px;
+}
+.boder-15 {
+  border-radius: 15px;
+}
+
+.over-auto {
+  overflow: auto;
+}
+.over-auto::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+  position: fixed;
+}
+
+/* 滚动条导轨 */
+::-webkit-scrollbar-track {
+  border-radius: 4px;
+  background: rgba(199, 97, 97, 0.06);
+  -webkit-box-shadow: inset 0 0 5px rgba(207, 48, 48, 0.08);
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: rgba(23, 164, 33, 0.15);
+  -webkit-box-shadow: inset 0 0 10px rgba(23, 164, 33, 0.2);
+}
