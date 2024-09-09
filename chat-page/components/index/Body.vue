@@ -1,6 +1,7 @@
 <template>
   <div class="main-body flex-center-onely">
     <div class="body">123</div>
+    
     <!-- <div class="lottiePop-p" ref="lottiePop"></div> -->
   </div>
 </template>
@@ -9,8 +10,6 @@
 import lottie from "lottie-web";
 const lottiePop = ref();
 onMounted(() => {
-  // 在这里执行需要在挂载后执行的逻辑
-  console.log("组件已挂载", lottie);
   lottie.loadAnimation({
     container: lottiePop.value,
     renderer: "svg",
@@ -23,10 +22,11 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .main-body {
-  margin-top: 4rem;
+  padding-top: 4rem;
   min-height: calc(100vh - 4rem);
 }
 .body {
+  height: 1550px;
   width: 1320px;
 }
 .lottiePop-p {

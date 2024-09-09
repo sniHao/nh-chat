@@ -1,21 +1,79 @@
 <template>
-  <div class="main-nav flex-center-center" ref="containerRef">
+  <div class="main-nav flex-center-center">
     <div class="nav flex-center-zy pd-6">
-      <div class="flex-center">
-        <div class="ft-26 ft-b home-ft-color">nh-chat</div>
-        <div class="ml-26 ft-color-tips-1">演示</div>
-        <div class="ml-16 ft-color-tips-2">说明文档</div>
+      <div class="flex-center ft-b">
+        <div class="ft-26 home-ft-color">nh-chat</div>
+        <div class="ml-26 ft-color-tips hover-ft">演示</div>
+        <div class="ml-16 ft-color-tips hover-ft">说明文档</div>
       </div>
       <div class="flex">
-        <div>cut</div>
-        <div class="ml-16">github</div>
+        <div class="flex-center-center pd-6 hover-btn" @click="switchMode">
+          <n-icon size="26" color="#d2d2d2" v-if="modeStyle">
+            <svg
+              t="1725868705046"
+              class="icon"
+              viewBox="0 0 1024 1024"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              p-id="4459"
+              data-spm-anchor-id="a313x.collections_detail.0.i0.363a3a81y5zOFI"
+              width="64"
+              height="64"
+            >
+              <path
+                d="M525.963636 93.090909c225.745455 6.981818 404.945455 193.163636 404.945455 418.909091 0 230.4-188.509091 418.909091-418.909091 418.909091-174.545455 0-323.490909-107.054545-386.327273-256H139.636364c230.4 0 418.909091-188.509091 418.909091-418.909091 0-58.181818-11.636364-111.709091-32.581819-162.909091m0-93.090909c-30.254545 0-58.181818 13.963636-76.8 39.563636-18.618182 25.6-20.945455 60.509091-9.309091 88.436364 16.290909 41.890909 25.6 83.781818 25.6 128 0 179.2-146.618182 325.818182-325.818181 325.818182h-11.636364-2.327273c-30.254545 0-58.181818 13.963636-76.8 39.563636-18.618182 25.6-20.945455 60.509091-9.309091 88.436364C121.018182 900.654545 304.872727 1024 512 1024c281.6 0 512-230.4 512-512C1024 235.054545 807.563636 9.309091 528.290909 0h-2.327273z"
+                p-id="4460"
+                data-spm-anchor-id="a313x.collections_detail.0.i1.363a3a81y5zOFI"
+                class=""
+              ></path>
+            </svg>
+          </n-icon>
+          <n-icon size="26" color="#d2d2d2" v-else>
+            <svg
+              t="1725870986269"
+              class="icon"
+              viewBox="0 0 1024 1024"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              p-id="6225"
+              width="64"
+              height="64"
+            >
+              <path
+                d="M507.2 288c123.2 0 224 100.8 224 224s-100.8 224-224 224-224-100.8-224-224 99.2-224 224-224m0-64c-158.4 0-288 129.6-288 288s129.6 288 288 288 288-129.6 288-288-129.6-288-288-288z m4.8-48c17.6 0 32-14.4 32-32V48c0-17.6-14.4-32-32-32s-32 14.4-32 32v96c0 17.6 14.4 32 32 32z m0 832c17.6 0 32-14.4 32-32v-96c0-17.6-14.4-32-32-32s-32 14.4-32 32v96c0 17.6 14.4 32 32 32zM176 512c0-17.6-14.4-32-32-32H48c-17.6 0-32 14.4-32 32s14.4 32 32 32h96c17.6 0 32-14.4 32-32z m832 0c0-17.6-14.4-32-32-32h-96c-17.6 0-32 14.4-32 32s14.4 32 32 32h96c17.6 0 32-14.4 32-32zM273.6 273.6c12.8-12.8 12.8-33.6 0-44.8l-67.2-67.2c-12.8-12.8-33.6-12.8-44.8 0-12.8 12.8-12.8 33.6 0 44.8l67.2 67.2c12.8 12.8 33.6 12.8 44.8 0z m588.8 588.8c12.8-12.8 12.8-33.6 0-44.8l-67.2-67.2c-12.8-12.8-33.6-12.8-44.8 0-12.8 12.8-12.8 33.6 0 44.8l67.2 67.2c12.8 12.8 32 12.8 44.8 0zM275.2 748.8c-12.8-12.8-33.6-12.8-44.8 0L163.2 816c-12.8 12.8-12.8 33.6 0 44.8 12.8 12.8 33.6 12.8 44.8 0l67.2-67.2c11.2-11.2 11.2-32 0-44.8z m587.2-587.2c-12.8-12.8-33.6-12.8-44.8 0l-67.2 67.2c-12.8 12.8-12.8 33.6 0 44.8 12.8 12.8 33.6 12.8 44.8 0l67.2-67.2c12.8-12.8 12.8-32 0-44.8z"
+                p-id="6226"
+              ></path>
+            </svg>
+          </n-icon>
+        </div>
+        <div class="ml-8 flex-center-center pd-6 hover-btn">
+          <n-icon size="28" color="#d2d2d2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink"
+              viewBox="0 0 512 512"
+            >
+              <path
+                d="M256 32C132.3 32 32 134.9 32 261.7c0 101.5 64.2 187.5 153.2 217.9a17.56 17.56 0 0 0 3.8.4c8.3 0 11.5-6.1 11.5-11.4c0-5.5-.2-19.9-.3-39.1a102.4 102.4 0 0 1-22.6 2.7c-43.1 0-52.9-33.5-52.9-33.5c-10.2-26.5-24.9-33.6-24.9-33.6c-19.5-13.7-.1-14.1 1.4-14.1h.1c22.5 2 34.3 23.8 34.3 23.8c11.2 19.6 26.2 25.1 39.6 25.1a63 63 0 0 0 25.6-6c2-14.8 7.8-24.9 14.2-30.7c-49.7-5.8-102-25.5-102-113.5c0-25.1 8.7-45.6 23-61.6c-2.3-5.8-10-29.2 2.2-60.8a18.64 18.64 0 0 1 5-.5c8.1 0 26.4 3.1 56.6 24.1a208.21 208.21 0 0 1 112.2 0c30.2-21 48.5-24.1 56.6-24.1a18.64 18.64 0 0 1 5 .5c12.2 31.6 4.5 55 2.2 60.8c14.3 16.1 23 36.6 23 61.6c0 88.2-52.4 107.6-102.3 113.3c8 7.1 15.2 21.1 15.2 42.5c0 30.7-.3 55.5-.3 63c0 5.4 3.1 11.5 11.4 11.5a19.35 19.35 0 0 0 4-.4C415.9 449.2 480 363.1 480 261.7C480 134.9 379.7 32 256 32z"
+                fill="currentColor"
+              ></path>
+            </svg>
+          </n-icon>
+          <span class="ml-4">{{ githubCount }}</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-const containerRef = ref<HTMLElement | undefined>(undefined);
+const githubCount = ref(0);
+
+// 切换主题
+const modeStyle = ref(true);
+const switchMode = () => {
+  modeStyle.value = !modeStyle.value;
+};
 </script>
 
 <style lang="scss" scoped>
@@ -24,7 +82,8 @@ const containerRef = ref<HTMLElement | undefined>(undefined);
   top: 0;
   height: 4rem;
   width: 100%;
-  background-color: #17172b;
+  background-color: #17172b99;
+  backdrop-filter: blur(4px);
   z-index: 999;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }

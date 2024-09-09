@@ -4,19 +4,35 @@ body {
 }
 
 .home-bg-color {
-  background-color: #17172b;
+  background-color: $bg-color;
 }
 .home-ft-color {
-  color: #ff6700;
+  color: $ft-color;
 }
 .ft-color-white {
   color: white;
 }
 
-.ft-color-tips-1 {
-  color: rgb(240, 240, 240);
+.ft-color-tips {
+  color: $ft-color-tips;
 }
 
-.ft-color-tips-2 {
-  color: rgb(230, 230, 230);
+.hover-btn {
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: $px-2;
+
+  border-color: #ffffff00;
+}
+
+.hover-btn:hover {
+  background-color: $ft-color-op-7;
+  cursor: pointer;
+  border-radius: $px-6;
+  border-color: $ft-color-tips;
+}
+
+.hover-ft:hover {
+  color: $ft-color;
+  cursor: pointer;
 }
