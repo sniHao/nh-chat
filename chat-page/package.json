@@ -10,10 +10,21 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@pinia/nuxt": "^0.5.4",
+    "lottie-web": "^5.12.2",
     "nuxt": "^3.13.0",
-    "vue": "latest"
+    "nuxtjs-naive-ui": "^1.0.2",
+    "pinia": "^2.2.2",
+    "unplugin-auto-import": "^0.18.2",
+    "unplugin-vue-components": "^0.27.4",
+    "vue": "latest",
+    "vue3-lottie": "^3.3.1"
   },
   "devDependencies": {
+    "naive-ui": "^2.39.0",
     "sass-embedded": "^1.78.0"
+  },
+  "overrides": {
+    "vue": "latest"
   }
 }

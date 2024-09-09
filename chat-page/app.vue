@@ -1,6 +1,9 @@
 <template>
-  <IndexNav></IndexNav>
-  <IndexBody></IndexBody>
+  <div class="home-bg-color ft-color-white">
+    <IndexNav></IndexNav>
+    <IndexBody></IndexBody>
+  </div>
+
   <!-- <div><NuxtLink to="/">首页</NuxtLink> <NuxtPage /></div> -->
 </template>
 
