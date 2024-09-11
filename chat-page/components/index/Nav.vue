@@ -80,14 +80,14 @@ const switchMode = () => {
 .main-nav {
   position: fixed;
   top: 0;
-  height: 4rem;
+  height: $px-64;
   width: 100%;
   background-color: #17172b99;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur($px-4);
   z-index: 999;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 $px-2 $px-5 rgba(0, 0, 0, 0.2);
 }
 .nav {
-  width: 80rem;
+  width: $px-1320;
 }
 </style>
