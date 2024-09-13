@@ -1,13 +1,15 @@
 <template>
   <div class="home-bg-color ft-color-white">
     <IndexNav></IndexNav>
-    <IndexBody></IndexBody>
+    <div class="over-auto main-body">
+      <NuxtPage />
+    </div>
   </div>
-
-  <!-- <div><NuxtLink to="/">首页</NuxtLink> <NuxtPage /></div> -->
 </template>
 
-<script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
-</script>
-<style lang="scss" scoped></style>
+<script setup lang="ts"></script>
+<style lang="scss" scoped>
+.main-body {
+  height: 100vh;
+}
+</style>

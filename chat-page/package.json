@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.5.4",
+    "axios": "^1.7.7",
     "lottie-web": "^5.12.2",
     "nuxt": "^3.13.0",
     "nuxtjs-naive-ui": "^1.0.2",
