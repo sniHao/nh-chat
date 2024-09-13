@@ -78,7 +78,7 @@ const switchMode = () => {
   top: 0;
   height: $px-64;
   width: calc(100vw - 0.4rem); //减去滚动条宽度
-  background-color: #17172b99;
+  background-color: #0f172a99;
   backdrop-filter: blur($px-4);
   z-index: 9;
   box-shadow: 0 $px-2 $px-5 rgba(0, 0, 0, 0.2);

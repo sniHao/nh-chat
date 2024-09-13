@@ -1,5 +1,5 @@
 <template>
-  <div class="body w-100 flex-center-onely">
+  <div class="body w-100 h-100 flex-center-onely">
     <ChatMain></ChatMain>
   </div>
 </template>
