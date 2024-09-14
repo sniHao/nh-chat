@@ -16,14 +16,14 @@
 
 <style lang="scss" scoped>
 .chat-main {
-  background-color: #182134;
-  box-shadow: 0 0 0 0.4px rgb(223, 210, 210);
+  background-color: #630ea1;
+  box-shadow: 0 0 0 0.4px $ft-color;
   height: $px-560;
   border-radius: $px-12;
 }
 .chat-com {
   width: $px-280;
-  border-right: $px-1 solid #55392a;
+  border-right: $px-1 solid $ft-color-tips;
 }
 .chat-body {
   width: calc(100% - $px-280 - $px-1);
