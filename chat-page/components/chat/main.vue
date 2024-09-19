@@ -4,8 +4,15 @@
       <div class="chat-com flex-down">
         <!-- 搜索 -->
         <div class="pd-12">
-          <n-input :style="{ width: '70%' }" />
-          <n-button type="primary" ghost>搜索</n-button>
+          <n-input-group>
+            <n-input
+              style="--n-border-hover: 1px solid #ff6700; --n-border-focus: 1px solid #ff6700; --n-box-shadow-focus: 0 0 0 2px rgba(255, 103, 0, 0.2)"
+              :style="{ width: '100%' }"
+              placeholder="输入Ta的邮箱"
+              v-model:value="searchVal"
+              clearable />
+            <n-input-group-label class="hover-pointer" @click="goSearch" color="#ff6700">搜索</n-input-group-label>
+          </n-input-group>
         </div>
         <!-- 通讯列表 -->
         <div class="over-auto w-100 user-list">
@@ -30,6 +37,21 @@
 </template>
 
 <script setup lang="ts">
+import { createDiscreteApi } from 'naive-ui';
+const { notification } = createDiscreteApi(['notification']);
+
+const searchVal = ref('');
+const goSearch = () => {
+  const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+  if (!emailPattern.test(searchVal.value)) {
+    notification['error']({
+      content: '请输入正确的邮箱格式',
+      duration: 2500,
+      keepAliveOnHover: true
+    });
+    return;
+  }
+};
 const newInfo = ref(false);
 onMounted(() => {
   document.getElementsByClassName('user-list')[0].addEventListener('contextmenu', function (e) {
@@ -44,23 +66,43 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+:deep(.n-input__input-el) {
+  color: $ft-color !important;
+}
+
+.n-input:not(.n-input--disabled).n-input--focus {
+  background-color: rgb(255 255 255 / 4%);
+}
+
+.n-input:hover {
+  box-shadow: unset !important;
+  border: unset !important;
+}
+
+.n-input {
+  border-radius: $px-6;
+  background-color: rgb(255 255 255 / 12%);
+}
+
 .user-main {
   width: calc(100% - 3rem - 0.375rem);
   color: $ft-color-tips;
 }
+
 .user-head {
   width: $px-48;
   height: $px-48;
   border-radius: 50%;
   background-color: rgb(255 255 255 / 12%);
 }
+
 .user-box {
-  border-bottom: 1px solid rgb(210 210 210 / 50%);
+  border-bottom: $px-1 solid rgb(210 210 210 / 50%);
 }
 
 .chat-main {
   background-color: rgb(255 255 255 / 12%);
-  box-shadow: 0 0 0 1.5px $ft-color-tips;
+  box-shadow: 0 0 0 $px-1-5 $ft-color-tips;
   height: $px-560;
   border-radius: $px-12;
 }
