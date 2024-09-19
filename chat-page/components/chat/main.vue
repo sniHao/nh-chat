@@ -33,6 +33,18 @@
       <!-- 聊天框 -->
       <div class="chat-body">12</div>
     </div>
+    <!-- 弹框 -->
+    <n-modal v-model:show="showModal">
+      <n-card style="width: 600px" :bordered="false" size="huge" role="dialog" aria-modal="true">
+        <div class="flex-center-center ft-20">搜索结果</div>
+        <div style="background-color: #ff6700">
+          132
+          132
+          132
+        </div>
+        <template #footer>尾部</template>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
@@ -40,9 +52,13 @@
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 
+// 搜索列表
+const showModal = ref(false);
+// 搜索
 const searchVal = ref('');
 const goSearch = () => {
   const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+  showModal.value = true;
   if (!emailPattern.test(searchVal.value)) {
     notification['error']({
       content: '请输入正确的邮箱格式',
@@ -66,6 +82,12 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.user-list:hover::-webkit-scrollbar {
+  width: $px-4;
+}
+.user-list::-webkit-scrollbar {
+  width: 0px;
+}
 :deep(.n-input__input-el) {
   color: $ft-color !important;
 }
