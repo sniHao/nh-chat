@@ -128,7 +128,71 @@
         </div>
       </div>
       <!-- 聊天框 -->
-      <div class="chat-body">12</div>
+      <div class="chat-body flex-down">
+        <div class="cb-head flex-center">
+          <div class="cb-head-controls"></div>
+          <div class="w-100 flex-center-center">碳水呀</div>
+          <div class="cb-head-controls flex-center-onely mr-4 hover-pointer">
+            <svg t="1726907868490" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1512" width="28" height="28">
+              <path
+                d="M341.333333 512a85.333333 85.333333 0 1 1-170.666666 0 85.333333 85.333333 0 0 1 170.666666 0z m256 0a85.333333 85.333333 0 1 1-170.666666 0 85.333333 85.333333 0 0 1 170.666666 0z m170.666667 85.333333a85.333333 85.333333 0 1 0 0-170.666666 85.333333 85.333333 0 0 0 0 170.666666z"
+                fill="rgb(210, 210, 210)"
+                p-id="1513"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="cb-body h-100">
+          <div></div>
+          <div></div>
+          <div class="cb-body-controls">x</div>
+        </div>
+        <div class="cb-input">
+          <!-- 表情包图片等等 -->
+          <div class="cb-input-controls flex-center">
+            <svg
+              t="1726909382588"
+              class="icon hover-pointer ml-8"
+              viewBox="0 0 1024 1024"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              p-id="2842"
+              width="28"
+              height="28">
+              <path
+                d="M512 992C247.3 992 32 776.7 32 512S247.3 32 512 32s480 215.3 480 480-215.3 480-480 480z m0-896C282.6 96 96 282.6 96 512s186.6 416 416 416 416-186.6 416-416S741.4 96 512 96z"
+                fill="rgb(210, 210, 210)"
+                p-id="2843"></path>
+              <path
+                d="M512 800c-78 0-151.1-30.7-205.7-86.5C253.2 659.4 224 587.8 224 512c0-17.7 14.3-32 32-32h512c17.7 0 32 14.3 32 32 0 75.8-29.2 147.4-82.3 201.5C663.1 769.3 590 800 512 800zM352 668.8c42.5 43.4 99.3 67.2 160 67.2s117.5-23.9 160-67.2c33.7-34.4 55-77.9 61.7-124.8H290.3c6.6 46.9 28 90.3 61.7 124.8zM368 416c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zM656 416c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48z"
+                fill="rgb(210, 210, 210)"
+                p-id="2844"></path>
+            </svg>
+            <svg
+              t="1726909302481"
+              class="icon hover-pointer ml-8"
+              viewBox="0 0 1024 1024"
+              version="1.1"
+              xmlns="http://www.w3.org/2000/svg"
+              p-id="1714"
+              width="28"
+              height="28">
+              <path d="M268.91 339.07m-87.37 0a87.37 87.37 0 1 0 174.74 0 87.37 87.37 0 1 0-174.74 0Z" fill="rgb(210, 210, 210)" p-id="1715"></path>
+              <path
+                d="M857.66 61.17H167.21C75.35 61.17 0.88 135.64 0.88 227.51v466.27a40.979 40.979 0 0 0 0 16.87v85.85c0 91.86 74.47 166.34 166.34 166.34h690.45c91.86 0 166.34-74.47 166.34-166.34V227.51c0-91.86-74.47-166.34-166.34-166.34z m-690.45 81.89h690.45c46.57 0 84.45 37.88 84.45 84.45v349.44l-107.07-106.2c-29.58-29.34-68.81-45.61-110.47-45.83-41.63-0.21-81.06 15.65-110.94 44.68L427.57 650.33l-104.36-66a157.9 157.9 0 0 0-83.53-24.47c-29.59-0.17-58.6 7.94-83.82 23.47l-73.1 45.01V227.51c0-46.57 37.88-84.45 84.45-84.45z m690.45 737.89H167.21c-46.57 0-84.45-37.88-84.45-84.45v-72l116.03-71.45c24.59-15.14 56.24-14.95 80.64 0.48l131.63 83.24c15.99 10.12 36.84 7.95 50.41-5.23l209.21-203.21c29.57-28.72 77.43-28.47 106.7 0.56l164.74 163.39V796.5c0 46.57-37.88 84.45-84.45 84.45z"
+                fill="rgb(210, 210, 210)"
+                p-id="1716"></path>
+            </svg>
+          </div>
+          <!-- 输入框 -->
+          <div class="cb-input-main">
+            <n-input v-model:value="value" type="textarea" placeholder="基本的 Textarea" />
+          </div>
+          <div class="cb-input-go flex-center-zy pd-zy-6 ft-color-tips">
+            <div>10/10</div>
+            <div>按Enter发送</div>
+          </div>
+        </div>
+      </div>
     </div>
     <!-- 弹框 -->
     <n-modal v-model:show="showModal">
@@ -260,6 +324,31 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+.cb-input {
+  height: $px-160;
+  border-top: $px-1 solid $ft-color-tips;
+  .cb-input-main {
+    height: calc(100% - $px-32 - $px-32);
+  }
+  .cb-input-go,
+  .cb-input-controls {
+    height: $px-32;
+    background-color: rgb(255 255 255 / 12%);
+  }
+}
+
+.cb-body {
+  height: calc(100% - $px-2 - $px-48 - $px-160);
+}
+
+.cb-head {
+  height: $px-48;
+  border-bottom: $px-1 solid $ft-color-tips;
+  .cb-head-controls {
+    width: $px-32;
+  }
+}
+
 .user-list:hover::-webkit-scrollbar {
   width: $px-4;
 }
