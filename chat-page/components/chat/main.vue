@@ -185,7 +185,11 @@
           </div>
           <!-- 输入框 -->
           <div class="cb-input-main">
-            <n-input v-model:value="value" type="textarea" placeholder="基本的 Textarea" />
+            <n-input
+              style="--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset"
+              v-model:value="sendVal"
+              type="textarea"
+              placeholder="说点啥..." />
           </div>
           <div class="cb-input-go flex-center-zy pd-zy-6 ft-color-tips">
             <div>10/10</div>
@@ -234,6 +238,9 @@
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
+
+// 私信
+const sendVal = ref('');
 
 // 搜索
 const showModal = ref(false);
@@ -329,11 +336,28 @@ onBeforeUnmount(() => {
   border-top: $px-1 solid $ft-color-tips;
   .cb-input-main {
     height: calc(100% - $px-32 - $px-32);
+    background-color: #2c3344;
+    .n-input {
+      height: 100%;
+      background-color: unset;
+    }
+    .n-input:not(.n-input--disabled).n-input--focus {
+      background-color: unset;
+    }
+    :deep(.n-input__textarea-el) {
+      color: $ft-color !important;
+    }
+    :deep(.n-input-wrapper) {
+      resize: unset;
+    }
+    :deep(.n-scrollbar-rail__scrollbar) {
+      --n-scrollbar-color: rgba(255, 103, 0, 0.5);
+      --n-scrollbar-color-hover: rgba(255, 103, 0);
+    }
   }
   .cb-input-go,
   .cb-input-controls {
     height: $px-32;
-    background-color: rgb(255 255 255 / 12%);
   }
 }
 
