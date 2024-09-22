@@ -192,7 +192,7 @@
               placeholder="说点啥..." />
           </div>
           <div class="cb-input-go flex-center-zy pd-zy-6 ft-color-tips">
-            <div>10/10</div>
+            <div>{{ inputCount.val }} / {{ inputCount.max }}</div>
             <div>按Enter发送</div>
           </div>
         </div>
@@ -241,6 +241,10 @@ const { notification } = createDiscreteApi(['notification']);
 
 // 私信
 const sendVal = ref('');
+const inputCount = reactive({
+  val: 0,
+  max: 950
+});
 
 // 搜索
 const showModal = ref(false);
