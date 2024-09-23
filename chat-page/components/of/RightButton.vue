@@ -28,6 +28,7 @@ const props = defineProps({
   height: 150px;
   border-radius: $px-4;
   box-shadow: 0 0 $px-2 $px-1 $ft-color-tips-2;
-  background-color: #8e5bb4;
+  background-color: rgb(142 91 180 / 80%);
+  backdrop-filter: blur(0.25rem);
 }
 </style>
