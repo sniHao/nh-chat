@@ -323,6 +323,11 @@
   display: flex;
 }
 
+.flex-right {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
 .flex-center {
   display: flex;
   align-items: center;

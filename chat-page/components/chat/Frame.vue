@@ -2,9 +2,9 @@
   <!-- 聊天框 -->
   <div class="chat-body flex-down">
     <template v-if="Object.keys(props.user).length === 0">
-        <div class="h-100 flex-center-center flex-down">
-            <div class="ft-color-tips mt-10 ft-16">选择好友，一起聊聊吧！</div>
-        </div>
+      <div class="h-100 flex-center-center flex-down">
+        <div class="ft-color-tips mt-10 ft-16">选择好友，一起聊聊吧！</div>
+      </div>
     </template>
     <template v-else>
       <OfLoader v-if="loding"></OfLoader>
@@ -16,10 +16,24 @@
             <OfSvg :width="28" :height="28" name="pointer"></OfSvg>
           </div>
         </div>
-        <div class="cb-body h-100">
-          <div></div>
-          <div></div>
-          <div class="cb-body-controls">x</div>
+        <div class="cb-body over-auto h-100">
+          <div class="cbb-box">
+            <!-- 时间 -->
+            <div class="flex-center-center ft-13 ft-color-tips mb-8">
+              <div class="cbb-tips">上午12：00</div>
+            </div>
+            <!-- 其他事件 -->
+            <div class="flex-center-center ft-13 ft-color-tips mb-8">
+              <div class="cbb-tips">对方撤回了一条消息</div>
+            </div>
+            <!-- 消息框 -->
+            <div class="cbb-main flex">
+              <div class="cbbm-box cbbm-box-left">1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+            </div>
+            <div class="cbb-main flex-right">
+              <div class="cbbm-box cbbm-box-right">12xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+            </div>
+          </div>
         </div>
         <div class="cb-input">
           <!-- 表情包图片等等 -->
@@ -57,20 +71,14 @@ const props = defineProps({
     default: {}
   }
 });
-// 选择用户做出改变
-watchEffect(() => {
-  if (Object.keys(props.user).length === 0) return;
-  eqChat();
-  console.log('userInfo', props.user, Object.keys(props.user).length);
-});
 
 // 接口请求数据
 const loding = ref(true);
 const eqChat = () => {
+  loding.value = true;
   setTimeout(() => {
     loding.value = false;
-    console.log(0.0);
-  }, 2000);
+  }, 1000);
 };
 
 // 私信
@@ -109,9 +117,74 @@ const sendInfoPre = () => {
 };
 
 onMounted(() => {});
+// 选择用户做出改变
+watchEffect(() => {
+  if (Object.keys(props.user).length === 0) return;
+  eqChat();
+  console.log('userInfo', props.user, Object.keys(props.user).length);
+});
 </script>
 
 <style lang="scss" scoped>
+.cbbm-box-left {
+  background-color: $ft-color-op-8;
+  margin-left: $px-12;
+}
+.cbbm-box-left::after {
+  content: '';
+  width: 0px;
+  height: 0px;
+  border: $px-10 solid;
+  border-left: $px-10 solid transparent;
+  border-right: $px-10 solid $ft-color-op-8;
+  border-bottom: $px-10 solid transparent;
+  border-top: $px-10 solid transparent;
+  position: absolute;
+  left: -$px-20;
+  top: $px-14;
+}
+.cbbm-box-right {
+  background-color: $ft-color-2-op-8;
+  margin-right: $px-12;
+}
+.cbbm-box-right::after {
+  content: '';
+  width: 0px;
+  height: 0px;
+  border: $px-10 solid;
+  border-left: $px-10 solid $ft-color-2-op-8;
+  border-right: $px-10 solid transparent;
+  border-bottom: $px-10 solid transparent;
+  border-top: $px-10 solid transparent;
+  position: absolute;
+  right: -$px-20;
+  top: $px-14;
+}
+.cbbm-box {
+  min-width: $px-38;
+  max-width: 50%;
+  min-height: $px-48;
+  padding: $px-12 $px-8;
+  box-sizing: border-box;
+  position: relative;
+  border-radius: $px-8;
+  word-wrap: break-word;
+}
+
+.cbb-main {
+  min-height: $px-48;
+  margin-bottom: $px-12;
+
+}
+.cbb-tips {
+  border-radius: $px-4;
+  background-color: #8fa2c366;
+  padding: $px-2 $px-6;
+  box-sizing: border-box;
+}
+.cbb-box {
+  padding: $px-8 $px-12;
+}
 .cb-input {
   height: $px-160;
   border-top: $px-1 solid $ft-color-tips;
@@ -144,6 +217,12 @@ onMounted(() => {});
 
 .cb-body {
   height: calc(100% - $px-2 - $px-48 - $px-160);
+}
+.cb-body:hover::-webkit-scrollbar {
+  width: $px-4;
+}
+.cb-body::-webkit-scrollbar {
+  width: 0px;
 }
 
 .cb-head {
