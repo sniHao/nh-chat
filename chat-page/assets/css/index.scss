@@ -52,3 +52,11 @@ body {
 .mt-nav {
   margin-top: $px-64;
 }
+
+
+.user-head {
+  width: $px-42;
+  height: $px-42;
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 12%);
+}

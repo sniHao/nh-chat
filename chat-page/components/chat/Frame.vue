@@ -7,56 +7,65 @@
       </div>
     </template>
     <template v-else>
-      <OfLoader v-if="loding"></OfLoader>
-      <template v-else>
-        <div class="cb-head flex-center">
-          <div class="cb-head-controls"></div>
-          <div class="w-100 flex-center-center">{{ user.name }}</div>
-          <div class="cb-head-controls flex-center-onely mr-4 hover-pointer">
-            <OfSvg :width="28" :height="28" name="pointer"></OfSvg>
-          </div>
+      <OfLoader class="loader-abs" v-if="loding"></OfLoader>
+      <OfLoader class="loader-abs" style="background-color: #2c334485" v-if="lodingNewMessage"></OfLoader>
+      <div class="cb-head flex-center">
+        <div class="cb-head-controls"></div>
+        <div class="w-100 flex-center-center">{{ user.name }}</div>
+        <div class="cb-head-controls flex-center-onely mr-4 hover-pointer">
+          <OfSvg :width="28" :height="28" name="pointer"></OfSvg>
         </div>
-        <div class="cb-body over-auto h-100">
-          <div class="cbb-box">
-            <!-- 时间 -->
-            <div class="flex-center-center ft-13 ft-color-tips mb-8">
-              <div class="cbb-tips">上午12：00</div>
-            </div>
-            <!-- 其他事件 -->
-            <div class="flex-center-center ft-13 ft-color-tips mb-8">
-              <div class="cbb-tips">对方撤回了一条消息</div>
-            </div>
-            <!-- 消息框 -->
-            <div class="cbb-main flex">
-              <div class="cbbm-box cbbm-box-left">1xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
-            </div>
-            <div class="cbb-main flex-right">
-              <div class="cbbm-box cbbm-box-right">12xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
-            </div>
+      </div>
+      <div class="cb-body over-auto h-100">
+        <div class="cbb-box" v-for="(item, index) in chatData" :key="index">
+          <!-- 时间 -->
+          <div class="flex-center-center ft-13 ft-color-tips mb-8">
+            <div class="cbb-tips">{{ item.time }}</div>
           </div>
+          <!-- 其他事件 -->
+          <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.messageType === 2">
+            <div class="cbb-tips">对方撤回了一条消息</div>
+          </div>
+          <!-- 消息框 -->
+          <template v-else>
+            <div class="cbb-main flex" v-if="item.id == 0">
+              <div class="user-head flex-center-center mr-4">N</div>
+              <div class="cbbm-box cbbm-box-left flex">
+                <span v-if="item.messageType !== 2 && item.messageType !== 8">{{ item.message }}</span>
+                <n-image v-else class="chat-image" src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg" />
+              </div>
+            </div>
+            <div class="cbb-main flex-right" v-else>
+              <div class="user-head flex-center-center ml-4">N</div>
+              <div class="cbbm-box cbbm-box-right flex">
+                <span v-if="item.messageType !== 3 && item.messageType !== 11">{{ item.message }}</span>
+                <n-image v-else class="chat-image" src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg" />
+              </div>
+            </div>
+          </template>
         </div>
-        <div class="cb-input">
-          <!-- 表情包图片等等 -->
-          <div class="cb-input-controls flex-center">
-            <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="emoji"></OfSvg>
-            <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></OfSvg>
-          </div>
-          <!-- 输入框 -->
-          <div class="cb-input-main">
-            <n-input
-              style="--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset"
-              v-model:value="sendVal"
-              type="textarea"
-              @keydown.enter.native="handleKeyUp"
-              @input="valChange"
-              placeholder="说点啥..." />
-          </div>
-          <div class="cb-input-go flex-center-zy pd-zy-6 ft-color-tips">
-            <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
-            <div class="hover-pointer" @click="sendInfo">按Enter键发送</div>
-          </div>
+      </div>
+      <div class="cb-input">
+        <!-- 表情包图片等等 -->
+        <div class="cb-input-controls flex-center">
+          <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="emoji"></OfSvg>
+          <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></OfSvg>
         </div>
-      </template>
+        <!-- 输入框 -->
+        <div class="cb-input-main">
+          <n-input
+            style="--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset"
+            v-model:value="sendVal"
+            type="textarea"
+            @keydown.enter.native="handleKeyUp"
+            @input="valChange"
+            placeholder="说点啥..." />
+        </div>
+        <div class="cb-input-go flex-center-zy pd-zy-6 ft-color-tips">
+          <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
+          <div class="hover-pointer" @click="sendInfo">按Enter键发送</div>
+        </div>
+      </div>
     </template>
   </div>
 </template>
@@ -74,11 +83,23 @@ const props = defineProps({
 
 // 接口请求数据
 const loding = ref(true);
-const eqChat = () => {
-  loding.value = true;
+const chatData = ref([] as any);
+const eqChat = (uid: number) => {
+  for (let i = 0; i < uid + 2; i++) {
+    chatData.value.push({
+      id: i % 2,
+      messageType: i,
+      messageState: i,
+      message: '嘻嘻嘻嘻嘻嘻🤖' + i,
+      time: '12:00',
+      timeState: i % 2
+    });
+  }
   setTimeout(() => {
     loding.value = false;
-  }, 1000);
+    scrollToButtom();
+    listenerScrollToTop(true);
+  }, 150);
 };
 
 // 私信
@@ -100,7 +121,18 @@ const valChange = () => {
 const sendInfo = () => {
   if (!sendInfoPre()) return;
   console.log('发送？', sendVal.value);
+  chatData.value.push({
+    id: 999,
+    messageType: 0,
+    messageState: 0,
+    message: sendVal.value,
+    time: '12:00',
+    timeState: 2
+  });
   sendVal.value = '';
+  setTimeout(() => {
+    scrollToButtom();
+  }, 10);
 };
 // 发送消息前置处理
 const sendInfoPre = () => {
@@ -116,16 +148,85 @@ const sendInfoPre = () => {
   return true;
 };
 
+// 滚动条居底
+const scrollToButtom = () => {
+  let scrollDom = document.getElementsByClassName('cb-body')[0];
+  scrollDom.scrollTop = scrollDom.scrollHeight;
+};
+
+// 监听上拉拉取消息
+const hasNewMessage = ref(true);
+const lodingNewMessage = ref(false);
+
+const scrollToTop = () => {
+  let scrollDom = document.getElementsByClassName('cb-body')[0];
+  if (scrollDom.scrollTop < 30 && hasNewMessage.value && !lodingNewMessage.value) {
+    lodingNewMessage.value = true;
+    setTimeout(() => {
+      console.log('请求新数据');
+      chatData.value = [
+        {
+          id: 999,
+          messageType: 0,
+          messageState: 0,
+          message: '信心写信心写',
+          time: '12:00',
+          timeState: 2
+        },
+        ...chatData.value
+      ];
+      hasNewMessage.value = false;
+      lodingNewMessage.value = false;
+    }, 1000);
+  }
+};
+// 监听滚动条
+const listenerScrollToTop = (state: boolean) => {
+  let scrollDom = document.getElementsByClassName('cb-body')[0];
+  const throttledScrollToTop = throttle(scrollToTop, 50);
+  if (state) scrollDom.addEventListener('scroll', throttledScrollToTop);
+  else scrollDom.removeEventListener('scroll', throttledScrollToTop);
+};
+
+// 初始化数据
+const initData = () => {
+  chatData.value = [];
+  loding.value = true;
+  hasNewMessage.value = true;
+};
+
 onMounted(() => {});
 // 选择用户做出改变
-watchEffect(() => {
-  if (Object.keys(props.user).length === 0) return;
-  eqChat();
-  console.log('userInfo', props.user, Object.keys(props.user).length);
+watch(
+  () => props.user,
+  () => {
+    initData();
+    eqChat(props.user.id);
+    console.log('userInfo', props.user, Object.keys(props.user).length);
+  }
+);
+onBeforeUnmount(() => {
+  listenerScrollToTop(false);
 });
 </script>
 
 <style lang="scss" scoped>
+.loader-abs {
+  position: absolute;
+  background-color: #2c3344;
+  z-index: 6;
+  top: 0;
+  right: 0;
+  left: 0;
+  border-radius: $px-12;
+}
+:deep(.chat-image img) {
+  max-width: 100%;
+  max-height: $px-320;
+}
+.user-head {
+  border-radius: $px-6;
+}
 .cbbm-box-left {
   background-color: $ft-color-op-8;
   margin-left: $px-12;
@@ -141,7 +242,7 @@ watchEffect(() => {
   border-top: $px-10 solid transparent;
   position: absolute;
   left: -$px-20;
-  top: $px-14;
+  top: $px-11;
 }
 .cbbm-box-right {
   background-color: $ft-color-2-op-8;
@@ -158,23 +259,24 @@ watchEffect(() => {
   border-top: $px-10 solid transparent;
   position: absolute;
   right: -$px-20;
-  top: $px-14;
+  top: $px-11;
 }
 .cbbm-box {
   min-width: $px-38;
-  max-width: 50%;
-  min-height: $px-48;
-  padding: $px-12 $px-8;
+  max-width: calc(50% - $px-48);
+  min-height: $px-42;
+  padding: $px-9 $px-8;
   box-sizing: border-box;
   position: relative;
   border-radius: $px-8;
   word-wrap: break-word;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .cbb-main {
-  min-height: $px-48;
+  min-height: $px-42;
   margin-bottom: $px-12;
-
 }
 .cbb-tips {
   border-radius: $px-4;
@@ -235,5 +337,6 @@ watchEffect(() => {
 
 .chat-body {
   width: calc(100% - $px-280 - $px-1);
+  position: relative;
 }
 </style>

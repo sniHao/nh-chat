@@ -56,7 +56,7 @@
         </template>
         <div class="flex-center-zy" v-else>
           <div class="flex-center">
-            <div class="user-head flex-center-center" style="background-color: #ff6700">N</div>
+            <div class="user-head flex-center-center">N</div>
             <div class="ft-16 ft-b ml-10">昵称</div>
           </div>
           <n-button round strong type="primary" color="#9300ff">发起聊天</n-button>
@@ -207,13 +207,6 @@ onBeforeUnmount(() => {
   color: $ft-color-tips;
 }
 
-.user-head {
-  width: $px-48;
-  height: $px-48;
-  border-radius: 50%;
-  background-color: rgb(255 255 255 / 12%);
-}
-
 .user-box {
   border-bottom: $px-1 solid rgb(210 210 210 / 50%);
 }
@@ -224,7 +217,7 @@ onBeforeUnmount(() => {
 .chat-main {
   background-color: rgb(255 255 255 / 12%);
   box-shadow: 0 0 0 $px-1-5 $ft-color-tips;
-  height: $px-560;
+  height: $px-650;
   border-radius: $px-12;
 }
 
