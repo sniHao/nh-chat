@@ -132,7 +132,7 @@ const sendInfo = () => {
   sendVal.value = '';
   setTimeout(() => {
     scrollToButtom();
-  }, 10);
+  }, 100);
 };
 // 发送消息前置处理
 const sendInfoPre = () => {
@@ -228,8 +228,8 @@ onBeforeUnmount(() => {
   border-radius: $px-6;
 }
 .cbbm-box-left {
-  background-color: $ft-color-op-8;
-  margin-left: $px-12;
+  background-color: $ft-color-hui-1;
+  margin-left: $px-10;
 }
 .cbbm-box-left::after {
   content: '';
@@ -237,28 +237,28 @@ onBeforeUnmount(() => {
   height: 0px;
   border: $px-10 solid;
   border-left: $px-10 solid transparent;
-  border-right: $px-10 solid $ft-color-op-8;
+  border-right: $px-10 solid $ft-color-hui-1;
   border-bottom: $px-10 solid transparent;
   border-top: $px-10 solid transparent;
   position: absolute;
-  left: -$px-20;
+  left: -$px-16;
   top: $px-11;
 }
 .cbbm-box-right {
-  background-color: $ft-color-2-op-8;
-  margin-right: $px-12;
+  background-color: $ft-color-2-hui-1;
+  margin-right: $px-10;
 }
 .cbbm-box-right::after {
   content: '';
   width: 0px;
   height: 0px;
   border: $px-10 solid;
-  border-left: $px-10 solid $ft-color-2-op-8;
+  border-left: $px-10 solid $ft-color-2-hui-1;
   border-right: $px-10 solid transparent;
   border-bottom: $px-10 solid transparent;
   border-top: $px-10 solid transparent;
   position: absolute;
-  right: -$px-20;
+  right: -$px-16;
   top: $px-11;
 }
 .cbbm-box {
@@ -272,6 +272,7 @@ onBeforeUnmount(() => {
   word-wrap: break-word;
   word-break: break-all;
   overflow-wrap: break-word;
+  white-space:pre-wrap;
 }
 
 .cbb-main {
