@@ -48,12 +48,18 @@
       <div class="cb-input">
         <!-- 表情包图片等等 -->
         <div class="cb-input-controls flex-center">
-          <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="emoji"></OfSvg>
+          <n-popover trigger="click" raw @update:show="handleUpdateShow">
+            <template #trigger>
+              <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="emoji"></OfSvg>
+            </template>
+            <OfEmoJi @choose="chooseEmoji" />
+          </n-popover>
           <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></OfSvg>
         </div>
         <!-- 输入框 -->
         <div class="cb-input-main">
           <n-input
+            ref="inputInstRef"
             style="--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset"
             v-model:value="sendVal"
             type="textarea"
@@ -81,6 +87,25 @@ const props = defineProps({
   }
 });
 
+// 展开关闭表情
+const handleUpdateShow = (state: boolean) => {
+  if (state) inputInstRef.value?.focus();
+};
+
+// 表情回调
+const inputInstRef = ref<any>('');
+const chooseEmoji = (val: string) => {
+  const inputElement = inputInstRef.value?.$el.querySelector('textarea');
+  if (inputElement) {
+    const nowPonit = inputElement.selectionStart + val.length;
+    sendVal.value = sendVal.value.slice(0, inputElement.selectionStart) + val + sendVal.value.slice(inputElement.selectionStart);
+    setTimeout(() => {
+      inputElement.focus();
+      inputElement.setSelectionRange(nowPonit, nowPonit);
+    });
+  } else sendVal.value += val;
+};
+
 // 接口请求数据
 const loding = ref(true);
 const chatData = ref([] as any);
@@ -104,7 +129,7 @@ const eqChat = (uid: number) => {
 
 // 私信
 const sendVal = ref('');
-const inputMaxNumber = ref(950);
+const inputMaxNumber = ref(2000);
 // Enter事件
 const handleKeyUp = (e: KeyboardEvent) => {
   if (e.key !== 'Enter') return;
@@ -272,7 +297,7 @@ onBeforeUnmount(() => {
   word-wrap: break-word;
   word-break: break-all;
   overflow-wrap: break-word;
-  white-space:pre-wrap;
+  white-space: pre-wrap;
 }
 
 .cbb-main {
