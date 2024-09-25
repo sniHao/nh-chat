@@ -31,16 +31,24 @@
             <div class="cbb-main flex" v-if="item.id == 0">
               <div class="user-head flex-center-center mr-4">N</div>
               <div class="cbbm-box cbbm-box-left flex">
-                <span v-if="item.messageType !== 2 && item.messageType !== 8">{{ item.message }}</span>
-                <n-image v-else class="chat-image" src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg" />
+                <span v-if="item.messageType === 0">{{ item.message }}</span>
+                <n-image v-else class="chat-image" :src="item.message" />
               </div>
+              <!-- <div class="flex-end ml-6">
+                <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
+                <OfSvg class="message-loading" name="message-loading" :width="24" :height="24"></OfSvg>
+              </div> -->
             </div>
             <div class="cbb-main flex-right" v-else>
               <div class="user-head flex-center-center ml-4">N</div>
               <div class="cbbm-box cbbm-box-right flex">
-                <span v-if="item.messageType !== 3 && item.messageType !== 11">{{ item.message }}</span>
-                <n-image v-else class="chat-image" src="https://07akioni.oss-cn-beijing.aliyuncs.com/07akioni.jpeg" />
+                <span v-if="item.messageType === 0">{{ item.message }}</span>
+                <n-image v-else class="chat-image" :src="item.message" />
               </div>
+              <!-- <div class="flex-end mr-6">
+                <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
+                <OfSvg class="message-loading" name="message-loading" :width="24" :height="24"></OfSvg>
+              </div> -->
             </div>
           </template>
         </div>
@@ -54,7 +62,9 @@
             </template>
             <OfEmoJi @choose="chooseEmoji" />
           </n-popover>
-          <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></OfSvg>
+          <n-upload :show-file-list="false" @before-upload="beforeUpload">
+            <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></OfSvg>
+          </n-upload>
         </div>
         <!-- 输入框 -->
         <div class="cb-input-main">
@@ -79,7 +89,7 @@
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
-
+import type { UploadFileInfo } from 'naive-ui';
 const props = defineProps({
   user: {
     type: Object,
@@ -106,6 +116,57 @@ const chooseEmoji = (val: string) => {
   } else sendVal.value += val;
 };
 
+// 图片前置校验
+const upLoadCheck = async (file: File | null | undefined) => {
+  if (!file) {
+    notification['error']({
+      content: '文件异常👾',
+      duration: 2500,
+      keepAliveOnHover: true
+    });
+    return false;
+  }
+  if ((file?.size ?? 0) / 1024 / 1024 > 4) {
+    notification['error']({
+      content: '图片太大了吧，大小不能超过4M🤯',
+      duration: 2500,
+      keepAliveOnHover: true
+    });
+    return false;
+  }
+  if (file?.type !== 'image/png' && file?.type !== 'image/jpeg') {
+    notification['error']({
+      content: '只能发送png或jpeg格式的图片文件',
+      duration: 2500,
+      keepAliveOnHover: true
+    });
+    return false;
+  }
+  return true;
+};
+// 图片
+const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }) => {
+  const file = data.file.file;
+  const result = upLoadCheck(file);
+  if (!result) return false;
+  const reader = new FileReader();
+  reader.onload = function (e: any) {
+    chatData.value.push({
+      id: 1,
+      messageType: 1,
+      messageState: 1,
+      message: e.target.result,
+      time: '12:00',
+      timeState: 0
+    });
+  };
+  reader.readAsDataURL(file as any);
+  setTimeout(() => {
+    scrollToButtom();
+  }, 100);
+  return true;
+};
+
 // 接口请求数据
 const loding = ref(true);
 const chatData = ref([] as any);
@@ -113,7 +174,7 @@ const eqChat = (uid: number) => {
   for (let i = 0; i < uid + 2; i++) {
     chatData.value.push({
       id: i % 2,
-      messageType: i,
+      messageType: 0,
       messageState: i,
       message: '嘻嘻嘻嘻嘻嘻🤖' + i,
       time: '12:00',
@@ -208,6 +269,7 @@ const scrollToTop = () => {
 // 监听滚动条
 const listenerScrollToTop = (state: boolean) => {
   let scrollDom = document.getElementsByClassName('cb-body')[0];
+  if (!scrollDom) return;
   const throttledScrollToTop = throttle(scrollToTop, 50);
   if (state) scrollDom.addEventListener('scroll', throttledScrollToTop);
   else scrollDom.removeEventListener('scroll', throttledScrollToTop);
@@ -236,6 +298,18 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+.message-loading {
+  animation: circle 1s linear infinite;
+}
+:deep(.n-upload) {
+  width: unset;
+}
+:deep(.n-upload-trigger) {
+  display: flex;
+}
+:deep(.n-upload-trigger + .n-upload-file-list) {
+  margin-top: unset;
+}
 .loader-abs {
   position: absolute;
   background-color: #2c3344;

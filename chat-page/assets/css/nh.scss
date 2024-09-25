@@ -380,6 +380,11 @@
   justify-content: space-between;
 }
 
+.flex-end {
+  display: flex;
+  align-items: flex-end;
+}
+
 .flex-down-center {
   display: flex;
   align-items: center;

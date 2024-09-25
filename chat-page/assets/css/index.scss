@@ -52,10 +52,18 @@ body {
   margin-top: $px-64;
 }
 
-
 .user-head {
   width: $px-42;
   height: $px-42;
   border-radius: 50%;
   background-color: rgb(255 255 255 / 12%);
+}
+
+@keyframes circle {
+  0% {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
 }

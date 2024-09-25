@@ -30,7 +30,9 @@
             :key="index"
             @click="showChat(item)">
             <div class="user-box pd-sx-6 flex-center-zy">
-              <div class="user-head flex-center-center">{{ item.name }}</div>
+              <n-badge :value="item.notRead" :max="99" :offset="[-5, 5]">
+                <div class="user-head flex-center-center">{{ item.name }}</div>
+              </n-badge>
               <div class="user-main">
                 <div class="flex-center-zy">
                   <div class="ft-color-white ft-16 ft-b">{{ item.name }}</div>
@@ -79,6 +81,7 @@ const showChat = (user: any) => {
   if (nowUser.value?.id === user.id) return;
   checkId.value = user.id;
   nowUser.value = user;
+  user.notRead = 0;
 };
 
 // 搜索
@@ -107,7 +110,8 @@ const eqUserList = () => {
   for (let i = 0; i < 20; i++) {
     userList.value.push({
       id: i,
-      name: 'N'
+      name: 'N',
+      notRead: 40
     });
   }
   nextTick(() => {
