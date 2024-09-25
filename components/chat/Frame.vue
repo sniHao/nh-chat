@@ -117,7 +117,7 @@ const chooseEmoji = (val: string) => {
 };
 
 // 图片前置校验
-const upLoadCheck = async (file: File | null | undefined) => {
+const upLoadCheck = (file: File | null | undefined) => {
   if (!file) {
     notification['error']({
       content: '文件异常👾',
