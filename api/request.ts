@@ -6,7 +6,7 @@ const { loadingBar } = createDiscreteApi(['loadingBar']);
 
 //1. 创建axios对象
 const requests = axios.create({
-  baseURL: 'http://localhost:8089',
+  baseURL: 'http://localhost:8087',
   //   baseURL: 'https://www.notes-something.fun/notes/',
   timeout: 20000
 });

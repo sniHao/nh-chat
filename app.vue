@@ -8,13 +8,13 @@
 </template>
 
 <script setup lang="ts">
-import { useHomeStore } from './store/index';
 import WebSocketService from './utils/WebSocketService';
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 const router = useRouter();
+const store = useStore();
 // ws状态全局
-const ws = new WebSocketService('ws://127.0.0.1:8087/socket.chat/' + useHomeStore().token);
+const ws = new WebSocketService('ws://127.0.0.1:8087/socket.chat/' + store.token);
 provide('webSocketService', ws);
 
 // 获取当前聊天的uid

@@ -73,6 +73,8 @@
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
+const { dialog } = createDiscreteApi(['dialog']);
+const store = useStore();
 
 // 选择用户
 const checkId = ref(-1);
@@ -154,9 +156,24 @@ const closeRightBtnCom = (state: boolean) => {
   state ? dom.addEventListener('click', closeRightBtn) : dom.removeEventListener('click', closeRightBtn);
 };
 
+// 提示
+const welcome = () => {
+  if (store.not_tips == 'false')
+    dialog.warning({
+      title: 'Hi~👋',
+      content: '您当前为体验模式，数据不会保留。建议您登录后与好友开启实时聊天哦🎉',
+      positiveText: '别提醒我了',
+      onPositiveClick: () => {
+        store.stopTips();
+      },
+      negativeText: '知道啦'
+    });
+};
+
 // 来新消息了
 const newInfo = ref(false);
 onMounted(() => {
+  welcome();
   newInfo.value = true;
   setTimeout(() => {
     newInfo.value = false;

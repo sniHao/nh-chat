@@ -5,7 +5,7 @@
         <div class="flex-down w-min-360">
           <span class="ft-56 ft-b title-nh">nh-chat</span>
           <span class="ft-48 ft-b ft-color-tips-4">完整的源代码</span>
-          <span class="ft-48 ft-b ft-color-tips-4">清晰的使用文档</span>
+          <span class="ft-48 ft-b ft-color-tips-4">清晰的说明文档</span>
           <span class="ft-26 ft-color-tips-3">好用、不夸张的聊天框架🥰</span>
           <div class="mt-16">
             <n-button round strong type="primary" color="#ff6700" @click="goTry">在线体验</n-button>
