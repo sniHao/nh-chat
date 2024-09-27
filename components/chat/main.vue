@@ -31,14 +31,25 @@
             @click="showChat(item)">
             <div class="user-box pd-sx-6 flex-center-zy">
               <n-badge :value="item.notRead" :max="99" :offset="[-5, 5]">
-                <div class="user-head flex-center-center">{{ item.name }}</div>
+                <div class="user-head flex-center-center">
+                  <template v-if="item.photo.length > 5">
+                    <img :src="item.photo" />
+                  </template>
+                  <template v-else>
+                    {{ item.photo }}
+                  </template>
+                </div>
               </n-badge>
               <div class="user-main">
                 <div class="flex-center-zy">
                   <div class="ft-color-white ft-16 ft-b">{{ item.name }}</div>
-                  <div class="ft-13">7-5</div>
+                  <div class="ft-13">
+                    {{ reckonTime(item.lastMessageDate) }}
+                  </div>
                 </div>
-                <div class="ft-13 ft-over">最后聊天内容最后聊天内容最后聊天内容最后聊天内容</div>
+                <div class="ft-13 ft-over">
+                  {{ item.lastMessage }}
+                </div>
               </div>
             </div>
           </div>
@@ -72,6 +83,7 @@
 
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
+import { eqRelation } from '@/api/index';
 const { notification } = createDiscreteApi(['notification']);
 const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
@@ -107,19 +119,33 @@ const goSearch = () => {
 };
 
 // 查询用户通讯录
-const userList = ref([] as any);
+const userList = ref([] as Relation[]);
 const eqUserList = () => {
-  for (let i = 0; i < 20; i++) {
-    userList.value.push({
-      id: i,
-      name: 'N',
-      notRead: 40
-    });
-  }
+  eqRelation().then((res: Result): void => {
+    if (res.code === 403) {
+      welcome();
+      userList.value = [
+        {
+          id: 1,
+          uid: 1,
+          relationUid: 2,
+          lastMessage: '欢迎使用nh-caht',
+          notRead: 1,
+          top: 1,
+          lastMessageDate: getTimeFormat(new Date()),
+          name: '体验官',
+          photo: '体'
+        }
+      ];
+      return;
+    }
+    userList.value = res.data;
+  });
   nextTick(() => {
     addListener();
   });
 };
+
 // 创建监听
 const userListDom = ref([] as any);
 const addListener = () => {
@@ -128,6 +154,7 @@ const addListener = () => {
     item.addEventListener('contextmenu', (e: MouseEvent) => listenerUser(e, index));
   });
 };
+
 // 监听列表右键
 const rightBtnLeft = ref(0);
 const rightBtnTop = ref(0);
@@ -140,16 +167,19 @@ const listenerUser = (e: MouseEvent, index: number) => {
   rightBtnLeft.value = e.x;
   rightBtnTop.value = e.y;
 };
+
 // 销毁监听
 const clearListener = () => {
   userListDom.value.forEach((item: any, index: number) => {
     item.removeEventListener('contextmenu', (e: MouseEvent) => listenerUser(e, index));
   });
 };
+
 // 关闭右键
 const closeRightBtn = () => {
   showRightBtn.value = false;
 };
+
 // 关闭右键公共方法
 const closeRightBtnCom = (state: boolean) => {
   const dom = document.getElementsByClassName('chat-main')[0];
@@ -173,7 +203,6 @@ const welcome = () => {
 // 来新消息了
 const newInfo = ref(false);
 onMounted(() => {
-  welcome();
   newInfo.value = true;
   setTimeout(() => {
     newInfo.value = false;

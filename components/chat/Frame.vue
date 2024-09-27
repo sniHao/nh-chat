@@ -90,7 +90,7 @@
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 import type { UploadFileInfo } from 'naive-ui';
-import WebSocketService from '../../utils/WebSocketService';
+import WebSocketService from '@/utils/WebSocketService';
 const webSocketService = inject<WebSocketService>('webSocketService');
 const props = defineProps({
   user: {
