@@ -90,6 +90,8 @@
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 import type { UploadFileInfo } from 'naive-ui';
+import WebSocketService from '../../utils/WebSocketService';
+const webSocketService = inject<WebSocketService>('webSocketService');
 const props = defineProps({
   user: {
     type: Object,
@@ -282,13 +284,18 @@ const initData = () => {
   hasNewMessage.value = true;
 };
 
-onMounted(() => {});
+onMounted(() => {
+  console.log(webSocketService, '===');
+});
+
 // 选择用户做出改变
+const nowChatUid = inject<(uid: number) => void>('getNowChatUid');
 watch(
   () => props.user,
   () => {
     initData();
     eqChat(props.user.id);
+    if (nowChatUid) nowChatUid(props.user.id);
     console.log('userInfo', props.user, Object.keys(props.user).length);
   }
 );

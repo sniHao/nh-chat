@@ -31,7 +31,7 @@ const goHome = () => {
 const goGithub = () => {
   window.open('https://www.baidu.com', '_blank');
 };
-// 演示
+// 说明文档
 const goDocs = () => {
   router.push('/docs');
 };
