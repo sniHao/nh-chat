@@ -121,27 +121,15 @@ const chooseEmoji = (val: string) => {
 // 图片前置校验
 const upLoadCheck = (file: File | null | undefined) => {
   if (!file) {
-    notification['error']({
-      content: '文件异常👾',
-      duration: 2500,
-      keepAliveOnHover: true
-    });
+    tips('error', '文件异常👾');
     return false;
   }
   if ((file?.size ?? 0) / 1024 / 1024 > 4) {
-    notification['error']({
-      content: '图片太大了吧，大小不能超过4M🤯',
-      duration: 2500,
-      keepAliveOnHover: true
-    });
+    tips('error', '图片太大了吧，大小不能超过4M🤯');
     return false;
   }
   if (file?.type !== 'image/png' && file?.type !== 'image/jpeg') {
-    notification['error']({
-      content: '只能发送png或jpeg格式的图片文件',
-      duration: 2500,
-      keepAliveOnHover: true
-    });
+    tips('error', '只能发送png或jpeg格式的图片文件');
     return false;
   }
   return true;

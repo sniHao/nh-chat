@@ -31,7 +31,7 @@
             @click="showChat(item)">
             <div class="user-box pd-sx-6 flex-center-zy">
               <n-badge :value="item.notRead" :max="99" :offset="[-5, 5]">
-                <div class="user-head flex-center-center">
+                <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)">
                   <template v-if="item.photo.length > 5">
                     <img :src="item.photo" />
                   </template>
@@ -61,7 +61,7 @@
     <!-- 弹框 -->
     <n-modal v-model:show="showModal">
       <n-card style="width: 600px" :bordered="false" size="huge" role="dialog" aria-modal="true">
-        <template v-if="Object.keys(hasUser).length === 0">
+        <template v-if="!hasUser">
           <div class="flex-down-center">
             <OfSvg :width="64" :height="64" name="no-user" viewBox="0 0 1139 1024"></OfSvg>
             <span class="ft-16 ft-color-tips mt-12">未找到该用户</span>
@@ -69,10 +69,10 @@
         </template>
         <div class="flex-center-zy" v-else>
           <div class="flex-center">
-            <div class="user-head flex-center-center">N</div>
-            <div class="ft-16 ft-b ml-10">昵称</div>
+            <div class="user-head flex-center-center" :style="'background-color:' + tranColor(hasUser.photo)">{{ hasUser.photo }}</div>
+            <div class="ft-16 ft-b ml-10">{{ hasUser.name }}</div>
           </div>
-          <n-button round strong type="primary" color="#9300ff">发起聊天</n-button>
+          <n-button round strong type="primary" color="#9300ff" @click="goChat(hasUser.uid)">发起聊天</n-button>
         </div>
       </n-card>
     </n-modal>
@@ -83,10 +83,15 @@
 
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
-import { eqRelation } from '@/api/index';
-const { notification } = createDiscreteApi(['notification']);
+import { eqRelation, eqUserMail } from '@/api/index';
 const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
+
+// 发起聊天
+const goChat = (uid: number) => {
+  console.log('前往uid' + uid);
+  showModal.value = false;
+};
 
 // 选择用户
 const checkId = ref(-1);
@@ -101,21 +106,17 @@ const showChat = (user: any) => {
 // 搜索
 const showModal = ref(false);
 const searchVal = ref('');
-const hasUser = ref({});
+const hasUser = ref<any>();
 const goSearch = () => {
   const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
   hasUser.value = {};
-  if (!emailPattern.test(searchVal.value)) {
-    notification['error']({
-      content: '请输入正确的邮箱格式',
-      duration: 2500,
-      keepAliveOnHover: true
-    });
-    return;
-  }
+  if (!emailPattern.test(searchVal.value)) return tips('error', '请输入正确的邮箱格式');
   // 发送接口查询用户
-  showModal.value = true;
-  hasUser.value = { name: 'N' };
+  eqUserMail(searchVal.value).then((res) => {
+    if (res.code !== 200) return tips('error', res.msg);
+    hasUser.value = res.data;
+    showModal.value = true;
+  });
 };
 
 // 查询用户通讯录
@@ -133,7 +134,7 @@ const eqUserList = () => {
           notRead: 1,
           top: 1,
           lastMessageDate: getTimeFormat(new Date()),
-          name: '体验官',
+          name: '体验官小H',
           photo: '体'
         }
       ];
