@@ -15,6 +15,9 @@
           <OfSvg :width="28" :height="28" viewBox="0 0 512 512" name="github"></OfSvg>
           <span class="ml-4 ft-color-tips ft-b">{{ githubCount }}</span>
         </div>
+        <div class="flex-center-center pd-6 hover-btn" @click="goLogin">
+          <span class="ft-color-tips ft-b">登录 | 注册</span>
+        </div>
       </div>
     </div>
   </div>
@@ -33,6 +36,10 @@ const goGithub = () => {
 };
 // 说明文档
 const goDocs = () => {
+  router.push('/docs');
+};
+// 说明文档
+const goLogin = () => {
   router.push('/docs');
 };
 

@@ -4,6 +4,7 @@
     <div class="over-auto main-body">
       <NuxtPage />
     </div>
+    <LoginMain></LoginMain>
   </div>
 </template>
 
