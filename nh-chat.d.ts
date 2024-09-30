@@ -16,6 +16,16 @@ declare global {
     name: string;
     photo: string;
   }
+  interface message {
+    id: number;
+    sendUid: number;
+    relationUid: number;
+    type: number;
+    sendState: number;
+    receiveState: number;
+    date: Date;
+    message: string;
+  }
 }
 
 import { AxiosRequestConfig } from 'axios';

@@ -19,8 +19,8 @@
       <div class="cb-body over-auto h-100">
         <div class="cbb-box" v-for="(item, index) in chatData" :key="index">
           <!-- 时间 -->
-          <div class="flex-center-center ft-13 ft-color-tips mb-8">
-            <div class="cbb-tips">{{ item.time }}</div>
+          <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.tab">
+            <div class="cbb-tips">{{ cutChatTime(getTimeFormat(item.date)) }}</div>
           </div>
           <!-- 其他事件 -->
           <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.messageType === 2">
@@ -29,7 +29,7 @@
           <!-- 消息框 -->
           <template v-else>
             <div class="cbb-main flex" v-if="item.id == 0">
-              <div class="user-head flex-center-center mr-4">N</div>
+              <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor('啊')">啊</div>
               <div class="cbbm-box cbbm-box-left flex">
                 <span v-if="item.messageType === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
@@ -40,7 +40,7 @@
               </div> -->
             </div>
             <div class="cbb-main flex-right" v-else>
-              <div class="user-head flex-center-center ml-4">N</div>
+              <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor('哈')">哈</div>
               <div class="cbbm-box cbbm-box-right flex">
                 <span v-if="item.messageType === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
@@ -62,7 +62,7 @@
             </template>
             <OfEmoJi @choose="chooseEmoji" />
           </n-popover>
-          <n-upload :show-file-list="false" @before-upload="beforeUpload">
+          <n-upload :show-file-list="false" @before-upload="beforeUpload" accept=".png,.jpeg,.jpg">
             <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></OfSvg>
           </n-upload>
         </div>
@@ -98,6 +98,25 @@ const props = defineProps({
     default: {}
   }
 });
+
+// 消息与上一条消息时间标
+const chatTabOne = (data: message) => {
+  if (chatData.value.length === 0) data[i].tab = true;
+  else data.tab = countTimeDiff(getTimeFormat(data.date), getTimeFormat(chatData.value[chatData.value.length - 1].date), 60) >= 10;
+  return data;
+};
+
+// 消息列表是否需要时间标
+const chatTab = (data: [message]) => {
+  for (let i = data.length - 1; i >= 0; i--) {
+    if (i === 0) {
+      data[i].tab = true;
+      break;
+    }
+    data[i].tab = countTimeDiff(getTimeFormat(data[i].date), getTimeFormat(data[i - 1].date), 60) >= 10;
+  }
+  return data;
+};
 
 // 展开关闭表情
 const handleUpdateShow = (state: boolean) => {
@@ -146,7 +165,7 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
       messageType: 1,
       messageState: 1,
       message: e.target.result,
-      time: '12:00',
+      time: new Date(),
       timeState: 0
     });
   };
@@ -161,16 +180,18 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
 const loding = ref(true);
 const chatData = ref([] as any);
 const eqChat = (uid: number) => {
+  let data = [];
   for (let i = 0; i < uid + 2; i++) {
-    chatData.value.push({
+    data.push({
       id: i % 2,
       messageType: 0,
       messageState: i,
       message: '嘻嘻嘻嘻嘻嘻🤖' + i,
-      time: '12:00',
+      date: new Date(new Date().getTime() + 1000 * 60 * 11 * i),
       timeState: i % 2
     });
   }
+  chatData.value = chatTab(data);
   setTimeout(() => {
     loding.value = false;
     scrollToButtom();
@@ -197,14 +218,16 @@ const valChange = () => {
 const sendInfo = () => {
   if (!sendInfoPre()) return;
   console.log('发送？', sendVal.value);
-  chatData.value.push({
-    id: 999,
-    messageType: 0,
-    messageState: 0,
-    message: sendVal.value,
-    time: '12:00',
-    timeState: 2
-  });
+  chatData.value.push(
+    chatTabOne({
+      id: 999,
+      messageType: 0,
+      messageState: 0,
+      message: sendVal.value,
+      date: new Date(),
+      timeState: 2
+    })
+  );
   sendVal.value = '';
   setTimeout(() => {
     scrollToButtom();

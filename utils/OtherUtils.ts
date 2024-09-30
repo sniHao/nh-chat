@@ -10,6 +10,7 @@ export const tranColor = (name: string) => {
   return '#' + res.slice(1, 4);
 };
 
+// 通知弹窗
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 
