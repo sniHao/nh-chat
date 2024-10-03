@@ -23,3 +23,9 @@ export const tips = (type: NotificationType, msg: string) => {
     keepAliveOnHover: true
   });
 };
+
+// 邮箱校验
+export const isEmail = (email: string) => {
+  const reg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+  return reg.test(email);
+};

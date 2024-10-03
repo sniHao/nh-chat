@@ -3,39 +3,26 @@
     <!-- 登录框 -->
     <div class="login" id="loginx">
       <div class="login-main">
+        <div class="login-logo">nh-chat</div>
         <div class="login-close">
           <n-button @click="closeLo" quaternary ghost>
             <span>×</span>
           </n-button>
         </div>
-        <!-- 内容(注册) -->
-        <template v-if="cut == 3">
-          <LogonGo @cuts="clickEven" />
-        </template>
-        <!-- 内容(登录) -->
-        <template v-else>
-          <div class="login-boby">
-            <!-- 选择区 -->
+        <div class="login-boby">
+          <template v-if="cut == 1 || cut == 2">
             <div class="lb-title">
               <span @click="cut = 1" :class="{ tab_act: cut == 1 }">密码登录</span>
               <span @click="cut = 2" :class="{ tab_act: cut == 2 }">验证码登录</span>
             </div>
-            <!-- 选择区 -->
-            <template v-if="cut == 1">
-              <LoginGo @cuts="clickEven" />
-            </template>
-            <template v-if="cut == 2">
-              <LoginGoYzm />
-            </template>
-          </div>
-
-          <!-- other登录方式 -->
-          <!-- <LoginOther></LoginOther> -->
-        </template>
-
+            <LoginGo @cuts="clickEven" :cutUp="cut" />
+          </template>
+          <template v-if="cut == 3">
+            <LoginRegister @cuts="clickEven" />
+          </template>
+        </div>
         <div class="mt-30 flex-center-center flex-down">
-          <!-- <div>注册人数</div> -->
-          <n-divider><span>注册人数</span></n-divider>
+          <n-divider><span>体验人数</span></n-divider>
           <div class="ft-b">0</div>
         </div>
       </div>
@@ -44,25 +31,18 @@
 </template>
 
 <script setup>
-// import { watchWindowSize, closeLogin } from '@/hooks/UsLogin';
-// import { onMounted, ref } from 'vue';
-// import LoginGo from './LoginGo';
-// import LoginGoYzm from './LoginGoYzm';
-// import LoginOther from './LoginOther';
-// import LogonGo from './LogonGo';
-
 let cut = ref(1);
 
 // 关闭登录
-function closeLo() {
+const closeLo = () => {
   cut.value = 1;
   closeLogin();
-}
+};
 
-function cutValue() {}
 // 接受操作传的值(控制回复的展示)
 const clickEven = (val) => {
   cut.value = val.value;
+  console.log(cut.value, '??/');
 };
 
 onMounted(() => {
@@ -114,7 +94,14 @@ onMounted(() => {
   }
 }
 
-/* 关闭设置 */
+.login-logo {
+  position: absolute;
+  top: -$px-38;
+  font-size: $px-18;
+  color: white;
+  left: $px-20;
+}
+
 .login-close {
   position: absolute;
   top: -$px-42;
@@ -122,7 +109,7 @@ onMounted(() => {
 }
 .login-close span {
   font-size: $px-32;
-  color: rgb(255, 255, 255);
+  color: white;
 }
 
 /* 内容框 */
@@ -130,14 +117,14 @@ onMounted(() => {
   position: relative;
   margin-top: $px-48;
   min-height: calc($px-480 - $px-48);
-  background-color: rgb(255, 255, 255);
+  background-color: white;
   border-bottom-left-radius: 1.5%;
   border-bottom-right-radius: 1.5%;
 }
 /* 登录体title */
 .login-boby {
-  height: 320px;
-  padding: 18px 24px;
+  height: $px-320;
+  padding: $px-18 $px-24;
   box-sizing: border-box;
 }
 /*选择区*/
@@ -145,11 +132,11 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  font-size: 20px;
+  font-size: $px-20;
   font-weight: bold;
   color: rgb(152, 154, 150);
-  margin-bottom: 20px;
-  height: 50px;
+  margin-bottom: $px-20;
+  height: $px-48;
 }
 /* 悬浮变鼠标样式 */
 .lb-title span:hover {

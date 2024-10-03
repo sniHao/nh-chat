@@ -108,9 +108,8 @@ const showModal = ref(false);
 const searchVal = ref('');
 const hasUser = ref<any>();
 const goSearch = () => {
-  const emailPattern = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
+  if (!isEmail(searchVal.value)) return tips('error', '请输入正确的邮箱格式📫');
   hasUser.value = {};
-  if (!emailPattern.test(searchVal.value)) return tips('error', '请输入正确的邮箱格式');
   // 发送接口查询用户
   eqUserMail(searchVal.value).then((res) => {
     if (res.code !== 200) return tips('error', res.msg);

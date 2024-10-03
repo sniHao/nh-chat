@@ -1,33 +1,32 @@
 <template>
   <div class="lb-body">
+    <div class="flex-center-center mb-20">很荣幸您的加入体验</div>
     <div class="lb-tp-te">
       <input type="text" placeholder="请输入邮箱" v-model="data.mail" required />
     </div>
-    <div class="lb-tp-tepwd mt-18" v-if="cutUp == 1">
-      <input type="password" placeholder="请输入密码" v-model="data.pwd" required />
-    </div>
     <!-- 验证码 -->
-    <div class="lb-tp-tepwd flex-center mt-18" v-if="cutUp == 2">
+    <div class="lb-tp-tepwd flex-center mt-18">
       <input type="number" placeholder="验证码" v-model="data.code" required style="width: 62%" />
       <n-button class="btn-w" v-if="data.codeCut == 1" type="text" @click="getCode">获取验证码</n-button>
       <n-button class="btn-w" v-if="data.codeCut == 2" type="text" disabled>{{ countDown }}秒</n-button>
     </div>
+    <div class="lb-tp-tepwd mt-18">
+      <input type="password" placeholder="请输入密码" v-model="data.pwd" required />
+    </div>
     <template v-if="loding === 0">
       <div class="lb-tp-go mt-30">
-        <button @click.prevent="gologin" class="hover-pointer">登录</button>
+        <button @click.prevent="gologin" class="hover-pointer">注册</button>
       </div>
     </template>
     <template v-else>
       <div class="lb-tp-go mt-30">
         <button disabled>
-          <span>登录中...</span>
+          <span>注册中...</span>
         </button>
       </div>
     </template>
     <div class="flex-right flex-center mt-12">
-      <n-button quaternary ghost @click="cuts">立即注册</n-button>
-      <div class="mb-2">|</div>
-      <n-button quaternary ghost @click="forgot">忘记密码</n-button>
+      <n-button quaternary ghost @click="goLogin">返回登录</n-button>
     </div>
   </div>
 </template>
@@ -104,6 +103,11 @@ const loginCode = () => {
 
 const forgot = () => {
   tips('warning', '暂无法修改密码，建议使用验证码登录');
+};
+
+const goLogin = () => {
+  cut.value = 1;
+  emit('cuts', cut);
 };
 </script>
 
