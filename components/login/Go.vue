@@ -4,13 +4,13 @@
       <input type="text" placeholder="请输入邮箱" v-model="data.mail" required />
     </div>
     <div class="lb-tp-tepwd mt-18" v-if="cutUp == 1">
-      <input type="password" placeholder="请输入密码" v-model="data.pwd" required />
+      <input type="password" placeholder="请输入密码" v-model="data.password" required />
     </div>
     <!-- 验证码 -->
     <div class="lb-tp-tepwd flex-center mt-18" v-if="cutUp == 2">
       <input type="number" placeholder="验证码" v-model="data.code" required style="width: 62%" />
-      <n-button class="btn-w" v-if="data.codeCut == 1" type="text" @click="getCode">获取验证码</n-button>
-      <n-button class="btn-w" v-if="data.codeCut == 2" type="text" disabled>{{ countDown }}秒</n-button>
+      <n-button class="btn-w" v-if="codeState == 1" type="text" @click="getCode">获取验证码</n-button>
+      <n-button class="btn-w" v-if="codeState == 2" type="text" disabled>{{ countDown }}秒</n-button>
     </div>
     <template v-if="loding === 0">
       <div class="lb-tp-go mt-30">
@@ -25,14 +25,15 @@
       </div>
     </template>
     <div class="flex-right flex-center mt-12">
-      <n-button quaternary ghost @click="cuts">立即注册</n-button>
-      <div class="mb-2">|</div>
       <n-button quaternary ghost @click="forgot">忘记密码</n-button>
     </div>
   </div>
 </template>
 
 <script setup>
+import { login, welcome, welcomeCode } from '@/api/index';
+const store = useStore();
+
 const props = defineProps({
   cutUp: {
     type: Number,
@@ -40,31 +41,33 @@ const props = defineProps({
   }
 });
 
-let data = reactive({
+const data = reactive({
   mail: '',
-  pwd: '',
-  code: '',
-  token: '',
-  codeCut: 1
+  password: '',
+  code: ''
 });
+const codeState = ref(1);
 
 const countDown = ref(0);
 const getCode = () => {
   if (!isEmail(data.mail)) return tips('error', '请输入正确的邮箱格式📫');
-  console.log('获取验证码');
-  data.codeCut = 2;
-  countDown.value = 60;
-  let times = setInterval(() => {
-    countDown.value--;
-    if (countDown.value <= 0) {
-      data.codeCut = 1;
-      clearInterval(times);
-    }
-  }, 1000);
+  welcomeCode(data.mail).then((res) => {
+    if (res.code !== 200) return tips('error', res.msg);
+    tips('success', res.msg);
+    codeState.value = 2;
+    countDown.value = 60;
+    let times = setInterval(() => {
+      countDown.value--;
+      if (countDown.value <= 0) {
+        codeState.value = 1;
+        clearInterval(times);
+      }
+    }, 1000);
+  });
 };
 
 let cut = ref(1);
-const emit = defineEmits(['cuts']);
+const emit = defineEmits(['cuts', 'showLogin']);
 const cuts = () => {
   cut.value = 3;
   emit('cuts', cut);
@@ -72,34 +75,34 @@ const cuts = () => {
 
 //登录事件
 let loding = ref(0);
-async function gologin() {
+const gologin = () => {
   if (!isEmail(data.mail)) return tips('error', '请输入正确的邮箱格式📫');
   if (props.cutUp === 1) {
-    if (data.pwd.trim().length === 0) return;
-    if (data.pwd.length < 6) return tips('error', '密码不太对哦👾');
+    if (data.password.trim().length === 0) return;
+    if (data.password.length < 6) return tips('error', '密码不太对哦👾');
     loginPwd();
     return;
   }
   if (data.code.toString().trim().length === 0) return;
   loginCode();
-}
+};
 
 const loginPwd = () => {
   loding.value = 1;
-  //登录
-  setTimeout(() => {
-    loding.value = 0;
-    tips('success', '登录成功');
-  }, 2000);
+  login(data).then((res) => {
+    loginResultCom(res);
+  });
 };
 const loginCode = () => {
-  console.log(data.code.toString().trim());
-  loding.value = 1;
-  //登录
-  setTimeout(() => {
-    loding.value = 0;
-    tips('success', '登录成功');
-  }, 2000);
+  welcome(data).then((res) => {
+    loginResultCom(res);
+  });
+};
+const loginResultCom = (res) => {
+  loding.value = 0;
+  if (res.code !== 200) return tips('error', res.msg);
+  store.saveToken(res.data);
+  emit('showLogin', false);
 };
 
 const forgot = () => {

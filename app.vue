@@ -1,10 +1,10 @@
 <template>
   <div class="home-bg-color ft-color-white">
-    <IndexNav></IndexNav>
+    <IndexNav @showLogin="showLoginEvent"></IndexNav>
     <div class="over-auto main-body">
       <NuxtPage />
     </div>
-    <LoginMain></LoginMain>
+    <LoginMain v-if="showLogin" @showLogin="showLoginEvent"></LoginMain>
   </div>
 </template>
 
@@ -47,6 +47,12 @@ const ofNewMessage = (msg: any) => {
 // 查看消息详情
 const goChat = (id: number) => {
   router.push('/try/' + id);
+};
+
+// 登录框
+const showLogin = ref(false);
+const showLoginEvent = (show: boolean) => {
+  showLogin.value = show;
 };
 
 onMounted(() => {

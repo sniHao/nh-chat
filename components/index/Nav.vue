@@ -26,6 +26,7 @@
 <script setup lang="ts">
 const githubCount = ref('12k');
 const router = useRouter();
+const emit = defineEmits(['showLogin']);
 // 跳首页
 const goHome = () => {
   router.push('/');
@@ -38,9 +39,9 @@ const goGithub = () => {
 const goDocs = () => {
   router.push('/docs');
 };
-// 说明文档
+// 登录
 const goLogin = () => {
-  router.push('/docs');
+  emit('showLogin', true);
 };
 
 // 切换主题

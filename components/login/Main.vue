@@ -1,6 +1,5 @@
 <template>
   <div class="lo">
-    <!-- 登录框 -->
     <div class="login" id="loginx">
       <div class="login-main">
         <div class="login-logo">nh-chat</div>
@@ -10,16 +9,11 @@
           </n-button>
         </div>
         <div class="login-boby">
-          <template v-if="cut == 1 || cut == 2">
-            <div class="lb-title">
-              <span @click="cut = 1" :class="{ tab_act: cut == 1 }">密码登录</span>
-              <span @click="cut = 2" :class="{ tab_act: cut == 2 }">验证码登录</span>
-            </div>
-            <LoginGo @cuts="clickEven" :cutUp="cut" />
-          </template>
-          <template v-if="cut == 3">
-            <LoginRegister @cuts="clickEven" />
-          </template>
+          <div class="lb-title">
+            <span @click="cut = 1" :class="{ tab_act: cut == 1 }">密码登录</span>
+            <span @click="cut = 2" :class="{ tab_act: cut == 2 }">验证码登录</span>
+          </div>
+          <LoginGo @cuts="clickEven" @showLogin="showLoginEvent" :cutUp="cut" />
         </div>
         <div class="mt-30 flex-center-center flex-down">
           <n-divider><span>体验人数</span></n-divider>
@@ -31,23 +25,25 @@
 </template>
 
 <script setup>
-let cut = ref(1);
+const emit = defineEmits(['showLogin']);
+
+const cut = ref(1);
 
 // 关闭登录
 const closeLo = () => {
   cut.value = 1;
-  closeLogin();
+  emit('showLogin', false);
 };
 
 // 接受操作传的值(控制回复的展示)
 const clickEven = (val) => {
   cut.value = val.value;
-  console.log(cut.value, '??/');
 };
 
-onMounted(() => {
-  // 监听登录窗口大小
-});
+// 登录框状态
+const showLoginEvent = (show) => {
+  emit('showLogin', show);
+};
 </script>
 
 <style scoped lang="scss">
