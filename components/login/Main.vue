@@ -17,7 +17,7 @@
         </div>
         <div class="mt-30 flex-center-center flex-down">
           <n-divider><span>体验人数</span></n-divider>
-          <div class="ft-b">0</div>
+          <div class="ft-b">{{ count }}</div>
         </div>
       </div>
     </div>
@@ -25,6 +25,7 @@
 </template>
 
 <script setup>
+import { eqUserCount } from '@/api/index';
 const emit = defineEmits(['showLogin']);
 
 const cut = ref(1);
@@ -44,6 +45,13 @@ const clickEven = (val) => {
 const showLoginEvent = (show) => {
   emit('showLogin', show);
 };
+
+const count = ref(0);
+onMounted(() => {
+  eqUserCount().then((res) => {
+    if (res.code === 200) count.value = res.data;
+  });
+});
 </script>
 
 <style scoped lang="scss">

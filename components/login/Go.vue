@@ -102,7 +102,7 @@ const loginResultCom = (res) => {
   loding.value = 0;
   if (res.code !== 200) return tips('error', res.msg);
   store.saveToken(res.data);
-  emit('showLogin', false);
+  emit('showLogin', { win: false, state: true });
 };
 
 const forgot = () => {

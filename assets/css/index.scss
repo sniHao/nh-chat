@@ -58,6 +58,9 @@ body {
   border-radius: 50%;
   background-color: rgb(255 255 255 / 12%);
   color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes circle {

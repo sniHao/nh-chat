@@ -1,6 +1,6 @@
 <template>
   <div class="home-bg-color ft-color-white">
-    <IndexNav @showLogin="showLoginEvent"></IndexNav>
+    <IndexNav @showLogin="showLoginEvent" :refresh="refresh"></IndexNav>
     <div class="over-auto main-body">
       <NuxtPage />
     </div>
@@ -50,9 +50,11 @@ const goChat = (id: number) => {
 };
 
 // 登录框
+const refresh = ref(false);
 const showLogin = ref(false);
-const showLoginEvent = (show: boolean) => {
-  showLogin.value = show;
+const showLoginEvent = (val) => {
+  showLogin.value = val.win;
+  refresh.value = val.state;
 };
 
 onMounted(() => {

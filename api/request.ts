@@ -3,7 +3,6 @@ import axios from 'axios';
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 const { loadingBar } = createDiscreteApi(['loadingBar']);
-
 //1. 创建axios对象
 const requests = axios.create({
   baseURL: 'http://localhost:8087',
@@ -18,9 +17,9 @@ const errorTips = [
 //2. 请求拦截器
 requests.interceptors.request.use(
   (config) => {
-    // 如果token存在 就放入Authorization请求头 发送token
-    if (localStorage.getItem('token')) {
-      config.headers.Authorization = localStorage.getItem('token');
+    const store = sessionStorage.getItem('nh');
+    if (store && JSON.parse(store).token) {
+      config.headers.Authorization = JSON.parse(store).token;
     } else {
       config.headers.Authorization = 'null';
     }
