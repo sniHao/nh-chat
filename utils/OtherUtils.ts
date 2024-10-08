@@ -29,3 +29,10 @@ export const isEmail = (email: string) => {
   const reg = /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/;
   return reg.test(email);
 };
+
+// 字符长度截取
+export const truncate = (str: string) => {
+  if (str == null) return null;
+  if (str.length > 30) return str.substring(0, 30) + '...';
+  return str;
+};

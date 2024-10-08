@@ -25,6 +25,7 @@ declare global {
     receiveState: number;
     date: Date;
     message: string;
+    tab:boolean
   }
 }
 

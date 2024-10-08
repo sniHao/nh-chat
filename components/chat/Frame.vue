@@ -98,10 +98,11 @@ const props = defineProps({
     default: {}
   }
 });
+const emit = defineEmits(['sendCallBack']);
 
 // 消息与上一条消息时间标
 const chatTabOne = (data: message) => {
-  if (chatData.value.length === 0) data[i].tab = true;
+  if (chatData.value.length === 0) data.tab = true;
   else data.tab = countTimeDiff(getTimeFormat(data.date), getTimeFormat(chatData.value[chatData.value.length - 1].date), 60) >= 10;
   return data;
 };
@@ -170,6 +171,7 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
     });
   };
   reader.readAsDataURL(file as any);
+  emit('sendCallBack', { val: "图片", type: 1 });
   setTimeout(() => {
     scrollToButtom();
   }, 100);
@@ -228,6 +230,7 @@ const sendInfo = () => {
       timeState: 2
     })
   );
+  emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
   sendVal.value = '';
   setTimeout(() => {
     scrollToButtom();

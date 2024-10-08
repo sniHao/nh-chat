@@ -56,7 +56,7 @@
         </div>
       </div>
       <!-- 聊天框 -->
-      <ChatFrame :user="nowUser"></ChatFrame>
+      <ChatFrame :user="nowUser" @sendCallBack="sendCallBack"></ChatFrame>
     </div>
     <!-- 弹框 -->
     <n-modal v-model:show="showModal">
@@ -84,8 +84,22 @@
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
 import { eqRelation, eqUserMail } from '@/api/index';
+import { isEmail } from '~/utils/OtherUtils';
 const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
+
+// 发送消息回调
+const sendCallBack = (res: { val: string; type: number }) => {
+  let message = res.val;
+  if (res.type === 1) message = '[图片]';
+  for (let i = 0; i < userList.value.length; i++) {
+    if (userList.value[i].id === checkId.value) {
+      userList.value[i].lastMessage = message;
+      userList.value[i].lastMessageDate = getTimeFormat(new Date());
+      break;
+    }
+  }
+};
 
 // 发起聊天
 const goChat = (uid: number) => {
@@ -121,29 +135,28 @@ const goSearch = () => {
 // 查询用户通讯录
 const userList = ref([] as Relation[]);
 const eqUserList = () => {
-  eqRelation().then((res: Result): void => {
-    if (res.code === 403) {
-      welcome();
-      userList.value = [
-        {
-          id: 1,
-          uid: 1,
-          relationUid: 2,
-          lastMessage: '欢迎使用nh-caht',
-          notRead: 1,
-          top: 1,
-          lastMessageDate: getTimeFormat(new Date()),
-          name: '体验官小H',
-          photo: '体'
-        }
-      ];
-      return;
-    }
-    userList.value = res.data;
-  });
-  nextTick(() => {
-    addListener();
-  });
+  eqRelation()
+    .then((res: Result): void => {
+      if (!res.code || res.code === 403) {
+        welcome();
+        userList.value = [
+          {
+            id: 1,
+            uid: 1,
+            relationUid: 2,
+            lastMessage: '欢迎使用nh-caht',
+            notRead: 1,
+            top: 1,
+            lastMessageDate: getTimeFormat(new Date()),
+            name: '体验官小H',
+            photo: '体'
+          }
+        ];
+        return;
+      }
+      userList.value = res.data;
+    })
+    .finally(() => addListener());
 };
 
 // 创建监听

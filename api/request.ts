@@ -55,7 +55,7 @@ requests.interceptors.response.use(
       duration: 2500,
       keepAliveOnHover: true
     });
-    return Promise.reject(new Error(errorMessage[0]));
+    return error.request;
   }
 );
 
