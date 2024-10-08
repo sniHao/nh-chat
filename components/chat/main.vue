@@ -77,7 +77,7 @@
       </n-card>
     </n-modal>
     <!-- 右键封装 -->
-    <OfRightButton v-if="showRightBtn" :left="rightBtnLeft" :top="rightBtnTop" :list="czList"></OfRightButton>
+    <OfRightButton v-if="showRightBtn" :left="rightBtnLeft" :top="rightBtnTop" :list="czList" @choose="chooseRight"></OfRightButton>
   </div>
 </template>
 
@@ -168,6 +168,10 @@ const addListener = () => {
   });
 };
 
+// 选择右键内容回调
+const chooseRight = (item: any) => {
+  showRightBtn.value = false;
+};
 // 监听列表右键
 const rightBtnLeft = ref(0);
 const rightBtnTop = ref(0);
@@ -179,6 +183,7 @@ const listenerUser = (e: MouseEvent, index: number) => {
   // userList.value[index]
   rightBtnLeft.value = e.x;
   rightBtnTop.value = e.y;
+  czList.value = [{ id: 0, name: '置顶消息' }];
 };
 
 // 销毁监听
