@@ -20,18 +20,18 @@
         <div class="cbb-box" v-for="(item, index) in chatData" :key="index">
           <!-- 时间 -->
           <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.tab">
-            <div class="cbb-tips">{{ cutChatTime(getTimeFormat(item.date)) }}</div>
+            <div class="cbb-tips">{{ cutChatTime(item.date) }}</div>
           </div>
           <!-- 其他事件 -->
-          <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.messageType === 2">
+          <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.sendState === 2 || item.receiveState === 2">
             <div class="cbb-tips">对方撤回了一条消息</div>
           </div>
           <!-- 消息框 -->
           <template v-else>
-            <div class="cbb-main flex" v-if="item.id == 0">
-              <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor('啊')">啊</div>
+            <div class="cbb-main flex" v-if="item.receiveUid === user.receiveUid">
+              <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor(user.photo)">{{ user.photo }}</div>
               <div class="cbbm-box cbbm-box-left flex">
-                <span v-if="item.messageType === 0">{{ item.message }}</span>
+                <span v-if="item.type === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
               </div>
               <!-- <div class="flex-end ml-6">
@@ -42,7 +42,7 @@
             <div class="cbb-main flex-right" v-else>
               <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor('哈')">哈</div>
               <div class="cbbm-box cbbm-box-right flex">
-                <span v-if="item.messageType === 0">{{ item.message }}</span>
+                <span v-if="item.type === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
               </div>
               <!-- <div class="flex-end mr-6">
@@ -90,6 +90,7 @@
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 import type { UploadFileInfo } from 'naive-ui';
+import { eqChat, sendMessage } from '~/api/index';
 import WebSocketService from '@/utils/WebSocketService';
 const webSocketService = inject<WebSocketService>('webSocketService');
 const props = defineProps({
@@ -103,18 +104,18 @@ const emit = defineEmits(['sendCallBack']);
 // 消息与上一条消息时间标
 const chatTabOne = (data: message) => {
   if (chatData.value.length === 0) data.tab = true;
-  else data.tab = countTimeDiff(getTimeFormat(data.date), getTimeFormat(chatData.value[chatData.value.length - 1].date), 60) >= 10;
+  else data.tab = countTimeDiff(data.date, chatData.value[chatData.value.length - 1].date, 60) >= 10;
   return data;
 };
 
 // 消息列表是否需要时间标
-const chatTab = (data: [message]) => {
+const chatTab = (data: message[]) => {
   for (let i = data.length - 1; i >= 0; i--) {
     if (i === 0) {
       data[i].tab = true;
       break;
     }
-    data[i].tab = countTimeDiff(getTimeFormat(data[i].date), getTimeFormat(data[i - 1].date), 60) >= 10;
+    data[i].tab = countTimeDiff(data[i].date, data[i - 1].date, 60) >= 10;
   }
   return data;
 };
@@ -171,7 +172,7 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
     });
   };
   reader.readAsDataURL(file as any);
-  emit('sendCallBack', { val: "图片", type: 1 });
+  emit('sendCallBack', { val: '图片', type: 1 });
   setTimeout(() => {
     scrollToButtom();
   }, 100);
@@ -181,24 +182,43 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
 // 接口请求数据
 const loding = ref(true);
 const chatData = ref([] as any);
-const eqChat = (uid: number) => {
+const page = ref(1);
+const eqChatData = (uid: number) => {
+  eqChat(uid, page.value)
+    .then((res: Result) => {
+      let data = [] as message[];
+      if (!res.code || res.code === 403) {
+        data = eqChatDataStatic();
+      } else {
+        data = res.data.data;
+        page.value = res.data.page;
+      }
+      chatData.value = chatTab(data);
+      console.log(chatData.value, 'chatData.value');
+    })
+    .finally(() => {
+      setTimeout(() => {
+        loding.value = false;
+        scrollToButtom();
+        listenerScrollToTop(true);
+      }, 150);
+    });
+};
+
+//未登录静态数据
+const eqChatDataStatic = () => {
   let data = [];
-  for (let i = 0; i < uid + 2; i++) {
+  for (let i = 0; i < 3; i++) {
     data.push({
       id: i % 2,
       messageType: 0,
       messageState: i,
       message: '嘻嘻嘻嘻嘻嘻🤖' + i,
-      date: new Date(new Date().getTime() + 1000 * 60 * 11 * i),
+      date: getTimeFormat(new Date(new Date().getTime() + 1000 * 60 * 11 * i)),
       timeState: i % 2
     });
   }
-  chatData.value = chatTab(data);
-  setTimeout(() => {
-    loding.value = false;
-    scrollToButtom();
-    listenerScrollToTop(true);
-  }, 150);
+  return data;
 };
 
 // 私信
@@ -219,6 +239,13 @@ const valChange = () => {
 // 发送消息
 const sendInfo = () => {
   if (!sendInfoPre()) return;
+  sendMessage({
+    receiveUid: props.user.relationUid,
+    message: sendVal.value,
+    type: 0
+  }).then((res) => {
+    console.log(res, '发送结果');
+  });
   console.log('发送？', sendVal.value);
   chatData.value.push(
     chatTabOne({
@@ -226,7 +253,7 @@ const sendInfo = () => {
       messageType: 0,
       messageState: 0,
       message: sendVal.value,
-      date: new Date(),
+      date: getTimeFormat(new Date()),
       timeState: 2
     })
   );
@@ -308,7 +335,7 @@ watch(
   () => props.user,
   () => {
     initData();
-    eqChat(props.user.id);
+    eqChatData(props.user.relationUid);
     if (nowChatUid) nowChatUid(props.user.id);
     console.log('userInfo', props.user, Object.keys(props.user).length);
   }

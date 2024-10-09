@@ -15,3 +15,7 @@ export const eqUserCount = () => request({ url: 'user/eqUserCount', method: 'get
 export const eqRelation = () => request({ url: 'chat/eqRelation', method: 'get' });
 
 export const goChat = (receiveUid: number) => request({ url: 'chat/goChat/' + receiveUid, method: 'get' });
+
+export const eqChat = (receiveUid: number, page: number) => request({ url: 'chat/eqChat/' + receiveUid + '/' + page, method: 'get' });
+
+export const sendMessage = (data: { receiveUid: number; message: string; type: number }) => request({ url: 'chat/sendMessage', method: 'post', data });

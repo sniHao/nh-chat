@@ -23,7 +23,7 @@ declare global {
     type: number;
     sendState: number;
     receiveState: number;
-    date: Date;
+    date: string;
     message: string;
     tab:boolean
   }

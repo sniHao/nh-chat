@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
-import { eqRelation, eqUserMail, goChat } from '@/api/index';
+import { eqRelation, eqUserMail, goChat } from '~/api/index';
 import { isEmail } from '~/utils/OtherUtils';
 const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
