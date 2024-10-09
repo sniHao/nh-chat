@@ -71,3 +71,7 @@ body {
     rotate: 360deg;
   }
 }
+
+.ant-modal div[aria-hidden="true"] {
+  display: none !important
+}

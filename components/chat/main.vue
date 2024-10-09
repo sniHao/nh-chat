@@ -104,8 +104,9 @@ const sendCallBack = (res: { val: string; type: number }) => {
 // 发起聊天
 const sendChat = (uid: number) => {
   goChat(uid).then((res: Result) => {
-    if (res.code === 200) return addTopList(res.data);
-    tips('error', res.msg);
+    if (res.code !== 200) return tips('error', res.msg);
+    addTopList(res.data);
+    showChat(res.data);
   });
   showModal.value = false;
 };
@@ -113,12 +114,12 @@ const sendChat = (uid: number) => {
 // 添加到顶部通讯录
 const addTopList = (data: Relation) => {
   let pointer = 0;
+  let hasUserPointer = -1;
   for (let i = 0; i < userList.value.length; i++) {
-    if (userList.value[i].top !== 1) {
-      pointer = i;
-      break;
-    }
+    if (userList.value[i].top !== 1) pointer = i;
+    if (userList.value[i].id === data.id) hasUserPointer = i;
   }
+  if (hasUserPointer !== -1) userList.value.splice(hasUserPointer, 1);
   userList.value.splice(pointer, 0, data);
 };
 
