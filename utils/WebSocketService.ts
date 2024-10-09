@@ -1,18 +1,19 @@
 import { reactive } from 'vue';
 export default class WebSocketService {
   private socket: WebSocket | null = null;
-
+  private reconnectInterval = 1000; // 初始重连间隔时间（毫秒）
   public newMessage = reactive({
     uid: -1,
     value: ''
   });
-  constructor(private url: string) {}
+  constructor(private params: string) {}
 
   connect(): void {
-    this.socket = new WebSocket(this.url);
+    this.socket = new WebSocket('ws://127.0.0.1:8087/socket.chat/' + this.params);
 
     this.socket.onopen = () => {
       console.log('建立连接');
+      this.reconnectInterval = 1000;
     };
 
     this.socket.onmessage = (event: MessageEvent) => {
@@ -23,9 +24,17 @@ export default class WebSocketService {
 
     this.socket.onclose = () => {
       console.log('断开连接');
+      this.reconnect();
     };
   }
-
+  reconnect() {
+    if (this.reconnectInterval === 30000) return;
+    setTimeout(() => {
+      this.connect();
+      this.reconnectInterval *= 2;
+      if (this.reconnectInterval > 30000) this.reconnectInterval = 30000;
+    }, this.reconnectInterval);
+  }
   // 关闭连接
   close(): void {
     if (this.socket) {

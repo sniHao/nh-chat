@@ -1,6 +1,6 @@
 <template>
   <div class="home-bg-color ft-color-white">
-    <IndexNav @showLogin="showLoginEvent" :refresh="refresh"></IndexNav>
+    <IndexNav @showLogin="showLoginEvent"></IndexNav>
     <div class="over-auto main-body">
       <NuxtPage />
     </div>
@@ -15,7 +15,7 @@ const { notification } = createDiscreteApi(['notification']);
 const router = useRouter();
 const store = useStore();
 // ws状态全局
-const ws = new WebSocketService('ws://127.0.0.1:8087/socket.chat/' + store.token);
+const ws = new WebSocketService(store.token);
 provide('webSocketService', ws);
 
 // 获取当前聊天的uid
@@ -50,11 +50,10 @@ const goChat = (id: number) => {
 };
 
 // 登录框
-const refresh = ref(false);
 const showLogin = ref(false);
-const showLoginEvent = (val) => {
+const showLoginEvent = (val: { win: boolean; state: boolean }) => {
   showLogin.value = val.win;
-  refresh.value = val.state;
+  if (val.state) location.reload();
 };
 
 onMounted(() => {

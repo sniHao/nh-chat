@@ -66,12 +66,7 @@ const getCode = () => {
   });
 };
 
-let cut = ref(1);
-const emit = defineEmits(['cuts', 'showLogin']);
-const cuts = () => {
-  cut.value = 3;
-  emit('cuts', cut);
-};
+const emit = defineEmits(['showLogin']);
 
 //登录事件
 let loding = ref(0);

@@ -17,7 +17,7 @@ const errorTips = [
 //2. 请求拦截器
 requests.interceptors.request.use(
   (config) => {
-    const store = sessionStorage.getItem('nh');
+    const store = localStorage.getItem('nh');
     if (store && JSON.parse(store).token) {
       config.headers.Authorization = JSON.parse(store).token;
     } else {

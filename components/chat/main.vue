@@ -72,7 +72,7 @@
             <div class="user-head flex-center-center" :style="'background-color:' + tranColor(hasUser.photo)">{{ hasUser.photo }}</div>
             <div class="ft-16 ft-b ml-10">{{ hasUser.name }}</div>
           </div>
-          <n-button round strong type="primary" color="#9300ff" @click="goChat(hasUser.uid)">发起聊天</n-button>
+          <n-button round strong type="primary" color="#9300ff" @click="sendChat(hasUser.uid)">发起聊天</n-button>
         </div>
       </n-card>
     </n-modal>
@@ -83,7 +83,7 @@
 
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
-import { eqRelation, eqUserMail } from '@/api/index';
+import { eqRelation, eqUserMail, goChat } from '@/api/index';
 import { isEmail } from '~/utils/OtherUtils';
 const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
@@ -102,9 +102,24 @@ const sendCallBack = (res: { val: string; type: number }) => {
 };
 
 // 发起聊天
-const goChat = (uid: number) => {
-  console.log('前往uid' + uid);
+const sendChat = (uid: number) => {
+  goChat(uid).then((res: Result) => {
+    if (res.code === 200) return addTopList(res.data);
+    tips('error', res.msg);
+  });
   showModal.value = false;
+};
+
+// 添加到顶部通讯录
+const addTopList = (data: Relation) => {
+  let pointer = 0;
+  for (let i = 0; i < userList.value.length; i++) {
+    if (userList.value[i].top !== 1) {
+      pointer = i;
+      break;
+    }
+  }
+  userList.value.splice(pointer, 0, data);
 };
 
 // 选择用户

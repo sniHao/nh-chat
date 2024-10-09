@@ -13,3 +13,5 @@ export const welcomeCode = (mail: string) => request({ url: 'user/welcomeCode/' 
 export const eqUserCount = () => request({ url: 'user/eqUserCount', method: 'get' });
 
 export const eqRelation = () => request({ url: 'chat/eqRelation', method: 'get' });
+
+export const goChat = (receiveUid: number) => request({ url: 'chat/goChat/' + receiveUid, method: 'get' });

@@ -29,12 +29,6 @@ import { userInfo } from '@/api/index';
 const githubCount = ref('12k');
 const router = useRouter();
 const emit = defineEmits(['showLogin']);
-const props = defineProps({
-  refresh: {
-    type: Boolean,
-    default: false
-  }
-});
 // 跳首页
 const goHome = () => {
   router.push('/');
@@ -57,13 +51,6 @@ const modeStyle = ref(true);
 const switchMode = () => {
   modeStyle.value = !modeStyle.value;
 };
-
-watch(
-  () => props.refresh,
-  () => {
-    if (props.refresh) eqUser();
-  }
-);
 
 const state = ref(true);
 const uInfo = ref({} as any);

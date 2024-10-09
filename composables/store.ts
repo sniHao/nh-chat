@@ -16,6 +16,6 @@ export const useStore = defineStore('nh', {
     }
   },
   persist: process.client && {
-    storage: sessionStorage
+    storage: localStorage
   }
 });
