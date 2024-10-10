@@ -28,7 +28,7 @@
           </div>
           <!-- 消息框 -->
           <template v-else>
-            <div class="cbb-main flex" v-if="item.receiveUid === user.receiveUid">
+            <div class="cbb-main flex" v-if="item.sendUid === user.receiveUid">
               <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor(user.photo)">{{ user.photo }}</div>
               <div class="cbbm-box cbbm-box-left flex">
                 <span v-if="item.type === 0">{{ item.message }}</span>
@@ -104,7 +104,7 @@ const emit = defineEmits(['sendCallBack']);
 // 消息与上一条消息时间标
 const chatTabOne = (data: message) => {
   if (chatData.value.length === 0) data.tab = true;
-  else data.tab = countTimeDiff(data.date, chatData.value[chatData.value.length - 1].date, 60) >= 10;
+  else data.tab = countTimeDiff(chatData.value[chatData.value.length - 1].date, data.date, 60) >= 10;
   return data;
 };
 
@@ -115,7 +115,7 @@ const chatTab = (data: message[]) => {
       data[i].tab = true;
       break;
     }
-    data[i].tab = countTimeDiff(data[i].date, data[i - 1].date, 60) >= 10;
+    data[i].tab = countTimeDiff(data[i - 1].date, data[i].date, 60) >= 10;
   }
   return data;
 };
@@ -244,24 +244,34 @@ const sendInfo = () => {
     message: sendVal.value,
     type: 0
   }).then((res) => {
-    console.log(res, '发送结果');
+    if (res.code !== 200) {
+      // 消息 发送失败标识
+      tips('error', res.msg);
+    }
+    pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 0, sendVal.value);
+    emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
+    sendVal.value = '';
+    setTimeout(() => {
+      scrollToButtom();
+    }, 100);
   });
-  console.log('发送？', sendVal.value);
+};
+
+// 推送单条消息
+const pushDataOneCom = (id: number, sendUid: number, relationUid: number, type: number, message: string) => {
   chatData.value.push(
     chatTabOne({
-      id: 999,
-      messageType: 0,
-      messageState: 0,
-      message: sendVal.value,
+      id: id,
+      sendUid: sendUid,
+      relationUid: relationUid,
+      type: type,
+      sendState: 1,
+      receiveState: 1,
       date: getTimeFormat(new Date()),
-      timeState: 2
+      message: message,
+      tab: false
     })
   );
-  emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
-  sendVal.value = '';
-  setTimeout(() => {
-    scrollToButtom();
-  }, 100);
 };
 // 发送消息前置处理
 const sendInfoPre = () => {
@@ -298,7 +308,7 @@ const scrollToTop = () => {
           id: 999,
           messageType: 0,
           messageState: 0,
-          message: '信心写信心写',
+          message: '新的聊天数据呀',
           time: '12:00',
           timeState: 2
         },
