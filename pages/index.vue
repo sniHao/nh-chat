@@ -19,14 +19,30 @@
   <!-- 简介 -->
   <div class="w-100 flex-center-onely">
     <div class="w-1280">
-      <div class="flex-center-center ft-30 home-ft-color mb-16">所用技术</div>
+      <div class="flex-center-center ft-28 ft-color-white mb-16">采用前沿技术路线</div>
       <div class="flex-wrap flex-center-onely">
-        <div class="box card flex-down-center pd-6 ml-7 mr-7 mb-14" v-for="i in 10">
-          <div class="ft-28 home-ft-color">前端🤖</div>
+        <div class="box card flex-down-center pd-6 ml-7 mr-7 mb-14" v-for="(item, index) in technology" :key="index">
+          <div class="ft-28 home-ft-color mb-14">{{ item.name }}</div>
           <n-timeline>
-            <n-timeline-item color="red" content="啊" />
+            <n-timeline-item color="rgb(147, 0, 255)" :content="ite" v-for="(ite, index) in item.list" :key="index" />
           </n-timeline>
         </div>
+      </div>
+      <div class="flex-center-center ft-28 ft-color-white mb-16 mt-20">赞助商</div>
+      <div class="flex-wrap flex-center-center">
+        <div class="flex-center-center pd-6 ml-10 mr-10" style="width: unset" v-for="(item, index) in sponsor" :key="index">
+          <div class="ft-28 home-ft-color-2 hover-pointer">{{ item.name }}</div>
+        </div>
+        <n-button color="rgb(147, 0, 255)" size="large" dashed round>成为赞助商</n-button>
+      </div>
+    </div>
+  </div>
+  <!-- end -->
+  <div class="w-100 flex-center-onely">
+    <div class="w-100">
+      <n-divider style="--n-color: rgb(255 103 0/ 30%);margin-bottom: unset;" />
+      <div class="flex-center-center pd-sx-12">
+        <span>备案号xxx</span>
       </div>
     </div>
   </div>
@@ -40,6 +56,28 @@ const goTry = () => {
   router.push('/try');
 };
 
+const technology = ref([
+  {
+    name: '前端🤖',
+    list: ['Nuxt3', 'Vue3', 'Vite', 'TypeScript', 'Pinia', 'Naive UI', 'Lottie']
+  },
+  {
+    name: '后端🚀',
+    list: ['JDK21', 'SpringBoot3', 'MyBatis-Plus', 'SpringSecurity', 'JWT', 'Swagger3']
+  },
+  {
+    name: '消息👨‍🚀',
+    list: ['WebSocket']
+  },
+  {
+    name: '存储🙈',
+    list: ['Mysql', 'Redis']
+  }
+]);
+const sponsor = ref([
+  { name: 'Github', url: '' },
+  { name: 'Gitee', url: '' }
+]);
 const lottiePop = ref();
 onMounted(() => {
   lottie.loadAnimation({
@@ -53,6 +91,12 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+:deep(.n-timeline-item-content__content) {
+  color: $ft-color-tips !important;
+}
+:deep(.n-timeline-item-timeline__line) {
+  background-color: $ft-color-2 !important;
+}
 .title-nh {
   background: -webkit-linear-gradient(280deg, $ft-color 20%, $ft-color-2);
   -webkit-background-clip: text;
@@ -75,7 +119,9 @@ onMounted(() => {
   height: $px-240;
 }
 .card {
-  width: $px-480;
-  border-radius: $px-4;
+  width: $px-280;
+  border-radius: $px-8;
+  background-color: rgb(255 255 255 / 12%);
+  box-shadow: 0 0 0 $px-0-5 rgb(210, 210, 210);
 }
 </style>

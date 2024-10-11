@@ -2,7 +2,7 @@
   <div class="main-nav flex-center-center">
     <div class="nav flex-center-zy pd-6">
       <div class="flex-center ft-b">
-        <div class="ft-26 home-ft-color hover-pointer" @click="goHome">nh-chat</div>
+        <div class="ft-26 home-ft-color hover-pointer" @click="goHome" v-if="showLog">nh-chat</div>
         <div class="ml-26 ft-color-tips hover-ft" @click="goGithub">演示</div>
         <div class="ml-16 ft-color-tips hover-ft" @click="goDocs">说明文档</div>
       </div>
@@ -61,8 +61,18 @@ const eqUser = () => {
     state.value = false;
   });
 };
+
+const showLog = ref(true);
+const resize = () => {
+  showLog.value = window.screen.width > 510 && window.innerWidth > 510;
+};
+
 onMounted(() => {
   eqUser();
+  window.addEventListener('resize', resize);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', resize);
 });
 </script>
 

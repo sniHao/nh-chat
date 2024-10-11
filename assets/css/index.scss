@@ -6,6 +6,10 @@ body {
 .home-bg-color {
   background-color: $bg-color;
 }
+
+.home-ft-color-2 {
+  color: $ft-color-2;
+}
 .home-ft-color {
   color: $ft-color;
 }
@@ -72,6 +76,6 @@ body {
   }
 }
 
-.ant-modal div[aria-hidden="true"] {
-  display: none !important
+.ant-modal div[aria-hidden='true'] {
+  display: none !important;
 }
