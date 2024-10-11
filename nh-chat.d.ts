@@ -18,14 +18,15 @@ declare global {
   }
   interface message {
     id: number;
-    sendUid: number;
+    sendUid: number | undefined;
     relationUid: number;
     type: number;
     sendState: number;
     receiveState: number;
     date: string;
     message: string;
-    tab:boolean
+    tab: boolean;
+    state: boolean;
   }
 }
 

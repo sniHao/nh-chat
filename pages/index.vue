@@ -42,7 +42,7 @@
     <div class="w-100">
       <n-divider style="--n-color: rgb(255 103 0/ 30%);margin-bottom: unset;" />
       <div class="flex-center-center pd-sx-12">
-        <span>备案号xxx</span>
+        <span class="ft-color-tips">备案号xxx</span>
       </div>
     </div>
   </div>

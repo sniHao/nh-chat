@@ -34,10 +34,9 @@
                 <span v-if="item.type === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
               </div>
-              <!-- <div class="flex-end ml-6">
+              <div class="flex-end ml-6" v-if="!item.state">
                 <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
-                <OfSvg class="message-loading" name="message-loading" :width="24" :height="24"></OfSvg>
-              </div> -->
+              </div>
             </div>
             <div class="cbb-main flex-right" v-else>
               <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor('哈')">哈</div>
@@ -45,10 +44,9 @@
                 <span v-if="item.type === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
               </div>
-              <!-- <div class="flex-end mr-6">
+              <div class="flex-end mr-6" v-if="!item.state">
                 <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
-                <OfSvg class="message-loading" name="message-loading" :width="24" :height="24"></OfSvg>
-              </div> -->
+              </div>
             </div>
           </template>
         </div>
@@ -111,6 +109,7 @@ const chatTabOne = (data: message) => {
 // 消息列表是否需要时间标
 const chatTab = (data: message[]) => {
   for (let i = data.length - 1; i >= 0; i--) {
+    data[i].state = true;
     if (i === 0) {
       data[i].tab = true;
       break;
@@ -183,20 +182,33 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
 const loding = ref(true);
 const chatData = ref([] as any);
 const page = ref(1);
-const eqChatData = (uid: number) => {
-  eqChat(uid, page.value)
+const next = ref(false);
+const eqChatData = () => {
+  eqChatCom();
+};
+// 数据公共
+const eqChatCom = (needBootom: boolean = true) => {
+  lodingNewMessage.value = true;
+  eqChat(props.user.relationUid, page.value)
     .then((res: Result) => {
       let data = [] as message[];
-      if (!res.code || res.code === 403) {
-        data = eqChatDataStatic();
+      if (needBootom) {
+        if (!res.code || res.code === 403) {
+          data = eqChatDataStatic();
+        } else {
+          data = res.data.data;
+          next.value = res.data.next;
+        }
+        chatData.value = chatTab(data);
       } else {
-        data = res.data.data;
-        page.value = res.data.page;
+        data = [addStaticDataCom(new Date(new Date().getTime() - 1000 * 60 * 50), '新的聊天数据哦'), chatData.value[0]];
+        chatData.value.shift();
+        chatData.value = [...chatTab(data), ...chatData.value];
       }
-      chatData.value = chatTab(data);
-      console.log(chatData.value, 'chatData.value');
     })
     .finally(() => {
+      lodingNewMessage.value = false;
+      if (!needBootom) return;
       setTimeout(() => {
         loding.value = false;
         scrollToButtom();
@@ -208,17 +220,27 @@ const eqChatData = (uid: number) => {
 //未登录静态数据
 const eqChatDataStatic = () => {
   let data = [];
-  for (let i = 0; i < 3; i++) {
-    data.push({
-      id: i % 2,
-      messageType: 0,
-      messageState: i,
-      message: '嘻嘻嘻嘻嘻嘻🤖' + i,
-      date: getTimeFormat(new Date(new Date().getTime() + 1000 * 60 * 11 * i)),
-      timeState: i % 2
-    });
+  const initMessage = ['欢迎体验nh-chat👋。需要提醒的是，当前为体验模式，数据不会被保存', '你可以尝试向我发送消息哟，体验不同的功能。'];
+  for (let i = 0; i < 2; i++) {
+    data.push(addStaticDataCom(new Date(new Date().getTime() - 1000 * 60 * 50 + 1000 * 60 * 11 * i), initMessage[i]));
   }
   return data;
+};
+
+// 添加静态消息公共
+const addStaticDataCom = (date: Date, message: string) => {
+  return {
+    date: getTimeFormat(date),
+    id: -1,
+    message: message,
+    receiveState: 1,
+    relationUid: -1,
+    sendState: 1,
+    sendUid: undefined,
+    type: 0,
+    tab: false,
+    state: true
+  };
 };
 
 // 私信
@@ -244,11 +266,7 @@ const sendInfo = () => {
     message: sendVal.value,
     type: 0
   }).then((res) => {
-    if (res.code !== 200) {
-      // 消息 发送失败标识
-      tips('error', res.msg);
-    }
-    pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 0, sendVal.value);
+    pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 0, sendVal.value, res.code === 200);
     emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
     sendVal.value = '';
     setTimeout(() => {
@@ -258,7 +276,7 @@ const sendInfo = () => {
 };
 
 // 推送单条消息
-const pushDataOneCom = (id: number, sendUid: number, relationUid: number, type: number, message: string) => {
+const pushDataOneCom = (id: number, sendUid: number, relationUid: number, type: number, message: string, state: boolean) => {
   chatData.value.push(
     chatTabOne({
       id: id,
@@ -269,7 +287,8 @@ const pushDataOneCom = (id: number, sendUid: number, relationUid: number, type: 
       receiveState: 1,
       date: getTimeFormat(new Date()),
       message: message,
-      tab: false
+      tab: false,
+      state: state
     })
   );
 };
@@ -293,30 +312,12 @@ const scrollToButtom = () => {
   scrollDom.scrollTop = scrollDom.scrollHeight;
 };
 
-// 监听上拉拉取消息
-const hasNewMessage = ref(true);
+// 上拉拉取消息
 const lodingNewMessage = ref(false);
-
 const scrollToTop = () => {
   let scrollDom = document.getElementsByClassName('cb-body')[0];
-  if (scrollDom.scrollTop < 30 && hasNewMessage.value && !lodingNewMessage.value) {
-    lodingNewMessage.value = true;
-    setTimeout(() => {
-      console.log('请求新数据');
-      chatData.value = [
-        {
-          id: 999,
-          messageType: 0,
-          messageState: 0,
-          message: '新的聊天数据呀',
-          time: '12:00',
-          timeState: 2
-        },
-        ...chatData.value
-      ];
-      hasNewMessage.value = false;
-      lodingNewMessage.value = false;
-    }, 1000);
+  if (scrollDom.scrollTop < 30 && next.value && !lodingNewMessage.value) {
+    eqChatCom(false);
   }
 };
 // 监听滚动条
@@ -332,7 +333,6 @@ const listenerScrollToTop = (state: boolean) => {
 const initData = () => {
   chatData.value = [];
   loding.value = true;
-  hasNewMessage.value = true;
 };
 
 onMounted(() => {
@@ -345,7 +345,7 @@ watch(
   () => props.user,
   () => {
     initData();
-    eqChatData(props.user.relationUid);
+    eqChatData();
     if (nowChatUid) nowChatUid(props.user.id);
     console.log('userInfo', props.user, Object.keys(props.user).length);
   }
