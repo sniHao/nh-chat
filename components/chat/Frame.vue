@@ -192,18 +192,22 @@ const eqChatCom = (needBootom: boolean = true) => {
   eqChat(props.user.relationUid, page.value)
     .then((res: Result) => {
       let data = [] as message[];
-      if (needBootom) {
-        if (!res.code || res.code === 403) {
-          data = eqChatDataStatic();
-        } else {
-          data = res.data.data;
-          next.value = res.data.next;
-        }
-        chatData.value = chatTab(data);
+      if (!res.code || res.code === 403) {
+        data = needBootom ? eqChatDataStatic() : [addStaticDataCom(new Date(new Date().getTime() - 1000 * 60 * 50), '新的聊天数据哦')];
       } else {
-        data = [addStaticDataCom(new Date(new Date().getTime() - 1000 * 60 * 50), '新的聊天数据哦'), chatData.value[0]];
+        data = res.data.data;
+        next.value = res.data.next;
+        if (next.value) page.value++;
+      }
+      if (needBootom) chatData.value = chatTab(data);
+      else {
+        const oldHeight = document.getElementsByClassName('cb-body')[0].scrollHeight || 0;
         chatData.value.shift();
         chatData.value = [...chatTab(data), ...chatData.value];
+        setTimeout(() => {
+          let newDom = document.getElementsByClassName('cb-body')[0];
+          newDom.scrollTop = newDom.scrollHeight - oldHeight;
+        }, 10);
       }
     })
     .finally(() => {
