@@ -19,3 +19,5 @@ export const goChat = (receiveUid: number) => request({ url: 'chat/goChat/' + re
 export const eqChat = (receiveUid: number, page: number) => request({ url: 'chat/eqChat/' + receiveUid + '/' + page, method: 'get' });
 
 export const sendMessage = (data: { receiveUid: number; message: string; type: number }) => request({ url: 'chat/sendMessage', method: 'post', data });
+
+export const sendMessageImage = (data: FormData, receiveUid: number) => request({ url: 'chat/sendMessageImage/' + receiveUid, method: 'post', data });

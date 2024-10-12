@@ -36,3 +36,11 @@ export const truncate = (str: string) => {
   if (str.length > 30) return str.substring(0, 30) + '...';
   return str;
 };
+
+// 12位随机数
+export const randomNumber = () => {
+  const randomNumberString = Math.floor(Math.random() * 100000000000)
+    .toString()
+    .padEnd(12, '0');
+  return randomNumberString;
+};

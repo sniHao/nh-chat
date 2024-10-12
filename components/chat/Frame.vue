@@ -88,7 +88,7 @@
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 import type { UploadFileInfo } from 'naive-ui';
-import { eqChat, sendMessage } from '~/api/index';
+import { eqChat, sendMessage, sendMessageImage } from '~/api/index';
 import WebSocketService from '@/utils/WebSocketService';
 const webSocketService = inject<WebSocketService>('webSocketService');
 const props = defineProps({
@@ -156,25 +156,23 @@ const upLoadCheck = (file: File | null | undefined) => {
 };
 // 图片
 const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }) => {
-  const file = data.file.file;
+  const file = data.file.file as File;
   const result = upLoadCheck(file);
   if (!result) return false;
   const reader = new FileReader();
   reader.onload = function (e: any) {
-    chatData.value.push({
-      id: 1,
-      messageType: 1,
-      messageState: 1,
-      message: e.target.result,
-      time: new Date(),
-      timeState: 0
+    const fd = new FormData();
+    fd.append('file', file);
+    sendMessageImage(fd, props.user.relationUid).then((res) => {
+      if (res.code !== 200) res.data = randomNumber();
+      pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 1, e.target.result, res.code === 200);
+      emit('sendCallBack', { val: truncate(e.target.result), type: 1 });
+      setTimeout(() => {
+        scrollToButtom();
+      }, 100);
     });
   };
   reader.readAsDataURL(file as any);
-  emit('sendCallBack', { val: '图片', type: 1 });
-  setTimeout(() => {
-    scrollToButtom();
-  }, 100);
   return true;
 };
 
@@ -193,7 +191,7 @@ const eqChatCom = (needBootom: boolean = true) => {
     .then((res: Result) => {
       let data = [] as message[];
       if (!res.code || res.code === 403) {
-        data = needBootom ? eqChatDataStatic() : [addStaticDataCom(new Date(new Date().getTime() - 1000 * 60 * 50), '新的聊天数据哦')];
+        data = eqChatDataStatic();
       } else {
         data = res.data.data;
         next.value = res.data.next;
@@ -201,6 +199,7 @@ const eqChatCom = (needBootom: boolean = true) => {
       }
       if (needBootom) chatData.value = chatTab(data);
       else {
+        data = chatTab([...data, chatData.value[0]]);
         const oldHeight = document.getElementsByClassName('cb-body')[0].scrollHeight || 0;
         chatData.value.shift();
         chatData.value = [...chatTab(data), ...chatData.value];
@@ -226,13 +225,13 @@ const eqChatDataStatic = () => {
   let data = [];
   const initMessage = ['欢迎体验nh-chat👋。需要提醒的是，当前为体验模式，数据不会被保存', '你可以尝试向我发送消息哟，体验不同的功能。'];
   for (let i = 0; i < 2; i++) {
-    data.push(addStaticDataCom(new Date(new Date().getTime() - 1000 * 60 * 50 + 1000 * 60 * 11 * i), initMessage[i]));
+    data.push(addStaticDataCom(new Date(new Date().getTime() - 1000 * 60 * 50 + 1000 * 60 * 11 * i), initMessage[i], 0));
   }
   return data;
 };
 
 // 添加静态消息公共
-const addStaticDataCom = (date: Date, message: string) => {
+const addStaticDataCom = (date: Date, message: string, type: number) => {
   return {
     date: getTimeFormat(date),
     id: -1,
@@ -241,7 +240,7 @@ const addStaticDataCom = (date: Date, message: string) => {
     relationUid: -1,
     sendState: 1,
     sendUid: undefined,
-    type: 0,
+    type: type,
     tab: false,
     state: true
   };
@@ -270,6 +269,7 @@ const sendInfo = () => {
     message: sendVal.value,
     type: 0
   }).then((res) => {
+    if (res.code !== 200) res.data = randomNumber();
     pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 0, sendVal.value, res.code === 200);
     emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
     sendVal.value = '';
