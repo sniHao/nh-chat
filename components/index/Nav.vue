@@ -69,6 +69,7 @@ const resize = () => {
 
 onMounted(() => {
   eqUser();
+  resize();
   window.addEventListener('resize', resize);
 });
 onBeforeUnmount(() => {

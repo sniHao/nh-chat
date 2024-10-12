@@ -54,6 +54,11 @@
             </div>
           </div>
         </div>
+        <!-- phone 通过nav全局引入-->
+        <div class="min-icon">
+          <OfSvg :width="32" :height="32" name="close" fill="#ff6700" viewBox="0 0 1139 1024"></OfSvg>
+          <OfSvg :width="32" :height="32" name="open" fill="#ff6700" viewBox="0 0 1139 1024"></OfSvg>
+        </div>
       </div>
       <!-- 聊天框 -->
       <ChatFrame :user="nowUser" @sendCallBack="sendCallBack"></ChatFrame>
@@ -251,6 +256,11 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+.min-icon {
+  position: absolute;
+  right: -1px;
+  bottom: 50%;
+}
 .user-list {
   padding-bottom: $px-4;
 }
@@ -306,6 +316,7 @@ onBeforeUnmount(() => {
 }
 
 .chat-com {
+  position: relative;
   width: $px-280;
   border-right: $px-1 solid $ft-color-tips;
 }
