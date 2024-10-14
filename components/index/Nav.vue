@@ -15,21 +15,23 @@
           <OfSvg :width="28" :height="28" viewBox="0 0 512 512" name="github"></OfSvg>
           <span class="ml-4 ft-color-tips ft-b">{{ githubCount }}</span>
         </div>
-        <div class="flex-center-center pd-6 hover-btn" @click="goLogin" v-if="state">
+        <div class="flex-center-center pd-6 hover-btn" @click="goLogin" v-if="userInfo.state">
           <span class="ft-color-tips ft-b">登录 | 注册</span>
         </div>
-        <div v-else class="user-head flex-center-center user-head-nav ml-12" :style="'background-color:' + tranColor(uInfo.photo)">{{ uInfo.photo }}</div>
+        <div v-else class="user-head flex-center-center user-head-nav ml-12" :style="'background-color:' + tranColor(userInfo.uInfo.photo)">
+          {{ userInfo.uInfo.photo }}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { userInfo } from '@/api/index';
 const githubCount = ref('12k');
 const router = useRouter();
 const emit = defineEmits(['showLogin']);
 const isSmallWin = inject('isSmallWin');
+const userInfo = inject<Ref<any>>('userInfo');
 // 跳首页
 const goHome = () => {
   router.push('/');
@@ -53,19 +55,20 @@ const switchMode = () => {
   modeStyle.value = !modeStyle.value;
 };
 
-const state = ref(true);
-const uInfo = ref({} as any);
-const eqUser = () => {
-  userInfo().then((res) => {
-    if (res.code !== 200) return (state.value = true);
-    uInfo.value = res.data;
-    state.value = false;
-  });
-};
+// const state = ref(true);
+// const uInfo = ref({} as any);
+// const eqUser = () => {
+//   userInfo().then((res) => {
+//     if (res.code !== 200) return (state.value = true);
+//     uInfo.value = res.data;
+//     state.value = false;
+//   });
+// };
+// provide('userInfo', uInfo);
 
-onMounted(() => {
-  eqUser();
-});
+// onMounted(() => {
+//   eqUser();
+// });
 </script>
 
 <style lang="scss" scoped>

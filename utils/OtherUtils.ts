@@ -1,12 +1,7 @@
 // 单文字背景色
 export const tranColor = (name: string) => {
   let res = parseInt(name.charCodeAt(0) + '', 10).toString(16);
-  if (res.length === 2) {
-    const randomNumberString = Math.floor(Math.random() * 100)
-      .toString()
-      .padStart(2, '0');
-    res += randomNumberString;
-  }
+  if (res.length === 2) res = res.repeat(2);
   return '#' + res.slice(1, 4);
 };
 

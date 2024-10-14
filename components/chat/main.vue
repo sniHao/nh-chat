@@ -22,13 +22,7 @@
               <div class="ft-color-tips">聊天通讯空空的</div>
             </div>
           </template>
-          <div
-            v-else
-            class="pd-zy-12 hover-pointer user"
-            :class="item.id === checkId ? 'check' : ''"
-            v-for="(item, index) in userList"
-            :key="index"
-            @click="showChat(item)">
+          <div v-else class="pd-zy-12 hover-pointer user" :class="userClass(item)" v-for="(item, index) in userList" :key="item.id" @click="showChat(item)">
             <div class="user-box pd-sx-6 flex-center-zy">
               <n-badge :value="item.notRead" :max="99" :offset="[-5, 5]">
                 <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)">
@@ -88,6 +82,13 @@
         </div>
       </n-card>
     </n-modal>
+    <n-modal
+      v-model:show="showDelModel"
+      preset="dialog"
+      title="是否确认删除该聊天"
+      positive-text="确认"
+      negative-text="点错啦"
+      @positive-click="confirmDelChat"></n-modal>
     <!-- 右键封装 -->
     <OfRightButton v-if="showRightBtn" :left="rightBtnLeft" :top="rightBtnTop" :list="czList" @choose="chooseRight"></OfRightButton>
   </div>
@@ -95,12 +96,19 @@
 
 <script setup lang="ts">
 import { createDiscreteApi } from 'naive-ui';
-import { eqRelation, eqUserMail, goChat } from '~/api/index';
+import { eqRelation, eqUserMail, goChat, delChat, topChat } from '~/api/index';
 import { isEmail } from '~/utils/OtherUtils';
 const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 
+// 通讯样式
+const userClass = (item: Relation) => {
+  return {
+    check: item.id === checkId.value,
+    userTop: item.top === 1
+  };
+};
 // 手机状态下展开和收缩
 const isPhoneUnfold = ref(false);
 const isPhoneCallBack = (state: boolean) => {
@@ -118,6 +126,7 @@ const sendCallBack = (res: { val: string; type: number }) => {
       break;
     }
   }
+  sortData();
 };
 
 // 发起聊天
@@ -160,7 +169,6 @@ const hasUser = ref<any>();
 const goSearch = () => {
   if (!isEmail(searchVal.value)) return tips('error', '请输入正确的邮箱格式📫');
   hasUser.value = {};
-  // 发送接口查询用户
   eqUserMail(searchVal.value).then((res) => {
     if (res.code !== 200) return tips('error', res.msg);
     hasUser.value = res.data;
@@ -180,17 +188,40 @@ const eqUserList = () => {
             id: 1,
             uid: 1,
             relationUid: 2,
-            lastMessage: '欢迎使用nh-caht',
+            lastMessage: '你可以尝试向我发送消息哟，体验不同的功能。',
+            notRead: 1,
+            top: 0,
+            lastMessageDate: getTimeFormat(new Date()),
+            name: '体验官小H1',
+            photo: '体'
+          },
+          {
+            id: 2,
+            uid: 1,
+            relationUid: 2,
+            lastMessage: '你可以尝试向我发送消息哟，体验不同的功能。',
             notRead: 1,
             top: 1,
             lastMessageDate: getTimeFormat(new Date()),
-            name: '体验官小H',
+            name: '体验官小H2',
+            photo: '体'
+          },
+          {
+            id: 3,
+            uid: 1,
+            relationUid: 2,
+            lastMessage: '你可以尝试向我发送消息哟，体验不同的功能。',
+            notRead: 1,
+            top: 0,
+            lastMessageDate: getTimeFormat(new Date()),
+            name: '体验官小H3',
             photo: '体'
           }
         ];
         return;
       }
       userList.value = res.data;
+      sortData();
     })
     .finally(() => addListener());
 };
@@ -200,12 +231,15 @@ const userListDom = ref([] as any);
 const addListener = () => {
   userListDom.value = Array.from(document.getElementsByClassName('user-box'));
   userListDom.value.forEach((item: any, index: number) => {
-    item.addEventListener('contextmenu', (e: MouseEvent) => listenerUser(e, index));
+    const eventHandler = (e: MouseEvent) => listenerUser(e, index);
+    item.addEventListener('contextmenu', eventHandler);
+    item.__eventHandler = eventHandler;
   });
 };
 
 // 选择右键内容回调
 const chooseRight = (item: any) => {
+  item.incident();
   showRightBtn.value = false;
 };
 // 监听列表右键
@@ -213,19 +247,70 @@ const rightBtnLeft = ref(0);
 const rightBtnTop = ref(0);
 const czList = ref();
 const showRightBtn = ref(false);
+const nowCheckData = ref({} as Relation);
 const listenerUser = (e: MouseEvent, index: number) => {
   e.preventDefault();
   showRightBtn.value = true;
-  // userList.value[index]
   rightBtnLeft.value = e.x;
   rightBtnTop.value = e.y;
-  czList.value = [{ id: 0, name: '置顶消息' }];
+  nowCheckData.value = userList.value[index];
+  const top = userList.value[index].top;
+  czList.value = [
+    { id: 0, name: top === 0 ? '置顶聊天' : '取消置顶', incident: () => topChatGo(top === 0 ? 1 : 0) },
+    { id: 0, name: '删除聊天', incident: () => delChatGo() }
+  ];
+};
+
+// 置顶聊天
+const topChatGo = (state: number) => {
+  topChat(nowCheckData.value.id, state).then((res) => {
+    if (res.code !== 200) return tips('error', res.msg);
+    clearListener();
+    const index = userList.value.findIndex((item) => item.id === nowCheckData.value.id);
+    const [data] = userList.value.splice(index, 1);
+    data.top = state;
+    userList.value.unshift(data);
+    sortData();
+    setTimeout(() => {
+      addListener();
+    }, 1);
+  });
+};
+// 排序数据
+const sortData = () => {
+  userList.value.sort((a, b) => {
+    if (a.top === 1 && b.top !== 1) {
+      return -1;
+    }
+    if (b.top === 1 && a.top !== 1) {
+      return 1;
+    }
+    return countTimeDiff(a.lastMessageDate, b.lastMessageDate, 1000) > 0 ? 1 : -1;
+  });
+};
+
+// 删除聊天
+const showDelModel = ref(false);
+const delChatGo = () => {
+  showDelModel.value = true;
+};
+const confirmDelChat = () => {
+  delChat(nowCheckData.value.id).then((res) => {
+    if (res.code !== 200) return tips('error', res.msg);
+    showDelModel.value = false;
+    userList.value = userList.value.filter((item) => item.id !== nowCheckData.value.id);
+    if (nowUser.value.id === nowCheckData.value.id) nowUser.value = {};
+    return tips('success', res.msg);
+  });
 };
 
 // 销毁监听
 const clearListener = () => {
-  userListDom.value.forEach((item: any, index: number) => {
-    item.removeEventListener('contextmenu', (e: MouseEvent) => listenerUser(e, index));
+  userListDom.value.forEach((item: any) => {
+    if (item.__eventHandler) {
+      item.removeEventListener('contextmenu', item.__eventHandler);
+      delete item.__eventHandler;
+    }
   });
 };
 
@@ -308,9 +393,14 @@ onBeforeUnmount(() => {
   background-color: rgb(255 255 255 / 12%);
 }
 
+.userTop {
+  background-color: $ft-color-2-op-2 !important;
+}
+
 .user:hover {
   background-color: $bg-color-hover;
 }
+
 .check {
   background-color: $bg-color-hover;
 }

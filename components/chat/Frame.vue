@@ -35,17 +35,14 @@
                 <span v-if="item.type === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
               </div>
-              <div class="flex-end ml-6" v-if="!item.state">
-                <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
-              </div>
             </div>
             <div class="cbb-main flex-right" v-else>
-              <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor('哈')">哈</div>
+              <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor(userInfo.uInfo.photo)">{{userInfo.uInfo.photo}}</div>
               <div class="cbbm-box cbbm-box-right flex">
                 <span v-if="item.type === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
               </div>
-              <div class="flex-end mr-6" v-if="!item.state">
+              <div class="flex-end mr-6 hover-pointer" v-if="!item.state" @click="reissue(item.message)">
                 <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
               </div>
             </div>
@@ -93,6 +90,7 @@ import { eqChat, sendMessage, sendMessageImage } from '~/api/index';
 import WebSocketService from '@/utils/WebSocketService';
 const webSocketService = inject<WebSocketService>('webSocketService');
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
+const userInfo = inject<Ref<any>>('userInfo') || ref({});
 
 const props = defineProps({
   user: {
@@ -174,9 +172,7 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
       if (res.code !== 200) res.data = randomNumber();
       pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 1, e.target.result, res.code === 200);
       emit('sendCallBack', { val: truncate(e.target.result), type: 1 });
-      setTimeout(() => {
-        scrollToButtom();
-      }, 100);
+      scrollToButtom();
     });
   };
   reader.readAsDataURL(file as any);
@@ -256,7 +252,6 @@ const addStaticDataCom = (date: Date, message: string, type: number) => {
 // 私信
 const sendVal = ref('');
 const inputMaxNumber = ref(2000);
-// Enter事件
 const handleKeyUp = (e: KeyboardEvent) => {
   if (e.key !== 'Enter') return;
   if (e.shiftKey) return;
@@ -275,15 +270,30 @@ const sendInfo = () => {
     receiveUid: props.user.relationUid,
     message: sendVal.value,
     type: 0
-  }).then((res) => {
-    if (res.code !== 200) res.data = randomNumber();
-    pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 0, sendVal.value, res.code === 200);
-    emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
-    sendVal.value = '';
-    setTimeout(() => {
+  })
+    .then((res) => {
+      if (res.code !== 200) {
+        res.data = randomNumber();
+        if (firstMessage.value) simReissue(res.data);
+      }
+      pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 0, sendVal.value, res.code === 200);
+      emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
+      sendVal.value = '';
       scrollToButtom();
-    }, 100);
-  });
+    })
+    .finally(() => {
+      firstMessage.value = false;
+    });
+};
+
+// 模拟回复
+const firstMessage = ref(true);
+const simReissue = (id: number) => {
+  setTimeout(() => {
+    pushDataOneCom(id, props.user.receiveUid, props.user.uid, 0, '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰', true);
+    emit('sendCallBack', { val: truncate(randomNumber()), type: 0 });
+    scrollToButtom();
+  }, 2000);
 };
 
 // 推送单条消息
@@ -303,6 +313,7 @@ const pushDataOneCom = (id: number, sendUid: number, relationUid: number, type: 
     })
   );
 };
+
 // 发送消息前置处理
 const sendInfoPre = () => {
   if (sendVal.value.length === 0) return false;
@@ -317,10 +328,18 @@ const sendInfoPre = () => {
   return true;
 };
 
+// 发送失败重试
+const reissue = (message: string) => {
+  sendVal.value = message;
+  sendInfo();
+};
+
 // 滚动条居底
 const scrollToButtom = () => {
-  let scrollDom = document.getElementsByClassName('cb-body')[0];
-  scrollDom.scrollTop = scrollDom.scrollHeight;
+  setTimeout(() => {
+    let scrollDom = document.getElementsByClassName('cb-body')[0];
+    scrollDom.scrollTop = scrollDom.scrollHeight;
+  }, 100);
 };
 
 // 上拉拉取消息
@@ -344,6 +363,7 @@ const listenerScrollToTop = (state: boolean) => {
 const initData = () => {
   chatData.value = [];
   loding.value = true;
+  page.value = 1;
 };
 
 onMounted(() => {
@@ -355,10 +375,10 @@ const nowChatUid = inject<(uid: number) => void>('getNowChatUid');
 watch(
   () => props.user,
   () => {
+    if (Object.keys(props.user).length === 0) return;
     initData();
     eqChatData();
     if (nowChatUid) nowChatUid(props.user.id);
-    console.log('userInfo', props.user, Object.keys(props.user).length);
   }
 );
 onBeforeUnmount(() => {

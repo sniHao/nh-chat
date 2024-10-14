@@ -11,6 +11,7 @@
 <script setup lang="ts">
 import WebSocketService from './utils/WebSocketService';
 import { createDiscreteApi } from 'naive-ui';
+import { userInfo } from '~/api/index';
 const { notification } = createDiscreteApi(['notification']);
 const router = useRouter();
 const store = useStore();
@@ -63,9 +64,24 @@ const resize = () => {
 };
 provide('isSmallWin', isSmallWin);
 
+// 用户数据
+const data = ref({
+  state: true,
+  uInfo: {} as any
+});
+const eqUser = () => {
+  userInfo().then((res) => {
+    if (res.code !== 200) return (data.value.state = true);
+    data.value.uInfo = res.data;
+    data.value.state = false;
+  });
+};
+provide('userInfo', data);
+
 onMounted(() => {
   ws.connect();
   resize();
+  eqUser();
   window.addEventListener('resize', resize);
 });
 onUnmounted(() => {
