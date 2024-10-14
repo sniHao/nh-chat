@@ -212,7 +212,7 @@ const staticUser = () => {
 };
 
 // 创建监听
-const userListDom = ref([] as any);
+const userListDom = ref<Element[]>();
 const addListener = () => {
   userListDom.value = Array.from(document.getElementsByClassName('user-box'));
   userListDom.value.forEach((item: any, index: number) => {
@@ -294,7 +294,7 @@ const confirmDelChat = () => {
 
 // 销毁监听
 const clearListener = () => {
-  userListDom.value.forEach((item: any) => {
+  userListDom.value?.forEach((item: any) => {
     if (item.__eventHandler) {
       item.removeEventListener('contextmenu', item.__eventHandler);
       delete item.__eventHandler;

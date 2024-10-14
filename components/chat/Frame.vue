@@ -79,6 +79,8 @@
         </div>
       </div>
     </template>
+    <!-- 右键封装 -->
+    <OfRightButton v-if="showRightBtnMessage" :left="rightBtnLeft" :top="rightBtnTop" :list="czList" @choose="chooseRight"></OfRightButton>
   </div>
 </template>
 
@@ -218,6 +220,7 @@ const eqChatCom = (needBootom: boolean = true) => {
       setTimeout(() => {
         loding.value = false;
         scrollToButtom();
+        addListener();
         listenerScrollToTop(true);
       }, 150);
     });
@@ -372,6 +375,66 @@ onMounted(() => {
   console.log(webSocketService, '===');
 });
 
+// 右键监听
+const messageListDom = ref<Element[]>();
+const addListener = () => {
+  messageListDom.value = Array.from(document.getElementsByClassName('cbbm-box'));
+  messageListDom.value.forEach((item: any, index: number) => {
+    const eventHandler = (e: MouseEvent) => listenerMessage(e, index);
+    item.addEventListener('contextmenu', eventHandler);
+    item.__eventHandler = eventHandler;
+  });
+};
+// 选择右键内容回调
+const chooseRight = (item: any) => {
+  item.incident();
+  showRightBtnMessage.value = false;
+};
+// 监听列表右键
+const rightBtnLeft = ref(0);
+const rightBtnTop = ref(0);
+const czList = ref();
+const showRightBtnMessage = ref(false);
+const nowCheckData = ref({} as Relation);
+const listenerMessage = (e: MouseEvent, index: number) => {
+  e.preventDefault();
+  showRightBtnMessage.value = true;
+  rightBtnLeft.value = e.x;
+  rightBtnTop.value = e.y;
+  nowCheckData.value = chatData.value[index];
+  czList.value = [
+    { id: 0, name: '删除聊天', incident: () => delMessageGo() },
+    { id: 0, name: '撤回', incident: () => delMessageGo() },
+    { id: 0, name: '复制', incident: () => delMessageGo() }
+  ];
+};
+
+// 删除聊天
+const delMessageGo = () => {
+  showRightBtnMessage.value = false;
+};
+
+// 销毁监听
+const clearListener = () => {
+  messageListDom.value?.forEach((item: any) => {
+    if (item.__eventHandler) {
+      item.removeEventListener('contextmenu', item.__eventHandler);
+      delete item.__eventHandler;
+    }
+  });
+};
+
+// 关闭右键
+const closeRightBtn = () => {
+  showRightBtnMessage.value = false;
+};
+
+// 关闭右键公共方法
+const closeRightBtnCom = (state: boolean) => {
+  const dom = document.getElementsByClassName('chat-main')[0];
+  state ? dom.addEventListener('click', closeRightBtn) : dom.removeEventListener('click', closeRightBtn);
+};
+
 // 选择用户做出改变
 const nowChatUid = inject<(uid: number) => void>('getNowChatUid');
 watch(
@@ -383,7 +446,12 @@ watch(
     if (nowChatUid) nowChatUid(props.user.id);
   }
 );
+onMounted(() => {
+  closeRightBtnCom(true);
+});
 onBeforeUnmount(() => {
+  clearListener();
+  closeRightBtnCom(false);
   listenerScrollToTop(false);
 });
 </script>
