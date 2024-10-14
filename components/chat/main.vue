@@ -1,9 +1,9 @@
 <template>
-  <div class="w-960 flex-center-center mt-nav">
+  <div class="w-960 flex-center-center mt-nav" :class="isSmallWin ? 'w-100' : ''">
     <div class="chat-main w-100 flex" :class="newInfo ? 'new-info ' : ''">
-      <div class="chat-com flex-down">
+      <div class="chat-com flex-down" :class="isPhoneUnfold ? 'shrink' : ''">
         <!-- 搜索 -->
-        <div class="pd-12">
+        <div class="pd-12" :class="isPhoneUnfold ? 'shrink' : ''">
           <n-input-group>
             <n-input
               style="--n-border-hover: 1px solid #ff6700; --n-border-focus: 1px solid #ff6700; --n-box-shadow-focus: 0 0 0 2px rgba(255, 103, 0, 0.2)"
@@ -55,13 +55,20 @@
           </div>
         </div>
         <!-- phone 通过nav全局引入-->
-        <div class="min-icon">
-          <OfSvg :width="32" :height="32" name="close" fill="#ff6700" viewBox="0 0 1139 1024"></OfSvg>
-          <OfSvg :width="32" :height="32" name="open" fill="#ff6700" viewBox="0 0 1139 1024"></OfSvg>
+        <div class="min-icon" v-if="isSmallWin">
+          <OfSvg
+            :width="32"
+            :height="32"
+            name="close"
+            fill="#ff6700"
+            viewBox="0 0 1139 1024"
+            v-if="!isPhoneUnfold"
+            @click="isPhoneCallBack(isPhoneUnfold)"></OfSvg>
+          <OfSvg :width="32" :height="32" name="open" fill="#ff6700" viewBox="0 0 1139 1024" v-else @click="isPhoneCallBack(isPhoneUnfold)"></OfSvg>
         </div>
       </div>
       <!-- 聊天框 -->
-      <ChatFrame :user="nowUser" @sendCallBack="sendCallBack"></ChatFrame>
+      <ChatFrame :user="nowUser" @sendCallBack="sendCallBack" :isPhoneUnfold="isPhoneUnfold"></ChatFrame>
     </div>
     <!-- 弹框 -->
     <n-modal v-model:show="showModal">
@@ -92,6 +99,13 @@ import { eqRelation, eqUserMail, goChat } from '~/api/index';
 import { isEmail } from '~/utils/OtherUtils';
 const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
+const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
+
+// 手机状态下展开和收缩
+const isPhoneUnfold = ref(false);
+const isPhoneCallBack = (state: boolean) => {
+  isPhoneUnfold.value = !state;
+};
 
 // 发送消息回调
 const sendCallBack = (res: { val: string; type: number }) => {
@@ -136,6 +150,7 @@ const showChat = (user: any) => {
   checkId.value = user.id;
   nowUser.value = user;
   user.notRead = 0;
+  if (isSmallWin.value) isPhoneUnfold.value = true;
 };
 
 // 搜索
@@ -256,6 +271,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+.shrink {
+  width: $px-36 !important;
+  flex-direction: unset !important;
+}
 .min-icon {
   position: absolute;
   right: -1px;
@@ -317,6 +336,7 @@ onBeforeUnmount(() => {
 
 .chat-com {
   position: relative;
+  overflow: hidden;
   width: $px-280;
   border-right: $px-1 solid $ft-color-tips;
 }

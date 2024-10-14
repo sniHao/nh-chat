@@ -2,7 +2,7 @@
   <div class="main-nav flex-center-center">
     <div class="nav flex-center-zy pd-6">
       <div class="flex-center ft-b">
-        <div class="ft-26 home-ft-color hover-pointer" @click="goHome" v-if="showLog">nh-chat</div>
+        <div class="ft-26 home-ft-color hover-pointer" @click="goHome" v-if="!isSmallWin">nh-chat</div>
         <div class="ml-26 ft-color-tips hover-ft" @click="goGithub">演示</div>
         <div class="ml-16 ft-color-tips hover-ft" @click="goDocs">说明文档</div>
       </div>
@@ -29,6 +29,7 @@ import { userInfo } from '@/api/index';
 const githubCount = ref('12k');
 const router = useRouter();
 const emit = defineEmits(['showLogin']);
+const isSmallWin = inject('isSmallWin');
 // 跳首页
 const goHome = () => {
   router.push('/');
@@ -62,18 +63,8 @@ const eqUser = () => {
   });
 };
 
-const showLog = ref(true);
-const resize = () => {
-  showLog.value = window.screen.width > 510 && window.innerWidth > 510;
-};
-
 onMounted(() => {
   eqUser();
-  resize();
-  window.addEventListener('resize', resize);
-});
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', resize);
 });
 </script>
 

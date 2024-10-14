@@ -1,8 +1,9 @@
 <template>
   <!-- 聊天框 -->
-  <div class="chat-body flex-down">
+  <div class="chat-body flex-down" :class="isPhoneUnfold ? 'shrink-frame' : ''">
+    <div class="chat-body-overlay" v-if="!isPhoneUnfold && isSmallWin"></div>
     <template v-if="Object.keys(props.user).length === 0">
-      <div class="h-100 flex-center-center flex-down">
+      <div class="h-100 w-100 flex-center-center flex-down">
         <div class="ft-color-tips mt-10 ft-16">选择好友，一起聊聊吧！</div>
       </div>
     </template>
@@ -91,10 +92,16 @@ import type { UploadFileInfo } from 'naive-ui';
 import { eqChat, sendMessage, sendMessageImage } from '~/api/index';
 import WebSocketService from '@/utils/WebSocketService';
 const webSocketService = inject<WebSocketService>('webSocketService');
+const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
+
 const props = defineProps({
   user: {
     type: Object,
     default: {}
+  },
+  isPhoneUnfold: {
+    type: Boolean,
+    default: false
   }
 });
 const emit = defineEmits(['sendCallBack']);
@@ -360,6 +367,9 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+.shrink-frame {
+  width: calc(100% - $px-1) !important;
+}
 .message-loading {
   animation: circle 1s linear infinite;
 }
@@ -500,5 +510,16 @@ onBeforeUnmount(() => {
 .chat-body {
   width: calc(100% - $px-280 - $px-1);
   position: relative;
+  overflow: hidden;
+}
+.chat-body-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(44 51 68);
+  border-radius: $px-12;
+  z-index: 2;
 }
 </style>

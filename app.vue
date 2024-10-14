@@ -56,11 +56,21 @@ const showLoginEvent = (val: { win: boolean; state: boolean }) => {
   if (val.state) location.reload();
 };
 
+// 窗口大小变化
+let isSmallWin = ref(false);
+const resize = () => {
+  isSmallWin.value = window.screen.width < 510 || window.innerWidth < 510;
+};
+provide('isSmallWin', isSmallWin);
+
 onMounted(() => {
   ws.connect();
+  resize();
+  window.addEventListener('resize', resize);
 });
 onUnmounted(() => {
   ws.close();
+  window.removeEventListener('resize', resize);
 });
 </script>
 <style lang="scss">
