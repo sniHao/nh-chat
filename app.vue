@@ -67,7 +67,7 @@ provide('isSmallWin', isSmallWin);
 // 用户数据
 const data = ref({
   state: true,
-  uInfo: {} as any
+  uInfo: { photo: '哈' } as any
 });
 const eqUser = () => {
   userInfo().then((res) => {

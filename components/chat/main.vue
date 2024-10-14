@@ -183,47 +183,32 @@ const eqUserList = () => {
     .then((res: Result): void => {
       if (!res.code || res.code === 403) {
         welcome();
-        userList.value = [
-          {
-            id: 1,
-            uid: 1,
-            relationUid: 2,
-            lastMessage: '你可以尝试向我发送消息哟，体验不同的功能。',
-            notRead: 1,
-            top: 0,
-            lastMessageDate: getTimeFormat(new Date()),
-            name: '体验官小H1',
-            photo: '体'
-          },
-          {
-            id: 2,
-            uid: 1,
-            relationUid: 2,
-            lastMessage: '你可以尝试向我发送消息哟，体验不同的功能。',
-            notRead: 1,
-            top: 1,
-            lastMessageDate: getTimeFormat(new Date()),
-            name: '体验官小H2',
-            photo: '体'
-          },
-          {
-            id: 3,
-            uid: 1,
-            relationUid: 2,
-            lastMessage: '你可以尝试向我发送消息哟，体验不同的功能。',
-            notRead: 1,
-            top: 0,
-            lastMessageDate: getTimeFormat(new Date()),
-            name: '体验官小H3',
-            photo: '体'
-          }
-        ];
+        staticUser();
         return;
       }
       userList.value = res.data;
       sortData();
     })
     .finally(() => addListener());
+};
+
+// 静态用户通讯录
+const staticUser = () => {
+  userList.value = [];
+  for (let i = 0; i < 2; i++) {
+    userList.value.push({
+      id: i,
+      uid: 1,
+      relationUid: 2,
+      lastMessage: '你可以尝试向我发送消息哟，体验不同的功能。',
+      notRead: 1,
+      top: i,
+      lastMessageDate: getTimeFormat(new Date(new Date().getTime() - 1000 * 60 * i)),
+      name: '体验官H-' + (i + 1),
+      photo: '体'
+    });
+  }
+  sortData();
 };
 
 // 创建监听
@@ -264,7 +249,6 @@ const listenerUser = (e: MouseEvent, index: number) => {
 // 置顶聊天
 const topChatGo = (state: number) => {
   topChat(nowCheckData.value.id, state).then((res) => {
-    if (res.code !== 200) return tips('error', res.msg);
     clearListener();
     const index = userList.value.findIndex((item) => item.id === nowCheckData.value.id);
     const [data] = userList.value.splice(index, 1);
@@ -296,11 +280,15 @@ const delChatGo = () => {
 };
 const confirmDelChat = () => {
   delChat(nowCheckData.value.id).then((res) => {
-    if (res.code !== 200) return tips('error', res.msg);
+    clearListener();
     showDelModel.value = false;
     userList.value = userList.value.filter((item) => item.id !== nowCheckData.value.id);
     if (nowUser.value.id === nowCheckData.value.id) nowUser.value = {};
-    return tips('success', res.msg);
+    if (res.code !== 200) tips('warning', '体验环境，并没有真正的删除哦');
+    else tips('success', res.msg);
+    setTimeout(() => {
+      addListener();
+    }, 1);
   });
 };
 

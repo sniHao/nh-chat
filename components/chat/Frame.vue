@@ -37,7 +37,7 @@
               </div>
             </div>
             <div class="cbb-main flex-right" v-else>
-              <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor(userInfo.uInfo.photo)">{{userInfo.uInfo.photo}}</div>
+              <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor(userInfo.uInfo.photo)">{{ userInfo.uInfo.photo }}</div>
               <div class="cbbm-box cbbm-box-right flex">
                 <span v-if="item.type === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
@@ -90,7 +90,7 @@ import { eqChat, sendMessage, sendMessageImage } from '~/api/index';
 import WebSocketService from '@/utils/WebSocketService';
 const webSocketService = inject<WebSocketService>('webSocketService');
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
-const userInfo = inject<Ref<any>>('userInfo') || ref({});
+const userInfo = inject<Ref<any>>('userInfo');
 
 const props = defineProps({
   user: {
@@ -290,8 +290,9 @@ const sendInfo = () => {
 const firstMessage = ref(true);
 const simReissue = (id: number) => {
   setTimeout(() => {
-    pushDataOneCom(id, props.user.receiveUid, props.user.uid, 0, '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰', true);
-    emit('sendCallBack', { val: truncate(randomNumber()), type: 0 });
+    const message = '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰';
+    pushDataOneCom(id, props.user.receiveUid, props.user.uid, 0, message, true);
+    emit('sendCallBack', { val: truncate(message), type: 0 });
     scrollToButtom();
   }, 2000);
 };
@@ -364,6 +365,7 @@ const initData = () => {
   chatData.value = [];
   loding.value = true;
   page.value = 1;
+  sendVal.value = '';
 };
 
 onMounted(() => {
