@@ -212,9 +212,26 @@ const staticUser = () => {
 };
 
 // 创建监听
+const tapAndHold = ref(false);
 const addListener = () => {
   const parentDiv = document.querySelector('.user-list') as HTMLElement;
   parentDiv.addEventListener('contextmenu', listenerUser);
+  let longPressTimer: NodeJS.Timeout;
+  parentDiv.addEventListener('mousedown', (e: MouseEvent) => {
+    longPressTimer = setTimeout(() => {
+      listenerUser(e);
+      tapAndHold.value = true;
+      setTimeout(() => {
+        tapAndHold.value = false;
+      }, 500);
+    }, 500);
+  });
+  parentDiv.addEventListener('mouseup', () => {
+    clearTimeout(longPressTimer);
+  });
+  parentDiv.addEventListener('mouseleave', () => {
+    clearTimeout(longPressTimer);
+  });
 };
 
 // 选择右键内容回调
@@ -304,7 +321,7 @@ const clearListener = () => {
 
 // 关闭右键
 const closeRightBtn = () => {
-  showRightBtn.value = false;
+  if (!tapAndHold.value) showRightBtn.value = false;
 };
 
 // 关闭右键公共方法

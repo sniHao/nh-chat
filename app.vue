@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import WebSocketService from './utils/WebSocketService';
 import { createDiscreteApi } from 'naive-ui';
-import { userInfo } from '~/api/index';
+import { userInfo, eqUserBasics } from '~/api/index';
 const { notification } = createDiscreteApi(['notification']);
 const router = useRouter();
 const store = useStore();
@@ -27,21 +27,26 @@ const getNowChatUid = (uid: number) => {
 provide('getNowChatUid', getNowChatUid);
 
 watch(
-  () => ws.newMessage.uid,
+  () => ws.pushCount,
   () => {
-    // 收到消息对象不是当前聊天对象则推消息
-    if (nowUid.value !== ws.newMessage.uid) ofNewMessage(ws.newMessage);
+    if (nowUid.value !== ws.newMessage.receiveUid) ofNewMessage(ws.newMessage);
+  },
+  {
+    deep: true
   }
 );
 // 新消息处理
 const ofNewMessage = (msg: any) => {
-  console.log('推消息咯', msg);
-  if (msg.value.length > 30) msg.value = msg.value.substring(0, 30) + '...';
-  notification['info']({
-    content: '你收到了一条来自' + msg.uid + '的消息',
-    meta: () => h('div', null, [msg.value, h('span', { onClick: goChat(msg.uid), class: 'tips-link' }, '查看详情')]),
-    duration: 2500,
-    keepAliveOnHover: true
+  if (msg.message.length > 30) msg.message = msg.message.substring(0, 30) + '...';
+  if (msg.type === 1) msg.message = '[图片]';
+  eqUserBasics(msg.receiveUid).then((res: Result) => {
+    let name = res.code === 200 ? res.data.name : '未知用户';
+    notification['info']({
+      content: '你收到了一条来自 ' + name + ' 的消息',
+      meta: () => h('div', null, [msg.message, h('span', { onClick: goChat(msg.uid), class: 'tips-link' }, '查看详情')]),
+      duration: 3500,
+      keepAliveOnHover: true
+    });
   });
 };
 

@@ -1,6 +1,6 @@
 <template>
   <div class="lo">
-    <div class="login" id="loginx">
+    <div class="login" id="loginx" :class="isSmallWin ? 'small-style' : ''">
       <div class="login-main">
         <div class="login-logo">nh-chat</div>
         <div class="login-close">
@@ -24,8 +24,9 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { eqUserCount } from '@/api/index';
+const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const emit = defineEmits(['showLogin']);
 
 const cut = ref(1);
@@ -37,12 +38,12 @@ const closeLo = () => {
 };
 
 // 接受操作传的值(控制回复的展示)
-const clickEven = (val) => {
+const clickEven = (val: { value: number }) => {
   cut.value = val.value;
 };
 
 // 登录框状态
-const showLoginEvent = (show) => {
+const showLoginEvent = (show: { win: boolean; state: boolean }) => {
   emit('showLogin', show);
 };
 
@@ -55,6 +56,9 @@ onMounted(() => {
 </script>
 
 <style scoped lang="scss">
+.small-style {
+  width: 90% !important;
+}
 :deep(.n-divider:not(.n-divider--vertical)) {
   margin-top: $px-12;
   margin-bottom: $px-4;

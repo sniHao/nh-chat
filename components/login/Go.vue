@@ -30,7 +30,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { login, welcome, welcomeCode } from '@/api/index';
 const store = useStore();
 
@@ -84,16 +84,16 @@ const gologin = () => {
 
 const loginPwd = () => {
   loding.value = 1;
-  login(data).then((res) => {
+  login(data).then((res: Result) => {
     loginResultCom(res);
   });
 };
 const loginCode = () => {
-  welcome(data).then((res) => {
+  welcome(data).then((res: Result) => {
     loginResultCom(res);
   });
 };
-const loginResultCom = (res) => {
+const loginResultCom = (res: Result) => {
   loding.value = 0;
   if (res.code !== 200) return tips('error', res.msg);
   store.saveToken(res.data);

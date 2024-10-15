@@ -282,7 +282,7 @@ const sendInfo = () => {
     message: sendVal.value,
     type: 0
   })
-    .then((res) => {
+    .then((res: Result) => {
       if (res.code !== 200) {
         res.data = randomNumber();
         if (firstMessage.value) simReissue(res.data);
@@ -387,14 +387,28 @@ const initData = () => {
   sendVal.value = '';
 };
 
-onMounted(() => {
-  console.log(webSocketService, '===');
-});
-
 // 右键监听
+const tapAndHold = ref(false);
 const addListener = () => {
+  tapAndHold.value = false;
   const parentDiv = document.querySelector('.cb-body') as HTMLElement;
   parentDiv.addEventListener('contextmenu', listenerMessage);
+  let longPressTimer: NodeJS.Timeout;
+  parentDiv.addEventListener('mousedown', (e: MouseEvent) => {
+    longPressTimer = setTimeout(() => {
+      listenerMessage(e);
+      tapAndHold.value = true;
+      setTimeout(() => {
+        tapAndHold.value = false;
+      }, 500);
+    }, 500);
+  });
+  parentDiv.addEventListener('mouseup', () => {
+    clearTimeout(longPressTimer);
+  });
+  parentDiv.addEventListener('mouseleave', () => {
+    clearTimeout(longPressTimer);
+  });
 };
 // 右键事件
 const rightBtnLeft = ref(0);
@@ -433,6 +447,7 @@ const listenerMessage = (e: MouseEvent) => {
     czList.value.push({ id: 2, name: '撤回消息', incident: () => revocationMessageGo() });
   }
 };
+
 // 获取父级dom
 const eqFather = (target: HTMLElement) => {
   while (!target.classList.contains('cbb-box')) {
@@ -456,7 +471,7 @@ const revocationMessageGo = () => {
     reMessage.value = nowCheckData.value.message;
     reMessageId.value = nowCheckData.value.id;
   }
-  revocationMessage(nowCheckData.value.id).then((res) => {
+  revocationMessage(nowCheckData.value.id).then((res: Result) => {
     nowCheckData.value.message = '你撤回了一条消息';
     nowCheckData.value.sendState = 2;
     emit('sendCallBack', { val: truncate('你撤回了一条消息'), type: 0 });
@@ -470,7 +485,7 @@ const reEdit = () => {
 // 删除聊天
 const delMessageGo = () => {
   showRightBtnMessage.value = false;
-  delMessage(nowCheckData.value.id).then((res) => {
+  delMessage(nowCheckData.value.id).then((res: Result) => {
     const index = chatData.value.indexOf(nowCheckData.value);
     chatData.value.splice(index, 1);
     if (chatData.value.length === 0) emit('sendCallBack', { val: truncate('消息被删除'), type: 0 });
@@ -509,7 +524,7 @@ const clearListener = () => {
 
 // 关闭右键
 const closeRightBtn = () => {
-  showRightBtnMessage.value = false;
+  if (!tapAndHold.value) showRightBtnMessage.value = false;
 };
 
 // 关闭右键公共方法
@@ -529,7 +544,9 @@ watch(
     if (nowChatUid) nowChatUid(props.user.id);
   }
 );
+
 onMounted(() => {
+  console.log(webSocketService, '===');
   closeRightBtnCom(true);
 });
 onBeforeUnmount(() => {
