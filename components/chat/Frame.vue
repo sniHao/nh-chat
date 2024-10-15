@@ -32,7 +32,7 @@
           </div>
           <!-- 消息框 -->
           <template v-else>
-            <div class="cbb-main flex" v-if="item.sendUid === user.receiveUid">
+            <div class="cbb-main flex" v-if="item.receiveUid === user.uid">
               <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor(user.photo)">{{ user.photo }}</div>
               <div class="cbbm-box cbbm-box-left flex">
                 <span v-if="item.type === 0">{{ item.message }}</span>
@@ -93,7 +93,7 @@ const { notification } = createDiscreteApi(['notification']);
 import type { UploadFileInfo } from 'naive-ui';
 import { eqChat, sendMessage, sendMessageImage, revocationMessage, delMessage } from '~/api/index';
 import WebSocketService from '@/utils/WebSocketService';
-const webSocketService = inject<WebSocketService>('webSocketService');
+const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const userInfo = inject<Ref<any>>('userInfo');
 
@@ -251,7 +251,7 @@ const addStaticDataCom = (date: Date, message: string, type: number) => {
     id: -1,
     message: message,
     receiveState: 1,
-    relationUid: -1,
+    receiveUid: -1,
     sendState: 1,
     sendUid: undefined,
     type: type,
@@ -287,7 +287,7 @@ const sendInfo = () => {
         res.data = randomNumber();
         if (firstMessage.value) simReissue(res.data);
       }
-      pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 0, sendVal.value, res.code === 200);
+      pushDataOneCom(res.data, props.user.uid, props.user.relationUid, 0, sendVal.value, res.code === 200);
       emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
       sendVal.value = '';
       scrollToButtom();
@@ -302,21 +302,21 @@ const firstMessage = ref(true);
 const simReissue = (id: number) => {
   setTimeout(() => {
     const message = '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰';
-    pushDataOneCom(id, props.user.receiveUid, props.user.uid, 0, message, true);
+    pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, true);
     emit('sendCallBack', { val: truncate(message), type: 0 });
     scrollToButtom();
   }, 2000);
 };
 
 // 推送单条消息
-const pushDataOneCom = (id: number, sendUid: number, relationUid: number, type: number, message: string, state: boolean) => {
+const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: boolean, sendState: number = 1) => {
   chatData.value.push(
     chatTabOne({
       id: id,
       sendUid: sendUid,
-      relationUid: relationUid,
+      receiveUid: receiveUid,
       type: type,
-      sendState: 1,
+      sendState: sendState,
       receiveState: 1,
       date: getTimeFormat(new Date()),
       message: message,
@@ -545,8 +545,18 @@ watch(
   }
 );
 
+const ws = ref(webSocketService);
+watch(
+  () => ws.value?.pushCount,
+  () => {
+    const data = ws.value.newMessage;
+    pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, true, data.state);
+    emit('sendCallBack', { val: truncate(data.message), type: data.type });
+    scrollToButtom();
+  }
+);
+
 onMounted(() => {
-  console.log(webSocketService, '===');
   closeRightBtnCom(true);
 });
 onBeforeUnmount(() => {

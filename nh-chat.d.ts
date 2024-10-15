@@ -19,7 +19,7 @@ declare global {
   interface message {
     id: number;
     sendUid: number | undefined;
-    relationUid: number;
+    receiveUid: number;
     type: number;
     sendState: number;
     receiveState: number;
