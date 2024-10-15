@@ -42,7 +42,7 @@
                 <span v-if="item.type === 0">{{ item.message }}</span>
                 <n-image v-else class="chat-image" :src="item.message" />
               </div>
-              <div class="flex-end mr-6 hover-pointer" v-if="!item.state" @click="reissue(item.message)">
+              <div class="flex-end mr-6 hover-pointer" v-if="!item.state" @click="reissue(item.message, item.type)">
                 <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
               </div>
             </div>
@@ -173,7 +173,7 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
     sendMessageImage(fd, props.user.relationUid).then((res) => {
       if (res.code !== 200) res.data = randomNumber();
       pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 1, e.target.result, res.code === 200);
-      emit('sendCallBack', { val: truncate(e.target.result), type: 1 });
+      emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
       scrollToButtom();
     });
   };
@@ -333,7 +333,15 @@ const sendInfoPre = () => {
 };
 
 // 发送失败重试
-const reissue = (message: string) => {
+const reissue = async (message: string, type: number) => {
+  if (type === 1) {
+    const response = await fetch(message);
+    const blob = await response.blob();
+    const file = new File([blob], 'chat-image', { type: blob.type });
+    console.log(file);
+    beforeUpload({ file: { file: file } as UploadFileInfo, fileList: [] });
+    return;
+  }
   sendVal.value = message;
   sendInfo();
 };
@@ -376,28 +384,35 @@ onMounted(() => {
 });
 
 // 右键监听
-const messageListDom = ref<Element[]>();
 const addListener = () => {
-  messageListDom.value = Array.from(document.getElementsByClassName('cbbm-box'));
-  messageListDom.value.forEach((item: any, index: number) => {
-    const eventHandler = (e: MouseEvent) => listenerMessage(e, index);
-    item.addEventListener('contextmenu', eventHandler);
-    item.__eventHandler = eventHandler;
-  });
+  const parentDiv = document.querySelector('.cb-body') as HTMLElement;
+  parentDiv.addEventListener('contextmenu', listenerMessage);
 };
-// 选择右键内容回调
-const chooseRight = (item: any) => {
-  item.incident();
-  showRightBtnMessage.value = false;
-};
-// 监听列表右键
+// 右键事件
 const rightBtnLeft = ref(0);
 const rightBtnTop = ref(0);
 const czList = ref();
 const showRightBtnMessage = ref(false);
 const nowCheckData = ref({} as Relation);
-const listenerMessage = (e: MouseEvent, index: number) => {
+const listenerMessage = (e: MouseEvent) => {
   e.preventDefault();
+  const parentDiv = document.querySelector('.cb-body');
+  if (!parentDiv) return;
+  let target = e.target as HTMLElement;
+  let index = -1;
+  if (target.classList.contains('cbbm-box')) {
+    const allSonBoxes = Array.from(parentDiv.children);
+    index = allSonBoxes.indexOf(eqFather(target));
+  } else {
+    while (target !== parentDiv) {
+      if (target.classList.contains('cbbm-box')) {
+        const allSonBoxes = Array.from(parentDiv.children);
+        index = allSonBoxes.indexOf(eqFather(target));
+      }
+      target = target.parentElement as HTMLElement;
+    }
+  }
+  if (index === -1) return;
   showRightBtnMessage.value = true;
   rightBtnLeft.value = e.x;
   rightBtnTop.value = e.y;
@@ -408,6 +423,19 @@ const listenerMessage = (e: MouseEvent, index: number) => {
     { id: 0, name: '复制', incident: () => delMessageGo() }
   ];
 };
+// 获取父级dom
+const eqFather = (target: HTMLElement) => {
+  while (!target.classList.contains('cbb-box')) {
+    target = target.parentElement as HTMLElement;
+  }
+  return target;
+};
+
+// 选择右键内容回调
+const chooseRight = (item: any) => {
+  item.incident();
+  showRightBtnMessage.value = false;
+};
 
 // 删除聊天
 const delMessageGo = () => {
@@ -416,12 +444,8 @@ const delMessageGo = () => {
 
 // 销毁监听
 const clearListener = () => {
-  messageListDom.value?.forEach((item: any) => {
-    if (item.__eventHandler) {
-      item.removeEventListener('contextmenu', item.__eventHandler);
-      delete item.__eventHandler;
-    }
-  });
+  const parentDiv = document.querySelector('.cb-body') as HTMLElement;
+  parentDiv.removeEventListener('contextmenu', listenerMessage);
 };
 
 // 关闭右键

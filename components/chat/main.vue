@@ -212,14 +212,9 @@ const staticUser = () => {
 };
 
 // 创建监听
-const userListDom = ref<Element[]>();
 const addListener = () => {
-  userListDom.value = Array.from(document.getElementsByClassName('user-box'));
-  userListDom.value.forEach((item: any, index: number) => {
-    const eventHandler = (e: MouseEvent) => listenerUser(e, index);
-    item.addEventListener('contextmenu', eventHandler);
-    item.__eventHandler = eventHandler;
-  });
+  const parentDiv = document.querySelector('.user-list') as HTMLElement;
+  parentDiv.addEventListener('contextmenu', listenerUser);
 };
 
 // 选择右键内容回调
@@ -233,8 +228,25 @@ const rightBtnTop = ref(0);
 const czList = ref();
 const showRightBtn = ref(false);
 const nowCheckData = ref({} as Relation);
-const listenerUser = (e: MouseEvent, index: number) => {
+const listenerUser = (e: MouseEvent) => {
   e.preventDefault();
+  const parentDiv = document.querySelector('.user-list');
+  if (!parentDiv) return;
+  let target = e.target as HTMLElement;
+  let index = 0;
+  if (target.classList.contains('user-list')) return;
+  if (target.classList.contains('user')) {
+    const allSonBoxes = Array.from(parentDiv.children);
+    index = allSonBoxes.indexOf(target);
+  } else {
+    while (target !== parentDiv) {
+      if (target.classList.contains('user')) {
+        const allSonBoxes = Array.from(parentDiv.children);
+        index = allSonBoxes.indexOf(target);
+      }
+      target = target.parentElement as HTMLElement;
+    }
+  }
   showRightBtn.value = true;
   rightBtnLeft.value = e.x;
   rightBtnTop.value = e.y;
@@ -249,15 +261,11 @@ const listenerUser = (e: MouseEvent, index: number) => {
 // 置顶聊天
 const topChatGo = (state: number) => {
   topChat(nowCheckData.value.id, state).then((res) => {
-    clearListener();
     const index = userList.value.findIndex((item) => item.id === nowCheckData.value.id);
     const [data] = userList.value.splice(index, 1);
     data.top = state;
     userList.value.unshift(data);
     sortData();
-    setTimeout(() => {
-      addListener();
-    }, 1);
   });
 };
 // 排序数据
@@ -280,26 +288,18 @@ const delChatGo = () => {
 };
 const confirmDelChat = () => {
   delChat(nowCheckData.value.id).then((res) => {
-    clearListener();
     showDelModel.value = false;
     userList.value = userList.value.filter((item) => item.id !== nowCheckData.value.id);
     if (nowUser.value.id === nowCheckData.value.id) nowUser.value = {};
     if (res.code !== 200) tips('warning', '体验环境，并没有真正的删除哦');
     else tips('success', res.msg);
-    setTimeout(() => {
-      addListener();
-    }, 1);
   });
 };
 
 // 销毁监听
 const clearListener = () => {
-  userListDom.value?.forEach((item: any) => {
-    if (item.__eventHandler) {
-      item.removeEventListener('contextmenu', item.__eventHandler);
-      delete item.__eventHandler;
-    }
-  });
+  const parentDiv = document.querySelector('.user-list') as HTMLElement;
+  parentDiv.removeEventListener('contextmenu', listenerUser);
 };
 
 // 关闭右键
