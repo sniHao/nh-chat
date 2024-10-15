@@ -43,7 +43,21 @@ const ofNewMessage = (msg: any) => {
     let name = res.code === 200 ? res.data.name : '未知用户';
     notification['info']({
       content: '你收到了一条来自 ' + name + ' 的消息',
-      meta: () => h('div', null, [msg.message, h('span', { onClick: goChat(msg.uid), class: 'tips-link' }, '查看详情')]),
+      meta: () =>
+        h('div', null, [
+          msg.message,
+          h(
+            'span',
+            {
+              onClick: (event) => {
+                event.stopPropagation();
+                goChat(msg.receiveUid);
+              },
+              class: 'tips-link'
+            },
+            '查看详情'
+          )
+        ]),
       duration: 3500,
       keepAliveOnHover: true
     });
@@ -52,7 +66,8 @@ const ofNewMessage = (msg: any) => {
 
 // 查看消息详情
 const goChat = (id: number) => {
-  router.push('/try/' + id);
+  store.setGoChat(id);
+  router.push('/try');
 };
 
 // 登录框

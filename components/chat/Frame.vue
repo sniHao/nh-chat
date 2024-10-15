@@ -541,7 +541,7 @@ watch(
     if (Object.keys(props.user).length === 0) return;
     initData();
     eqChatData();
-    if (nowChatUid) nowChatUid(props.user.id);
+    if (nowChatUid) nowChatUid(props.user.relationUid);
   }
 );
 

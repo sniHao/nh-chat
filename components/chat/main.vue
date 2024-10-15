@@ -135,6 +135,7 @@ const sendChat = (uid: number) => {
     if (res.code !== 200) return tips('error', res.msg);
     addTopList(res.data);
     showChat(res.data);
+    sortData();
   });
   showModal.value = false;
 };
@@ -343,6 +344,15 @@ const welcome = () => {
       negativeText: '知道啦'
     });
 };
+
+watch(
+  () => store.go_chat_u,
+  () => {
+    if (store.go_chat_u === -1) return;
+    sendChat(store.go_chat_u);
+    store.initGoChat();
+  }
+);
 
 // 来新消息了
 const newInfo = ref(false);
