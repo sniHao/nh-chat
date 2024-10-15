@@ -21,7 +21,6 @@ const props = defineProps({
   }
 });
 const choose = (item: any) => {
-  console.log('点击了', item);
   emit('choose', item);
 };
 </script>

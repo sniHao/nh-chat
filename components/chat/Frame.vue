@@ -25,7 +25,10 @@
           </div>
           <!-- 其他事件 -->
           <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.sendState === 2 || item.receiveState === 2">
-            <div class="cbb-tips">对方撤回了一条消息</div>
+            <div class="cbb-tips">
+              {{ item.message }}
+              <n-button v-if="reMessageId === item.id" text color="#FF6700" class="ml-4" size="tiny" @click="reEdit">重新编辑</n-button>
+            </div>
           </div>
           <!-- 消息框 -->
           <template v-else>
@@ -88,7 +91,7 @@
 import { createDiscreteApi } from 'naive-ui';
 const { notification } = createDiscreteApi(['notification']);
 import type { UploadFileInfo } from 'naive-ui';
-import { eqChat, sendMessage, sendMessageImage } from '~/api/index';
+import { eqChat, sendMessage, sendMessageImage, revocationMessage, delMessage } from '~/api/index';
 import WebSocketService from '@/utils/WebSocketService';
 const webSocketService = inject<WebSocketService>('webSocketService');
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
@@ -111,6 +114,11 @@ const chatTabOne = (data: message) => {
   if (chatData.value.length === 0) data.tab = true;
   else data.tab = countTimeDiff(chatData.value[chatData.value.length - 1].date, data.date, 60) >= 10;
   return data;
+};
+
+// 指定两消息是否需要时间标
+const chatTabDiff = (data: message, lastDate: message) => {
+  return countTimeDiff(data.date, lastDate.date, 60) >= 10;
 };
 
 // 消息列表是否需要时间标
@@ -393,7 +401,7 @@ const rightBtnLeft = ref(0);
 const rightBtnTop = ref(0);
 const czList = ref();
 const showRightBtnMessage = ref(false);
-const nowCheckData = ref({} as Relation);
+const nowCheckData = ref({} as message);
 const listenerMessage = (e: MouseEvent) => {
   e.preventDefault();
   const parentDiv = document.querySelector('.cb-body');
@@ -418,10 +426,12 @@ const listenerMessage = (e: MouseEvent) => {
   rightBtnTop.value = e.y;
   nowCheckData.value = chatData.value[index];
   czList.value = [
-    { id: 0, name: '删除聊天', incident: () => delMessageGo() },
-    { id: 0, name: '撤回', incident: () => delMessageGo() },
-    { id: 0, name: '复制', incident: () => delMessageGo() }
+    { id: 0, name: '复制内容', incident: () => copyMessage() },
+    { id: 1, name: '删除消息', incident: () => delMessageGo() }
   ];
+  if (nowCheckData.value.sendUid !== props.user.receiveUid && countTimeDiff(nowCheckData.value.date, getTimeFormat(new Date()), 60) < 3) {
+    czList.value.push({ id: 2, name: '撤回消息', incident: () => revocationMessageGo() });
+  }
 };
 // 获取父级dom
 const eqFather = (target: HTMLElement) => {
@@ -437,15 +447,64 @@ const chooseRight = (item: any) => {
   showRightBtnMessage.value = false;
 };
 
+// 撤回消息
+const reMessage = ref('');
+const reMessageId = ref(-1);
+const revocationMessageGo = () => {
+  showRightBtnMessage.value = false;
+  if (nowCheckData.value.type === 0) {
+    reMessage.value = nowCheckData.value.message;
+    reMessageId.value = nowCheckData.value.id;
+  }
+  revocationMessage(nowCheckData.value.id).then((res) => {
+    nowCheckData.value.message = '你撤回了一条消息';
+    nowCheckData.value.sendState = 2;
+    emit('sendCallBack', { val: truncate('你撤回了一条消息'), type: 0 });
+  });
+};
+// 重新编辑
+const reEdit = () => {
+  sendVal.value = reMessage.value;
+};
+
 // 删除聊天
 const delMessageGo = () => {
   showRightBtnMessage.value = false;
+  delMessage(nowCheckData.value.id).then((res) => {
+    const index = chatData.value.indexOf(nowCheckData.value);
+    chatData.value.splice(index, 1);
+    if (chatData.value.length === 0) emit('sendCallBack', { val: truncate('消息被删除'), type: 0 });
+    else {
+      const lastData = chatData.value[chatData.value.length - 1];
+      emit('sendCallBack', { val: truncate(lastData.type === 1 ? '[图片]' : lastData.message), type: lastData.type });
+    }
+    if (index === chatData.value.length) return;
+    chatData.value[index].state = false;
+    if (index === 0) {
+      chatData.value[index].tab = true;
+      return;
+    }
+    chatData.value[index].tab = chatTabDiff(chatData.value[index - 1], chatData.value[index]);
+    if (res.code !== 200) tips('warning', '体验环境，并没有真正的删除哦');
+  });
+};
+
+// 复制聊天内容
+const copyMessage = () => {
+  if (nowCheckData.value.type === 1) {
+    copyImage(nowCheckData.value.message).then((res) => {
+      res ? tips('success', '图片已复制到粘贴板') : tips('error', '复制失败');
+    });
+    return;
+  }
+  const result = copyText(nowCheckData.value.message);
+  result ? tips('success', '内容已复制到粘贴板') : tips('error', '复制失败');
 };
 
 // 销毁监听
 const clearListener = () => {
   const parentDiv = document.querySelector('.cb-body') as HTMLElement;
-  parentDiv.removeEventListener('contextmenu', listenerMessage);
+  if (parentDiv) parentDiv.removeEventListener('contextmenu', listenerMessage);
 };
 
 // 关闭右键

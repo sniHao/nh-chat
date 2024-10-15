@@ -25,3 +25,7 @@ export const sendMessageImage = (data: FormData, receiveUid: number) => request(
 export const topChat = (relationId: number, state: number) => request({ url: 'chat/topChat/' + relationId + '/' + state, method: 'put' });
 
 export const delChat = (relationId: number) => request({ url: 'chat/delChat/' + relationId, method: 'put' });
+
+export const revocationMessage = (mid: number) => request({ url: 'chat/revocationMessage/' + mid, method: 'put' });
+
+export const delMessage = (mid: number) => request({ url: 'chat/delMessage/' + mid, method: 'put' });

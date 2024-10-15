@@ -39,3 +39,50 @@ export const randomNumber = () => {
     .padEnd(12, '0');
   return randomNumberString;
 };
+
+// 复制文本
+export const copyText = (text: string): boolean => {
+  const textArea = document.createElement('textarea');
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.select();
+  textArea.setSelectionRange(0, 99999);
+  let success = false;
+  try {
+    success = document.execCommand('copy');
+  } catch (err) {
+    success = false;
+  }
+  document.body.removeChild(textArea);
+  return success;
+};
+
+// 复制图片
+export const copyImage = (imageUrl: string): Promise<Boolean> => {
+  return new Promise((reactive) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+    img.src = imageUrl;
+    img.onload = async () => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          const item = new ClipboardItem({ 'image/png': blob });
+          try {
+            await navigator.clipboard.write([item]);
+            reactive(true);
+          } catch (err) {
+            reactive(false);
+          }
+        }
+      }, 'image/png');
+    };
+    img.onerror = () => {
+      reactive(false);
+    };
+  });
+};
