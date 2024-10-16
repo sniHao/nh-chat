@@ -118,7 +118,8 @@ const isPhoneCallBack = (state: boolean) => {
 };
 
 // 发送消息回调
-const sendCallBack = (res: { val: string; type: number }) => {
+const ofNewMessage = inject<(message: any) => void>('ofNewMessage');
+const sendCallBack = (res: { val: string; type: number; uid: number }) => {
   let message = res.val;
   if (res.type === 1) message = '[图片]';
   for (let i = 0; i < userList.value.length; i++) {
@@ -127,6 +128,13 @@ const sendCallBack = (res: { val: string; type: number }) => {
       userList.value[i].lastMessageDate = getTimeFormat(new Date());
       break;
     }
+  }
+  if (res.uid) {
+    if (ofNewMessage) ofNewMessage({ message: message, type: res.type, receiveUid: res.uid });
+    newInfo.value = true;
+    setTimeout(() => {
+      newInfo.value = false;
+    }, 600);
   }
   sortData();
 };
@@ -367,10 +375,12 @@ watch(
     newData.lastMessage = truncate(data.message) ?? '-';
     if (Object.keys(nowUser.value).length === 0 || nowUser.value.relationUid !== data.receiveUid) {
       newInfo.value = true;
-      newData.notRead++;
+      if (data.state !== 2) newData.notRead++;
       setTimeout(() => {
         newInfo.value = false;
       }, 600);
+    } else {
+      ws.value.send(JSON.stringify(nowUser.value.id));
     }
   }
 );

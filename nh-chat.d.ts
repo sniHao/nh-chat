@@ -27,6 +27,7 @@ declare global {
     message: string;
     tab: boolean;
     state: boolean;
+    check: boolean;
   }
 }
 

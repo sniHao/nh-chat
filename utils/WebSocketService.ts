@@ -18,17 +18,17 @@ export default class WebSocketService {
     this.socket.onopen = () => {
       this.state = this.socket?.readyState ?? 0;
     };
-
     this.socket.onmessage = (event: MessageEvent) => {
       this.newMessage = JSON.parse(event.data);
       this.pushCount.value++;
     };
-
     this.socket.onclose = () => {
       this.state = this.socket?.readyState ?? 0;
-      console.log('断开连接');
       this.reconnect();
     };
+  }
+  send(id: string) {
+    if (this.socket) this.socket.send(id);
   }
   reconnect() {
     if (this.reconnectInterval === 30000 || this.state === 1) return;
@@ -40,8 +40,6 @@ export default class WebSocketService {
   }
   // 关闭连接
   close(): void {
-    if (this.socket) {
-      this.socket.close();
-    }
+    if (this.socket) this.socket.close();
   }
 }

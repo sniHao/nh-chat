@@ -32,54 +32,78 @@
           </div>
           <!-- 消息框 -->
           <template v-else>
-            <div class="cbb-main flex" v-if="item.receiveUid === user.uid">
-              <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor(user.photo)">{{ user.photo }}</div>
-              <div class="cbbm-box cbbm-box-left flex">
-                <span v-if="item.type === 0">{{ item.message }}</span>
-                <n-image v-else class="chat-image" :src="item.message" />
+            <template v-if="item.sendUid !== user.uid">
+              <div class="flex w-100" @click="moreCheckedCallBack(item)" :class="moreCheckState ? 'is-checked' : ''">
+                <n-checkbox :checked="item.check" @update.self:checked="moreCheckedCallBack(item)" v-if="moreCheckState"></n-checkbox>
+                <div class="cbb-main flex">
+                  <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor(user.photo)">{{ user.photo }}</div>
+                  <div class="cbbm-box cbbm-box-left flex">
+                    <span v-if="item.type === 0">{{ item.message }}</span>
+                    <n-image v-else class="chat-image" :src="item.message" />
+                  </div>
+                </div>
               </div>
-            </div>
-            <div class="cbb-main flex-right" v-else>
-              <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor(userInfo.uInfo.photo)">{{ userInfo.uInfo.photo }}</div>
-              <div class="cbbm-box cbbm-box-right flex">
-                <span v-if="item.type === 0">{{ item.message }}</span>
-                <n-image v-else class="chat-image" :src="item.message" />
+            </template>
+            <template v-else>
+              <div class="flex w-100" @click="moreCheckedCallBack(item)" :class="moreCheckState ? 'is-checked' : ''">
+                <n-checkbox :checked="item.check" @update.self:checked.stop="moreCheckedCallBack(item)" v-if="moreCheckState"></n-checkbox>
+                <div class="cbb-main flex-right">
+                  <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor(userInfo.uInfo.photo)">{{ userInfo.uInfo.photo }}</div>
+                  <div class="cbbm-box cbbm-box-right flex">
+                    <span v-if="item.type === 0">{{ item.message }}</span>
+                    <n-image v-else class="chat-image" :src="item.message" />
+                  </div>
+                  <div class="flex-end mr-6 hover-pointer" v-if="!item.state" @click="reissue(item.message, item.type)">
+                    <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
+                  </div>
+                </div>
               </div>
-              <div class="flex-end mr-6 hover-pointer" v-if="!item.state" @click="reissue(item.message, item.type)">
-                <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
-              </div>
-            </div>
+            </template>
           </template>
         </div>
       </div>
       <div class="cb-input">
-        <!-- 表情包图片等等 -->
-        <div class="cb-input-controls flex-center">
-          <n-popover trigger="click" raw @update:show="handleUpdateShow">
-            <template #trigger>
-              <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="emoji"></OfSvg>
-            </template>
-            <OfEmoJi @choose="chooseEmoji" />
-          </n-popover>
-          <n-upload :show-file-list="false" @before-upload="beforeUpload" accept=".png,.jpeg,.jpg">
-            <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></OfSvg>
-          </n-upload>
-        </div>
-        <!-- 输入框 -->
-        <div class="cb-input-main">
-          <n-input
-            ref="inputInstRef"
-            style="--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset"
-            v-model:value="sendVal"
-            type="textarea"
-            @keydown.enter.native="handleKeyUp"
-            @input="valChange"
-            placeholder="说点啥..." />
-        </div>
-        <div class="cb-input-go flex-center-zy pd-zy-6 ft-color-tips">
-          <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
-          <div class="hover-pointer" @click="sendInfo">按Enter键发送</div>
-        </div>
+        <template v-if="moreCheckState">
+          <div class="flex-center-center h-100">
+            <div class="flex-down-center" @click="delMoreChecked">
+              <OfSvg :width="24" :height="24" fill="#ff6700" class="hover-pointer mb-2" name="del"></OfSvg>
+              <n-button text color="#ff6700" size="large">删除</n-button>
+            </div>
+            <div class="flex-down-center ml-18" @click="cancelMoreChecked">
+              <OfSvg :width="24" :height="24" fill="#ff670099" class="hover-pointer mb-2" name="cancel"></OfSvg>
+              <n-button text color="#ff670099" size="large">取消</n-button>
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <!-- 表情包图片等等 -->
+          <div class="cb-input-controls flex-center">
+            <n-popover trigger="click" raw @update:show="handleUpdateShow">
+              <template #trigger>
+                <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="emoji"></OfSvg>
+              </template>
+              <OfEmoJi @choose="chooseEmoji" />
+            </n-popover>
+            <n-upload :show-file-list="false" @before-upload="beforeUpload" accept=".png,.jpeg,.jpg">
+              <OfSvg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></OfSvg>
+            </n-upload>
+          </div>
+          <!-- 输入框 -->
+          <div class="cb-input-main">
+            <n-input
+              ref="inputInstRef"
+              style="--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset"
+              v-model:value="sendVal"
+              type="textarea"
+              @keydown.enter.native="handleKeyUp"
+              @input="valChange"
+              placeholder="说点啥..." />
+          </div>
+          <div class="cb-input-go flex-center-zy pd-zy-6 ft-color-tips">
+            <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
+            <div class="hover-pointer" @click="sendInfo">按Enter键发送</div>
+          </div>
+        </template>
       </div>
     </template>
     <!-- 右键封装 -->
@@ -125,6 +149,7 @@ const chatTabDiff = (data: message, lastDate: message) => {
 const chatTab = (data: message[]) => {
   for (let i = data.length - 1; i >= 0; i--) {
     data[i].state = true;
+    data[i].check = false;
     if (i === 0) {
       data[i].tab = true;
       break;
@@ -256,7 +281,8 @@ const addStaticDataCom = (date: Date, message: string, type: number) => {
     sendUid: undefined,
     type: type,
     tab: false,
-    state: true
+    state: true,
+    check: false
   };
 };
 
@@ -303,7 +329,7 @@ const simReissue = (id: number) => {
   setTimeout(() => {
     const message = '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰';
     pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, true);
-    emit('sendCallBack', { val: truncate(message), type: 0 });
+    emit('sendCallBack', { val: truncate(message), type: 0, uid: props.user.relationUid });
     scrollToButtom();
   }, 2000);
 };
@@ -321,7 +347,8 @@ const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: n
       date: getTimeFormat(new Date()),
       message: message,
       tab: false,
-      state: state
+      state: state,
+      check: false
     })
   );
 };
@@ -385,6 +412,7 @@ const initData = () => {
   loding.value = true;
   page.value = 1;
   sendVal.value = '';
+  moreCheckState.value = false;
 };
 
 // 右键监听
@@ -420,6 +448,7 @@ const listenerMessage = (e: MouseEvent) => {
   e.preventDefault();
   const parentDiv = document.querySelector('.cb-body');
   if (!parentDiv) return;
+  if (moreCheckState.value) return;
   let target = e.target as HTMLElement;
   let index = -1;
   if (target.classList.contains('cbbm-box')) {
@@ -446,6 +475,7 @@ const listenerMessage = (e: MouseEvent) => {
   if (nowCheckData.value.sendUid !== props.user.relationUid && countTimeDiff(nowCheckData.value.date, getTimeFormat(new Date()), 60) < 3) {
     czList.value.push({ id: 2, name: '撤回消息', incident: () => revocationMessageGo() });
   }
+  czList.value.push({ id: 3, name: '多选', incident: () => moreChecked() });
 };
 
 // 获取父级dom
@@ -516,6 +546,39 @@ const copyMessage = () => {
   result ? tips('success', '内容已复制到粘贴板') : tips('error', '复制失败');
 };
 
+// 多选
+const moreCheckState = ref(false);
+const moreChecked = () => {
+  moreCheckState.value = true;
+};
+// 删除多选内容
+const delMoreChecked = () => {
+  console.log(saveChecked.value);
+
+  moreCheckState.value = false;
+
+  // delMessage(saveChecked.value).then((res: Result) => {
+  //   saveChecked.value.forEach((item: number) => {
+  //     const index = chatData.value.findIndex((item2: message) => item2.id === item);
+  //     chatData.value.splice(index, 1);
+  //   });
+};
+// 取消多选
+const cancelMoreChecked = () => {
+  moreCheckState.value = false;
+  saveChecked.value = [];
+  chatData.value.forEach((item: message) => {
+    item.check = false;
+  });
+};
+// 多选操作
+const saveChecked = ref([] as number[]);
+const moreCheckedCallBack = (data: message) => {
+  if (!data.check) saveChecked.value.push(data.id);
+  else saveChecked.value.splice(saveChecked.value.indexOf(data.id), 1);
+  data.check = !data.check;
+};
+
 // 销毁监听
 const clearListener = () => {
   const parentDiv = document.querySelector('.cb-body') as HTMLElement;
@@ -574,6 +637,15 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+.is-checked:hover {
+  background-color: #4a505d;
+  cursor: pointer;
+}
+:deep(.n-checkbox-box-wrapper) {
+  margin-top: $px-14;
+  margin-right: $px-10;
+}
+
 .shrink-frame {
   width: calc(100% - $px-1) !important;
 }
@@ -647,15 +719,19 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
   position: relative;
   border-radius: $px-8;
-  word-wrap: break-word;
-  word-break: break-all;
-  overflow-wrap: break-word;
-  white-space: pre-wrap;
+  span {
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
 }
 
 .cbb-main {
+  width: 100%;
   min-height: $px-42;
-  margin-bottom: $px-12;
+  margin-top: $px-6;
+  margin-bottom: $px-6;
 }
 .cbb-tips {
   border-radius: $px-4;

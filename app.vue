@@ -70,6 +70,7 @@ const ofNewMessage = (msg: any) => {
     saveInfo.value.push(n);
   });
 };
+provide('ofNewMessage', ofNewMessage);
 
 // 查看消息详情
 const goChat = (id: number) => {

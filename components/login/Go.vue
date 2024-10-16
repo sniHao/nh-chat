@@ -4,7 +4,7 @@
       <input type="text" placeholder="请输入邮箱" v-model="data.mail" required />
     </div>
     <div class="lb-tp-tepwd mt-18" v-if="cutUp == 1">
-      <input type="password" placeholder="请输入密码" v-model="data.password" required />
+      <input type="password" placeholder="请输入密码" v-model="data.password" required @keyup.enter="goLogin"/>
     </div>
     <!-- 验证码 -->
     <div class="lb-tp-tepwd flex-center mt-18" v-if="cutUp == 2">
@@ -14,7 +14,7 @@
     </div>
     <template v-if="loding === 0">
       <div class="lb-tp-go mt-30">
-        <button @click.prevent="gologin" class="hover-pointer">登录</button>
+        <button @click.prevent="goLogin" class="hover-pointer">登录</button>
       </div>
     </template>
     <template v-else>
@@ -70,7 +70,7 @@ const emit = defineEmits(['showLogin']);
 
 //登录事件
 let loding = ref(0);
-const gologin = () => {
+const goLogin = () => {
   if (!isEmail(data.mail)) return tips('error', '请输入正确的邮箱格式📫');
   if (props.cutUp === 1) {
     if (data.password.trim().length === 0) return;
