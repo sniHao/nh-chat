@@ -264,16 +264,16 @@ const eqChatDataStatic = () => {
   let data = [];
   const initMessage = ['欢迎体验nh-chat👋。需要提醒的是，当前为体验模式，数据不会被保存', '你可以尝试向我发送消息哟，体验不同的功能。'];
   for (let i = 0; i < 2; i++) {
-    data.push(addStaticDataCom(new Date(new Date().getTime() - 1000 * 60 * 50 + 1000 * 60 * 11 * i), initMessage[i], 0));
+    data.push(addStaticDataCom(i, new Date(new Date().getTime() - 1000 * 60 * 50 + 1000 * 60 * 11 * i), initMessage[i], 0));
   }
   return data;
 };
 
 // 添加静态消息公共
-const addStaticDataCom = (date: Date, message: string, type: number) => {
+const addStaticDataCom = (id: number, date: Date, message: string, type: number) => {
   return {
     date: getTimeFormat(date),
-    id: -1,
+    id: id,
     message: message,
     receiveState: 1,
     receiveUid: -1,
@@ -311,7 +311,7 @@ const sendInfo = () => {
     .then((res: Result) => {
       if (res.code !== 200) {
         res.data = randomNumber();
-        if (firstMessage.value) simReissue(res.data);
+        if (firstMessage.value) simReissue(3);
       }
       pushDataOneCom(res.data, props.user.uid, props.user.relationUid, 0, sendVal.value, res.code === 200);
       emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
@@ -413,6 +413,7 @@ const initData = () => {
   page.value = 1;
   sendVal.value = '';
   moreCheckState.value = false;
+  saveChecked.value = [];
 };
 
 // 右键监听
@@ -542,7 +543,7 @@ const copyMessage = () => {
 const moreCheckState = ref(false);
 const moreChecked = () => {
   moreCheckState.value = true;
-  moreCheckedCallBack(nowCheckData.value)
+  moreCheckedCallBack(nowCheckData.value);
 };
 // 删除多选内容
 const delMoreChecked = () => {
