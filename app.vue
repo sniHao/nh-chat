@@ -36,12 +36,17 @@ watch(
   }
 );
 // 新消息处理
+let saveInfo = ref([] as any);
 const ofNewMessage = (msg: any) => {
   if (msg.message.length > 30) msg.message = msg.message.substring(0, 30) + '...';
   if (msg.type === 1) msg.message = '[图片]';
   eqUserBasics(msg.receiveUid).then((res: Result) => {
     let name = res.code === 200 ? res.data.name : '未知用户';
-    notification['info']({
+    if (saveInfo.value.length > 3) {
+      saveInfo.value.shift();
+      saveInfo.value[0].destroy();
+    }
+    const n = notification['info']({
       content: '你收到了一条来自 ' + name + ' 的消息',
       meta: () =>
         h('div', null, [
@@ -51,6 +56,7 @@ const ofNewMessage = (msg: any) => {
             {
               onClick: (event) => {
                 event.stopPropagation();
+                n.destroy();
                 goChat(msg.receiveUid);
               },
               class: 'tips-link'
@@ -61,6 +67,7 @@ const ofNewMessage = (msg: any) => {
       duration: 3500,
       keepAliveOnHover: true
     });
+    saveInfo.value.push(n);
   });
 };
 

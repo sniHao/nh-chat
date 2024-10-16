@@ -443,7 +443,7 @@ const listenerMessage = (e: MouseEvent) => {
     { id: 0, name: '复制内容', incident: () => copyMessage() },
     { id: 1, name: '删除消息', incident: () => delMessageGo() }
   ];
-  if (nowCheckData.value.sendUid !== props.user.receiveUid && countTimeDiff(nowCheckData.value.date, getTimeFormat(new Date()), 60) < 3) {
+  if (nowCheckData.value.sendUid !== props.user.relationUid && countTimeDiff(nowCheckData.value.date, getTimeFormat(new Date()), 60) < 3) {
     czList.value.push({ id: 2, name: '撤回消息', incident: () => revocationMessageGo() });
   }
 };
@@ -550,9 +550,16 @@ watch(
   () => ws.value?.pushCount,
   () => {
     const data = ws.value.newMessage;
-    pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, true, data.state);
+    if (Object.keys(props.user).length === 0 || props.user.relationUid !== data.receiveUid) return;
     emit('sendCallBack', { val: truncate(data.message), type: data.type });
-    scrollToButtom();
+    if (data.state === 2) {
+      let newData = chatData.value.filter((item: message) => item.id === data.mid)[0];
+      newData.sendState = 2;
+      newData.message = '对方撤回了一条消息';
+    } else {
+      pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, true, data.state);
+      scrollToButtom();
+    }
   }
 );
 

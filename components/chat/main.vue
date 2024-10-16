@@ -98,6 +98,8 @@
 import { createDiscreteApi } from 'naive-ui';
 import { eqRelation, eqUserMail, goChat, delChat, topChat } from '~/api/index';
 import { isEmail } from '~/utils/OtherUtils';
+import WebSocketService from '@/utils/WebSocketService';
+const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
 const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
@@ -199,7 +201,7 @@ const staticUser = () => {
   for (let i = 0; i < 2; i++) {
     userList.value.push({
       id: i,
-      uid: 1,
+      uid: -1,
       relationUid: 2,
       lastMessage: '你可以尝试向我发送消息哟，体验不同的功能。',
       notRead: 1,
@@ -356,11 +358,24 @@ watch(
 
 // 来新消息了
 const newInfo = ref(false);
+const ws = ref(webSocketService);
+watch(
+  () => ws.value?.pushCount,
+  () => {
+    const data = ws.value.newMessage;
+    let newData = userList.value.filter((item) => item.relationUid === data.receiveUid)[0];
+    newData.lastMessage = truncate(data.message) ?? '-';
+    if (Object.keys(nowUser.value).length === 0 || nowUser.value.relationUid !== data.receiveUid) {
+      newInfo.value = true;
+      newData.notRead++;
+      setTimeout(() => {
+        newInfo.value = false;
+      }, 600);
+    }
+  }
+);
+
 onMounted(() => {
-  newInfo.value = true;
-  setTimeout(() => {
-    newInfo.value = false;
-  }, 1500);
   eqUserList();
   closeRightBtnCom(true);
 });
