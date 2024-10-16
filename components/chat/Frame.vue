@@ -470,7 +470,7 @@ const listenerMessage = (e: MouseEvent) => {
   nowCheckData.value = chatData.value[index];
   czList.value = [
     { id: 0, name: '复制内容', incident: () => copyMessage() },
-    { id: 1, name: '删除消息', incident: () => delMessageGo() }
+    { id: 1, name: '删除消息', incident: () => delMessageGo([nowCheckData.value.id]) }
   ];
   if (nowCheckData.value.sendUid !== props.user.relationUid && countTimeDiff(nowCheckData.value.date, getTimeFormat(new Date()), 60) < 3) {
     czList.value.push({ id: 2, name: '撤回消息', incident: () => revocationMessageGo() });
@@ -513,23 +513,15 @@ const reEdit = () => {
 };
 
 // 删除聊天
-const delMessageGo = () => {
+const delMessageGo = (ids: number[]) => {
   showRightBtnMessage.value = false;
-  delMessage(nowCheckData.value.id).then((res: Result) => {
-    const index = chatData.value.indexOf(nowCheckData.value);
-    chatData.value.splice(index, 1);
+  delMessage(ids).then((res: Result) => {
+    chatData.value = chatData.value.filter((item: message) => !ids.includes(item.id));
     if (chatData.value.length === 0) emit('sendCallBack', { val: truncate('消息被删除'), type: 0 });
     else {
       const lastData = chatData.value[chatData.value.length - 1];
       emit('sendCallBack', { val: truncate(lastData.type === 1 ? '[图片]' : lastData.message), type: lastData.type });
     }
-    if (index === chatData.value.length) return;
-    chatData.value[index].state = false;
-    if (index === 0) {
-      chatData.value[index].tab = true;
-      return;
-    }
-    chatData.value[index].tab = chatTabDiff(chatData.value[index - 1], chatData.value[index]);
     if (res.code !== 200) tips('warning', '体验环境，并没有真正的删除哦');
   });
 };
@@ -550,18 +542,12 @@ const copyMessage = () => {
 const moreCheckState = ref(false);
 const moreChecked = () => {
   moreCheckState.value = true;
+  moreCheckedCallBack(nowCheckData.value)
 };
 // 删除多选内容
 const delMoreChecked = () => {
-  console.log(saveChecked.value);
-
   moreCheckState.value = false;
-
-  // delMessage(saveChecked.value).then((res: Result) => {
-  //   saveChecked.value.forEach((item: number) => {
-  //     const index = chatData.value.findIndex((item2: message) => item2.id === item);
-  //     chatData.value.splice(index, 1);
-  //   });
+  delMessageGo(saveChecked.value);
 };
 // 取消多选
 const cancelMoreChecked = () => {
