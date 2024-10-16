@@ -5,7 +5,7 @@ export const useStore = defineStore('nh', {
     return {
       token: '' as string,
       not_tips: 'false' as string,
-      go_chat_u: -1
+      go_chat_u: -99
     };
   },
   actions: {
@@ -19,7 +19,7 @@ export const useStore = defineStore('nh', {
       this.go_chat_u = uid;
     },
     initGoChat() {
-      this.go_chat_u = -1;
+      this.go_chat_u = -99;
     }
   },
   persist: process.client && {

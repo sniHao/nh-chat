@@ -358,11 +358,17 @@ const welcome = () => {
 watch(
   () => store.go_chat_u,
   () => {
-    if (store.go_chat_u === -1) return;
-    sendChat(store.go_chat_u);
-    store.initGoChat();
+    if (store.go_chat_u === -99) return;
+    upChat();
   }
 );
+// 跳聊天
+const upChat = () => {
+  sendChat(store.go_chat_u);
+  setTimeout(() => {
+    store.initGoChat();
+  }, 50);
+};
 
 // 来新消息了
 const newInfo = ref(false);
@@ -386,6 +392,7 @@ watch(
 );
 
 onMounted(() => {
+  if (store.go_chat_u !== -99) upChat();
   eqUserList();
   closeRightBtnCom(true);
 });

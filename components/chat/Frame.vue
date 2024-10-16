@@ -620,6 +620,7 @@ onBeforeUnmount(() => {
   clearListener();
   closeRightBtnCom(false);
   listenerScrollToTop(false);
+  if (nowChatUid) nowChatUid(-99);
 });
 </script>
 
