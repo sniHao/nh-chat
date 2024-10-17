@@ -168,6 +168,7 @@ const goLogin = () => {
 // 切换主题
 const modeStyle = ref(true);
 const switchMode = () => {
+  theme(!modeStyle.value);
   modeStyle.value = !modeStyle.value;
 };
 
