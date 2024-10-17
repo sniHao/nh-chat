@@ -12,6 +12,14 @@ export const welcome = (data: any) => request({ url: 'user/welcome', method: 'po
 
 export const welcomeCode = (mail: string) => request({ url: 'user/welcomeCode/' + mail, method: 'get' });
 
+export const logout = () => request({ url: 'user/logout', method: 'get' });
+
+export const upBasic = (name: string) => request({ url: 'user/upBasic/' + name, method: 'put' });
+
+export const adPassWord = (pwd: string) => request({ url: 'user/adPassWord/' + pwd, method: 'post' });
+
+export const hasPwd = () => request({ url: 'user/hasPwd', method: 'get' });
+
 export const eqUserCount = () => request({ url: 'user/eqUserCount', method: 'get' });
 
 export const eqRelation = () => request({ url: 'chat/eqRelation', method: 'get' });

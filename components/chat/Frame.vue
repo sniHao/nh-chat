@@ -8,16 +8,24 @@
       </div>
     </template>
     <template v-else>
-      <OfLoader class="loader-abs" v-if="loding"></OfLoader>
-      <OfLoader class="loader-abs" style="background-color: #2c334485" v-if="lodingNewMessage"></OfLoader>
+      <OfLoader class="loader-abs" style="background-color: #2c334485" v-if="lodingMessage"></OfLoader>
       <div class="cb-head flex-center">
         <div class="cb-head-controls"></div>
         <div class="w-100 flex-center-center">{{ user.name }}</div>
-        <div class="cb-head-controls flex-center-onely mr-4 hover-pointer">
-          <OfSvg :width="28" :height="28" name="pointer"></OfSvg>
-        </div>
+        <n-popover trigger="click" placement="bottom">
+          <template #trigger>
+            <div class="cb-head-controls flex-center-onely mr-4 hover-pointer">
+              <OfSvg :width="28" :height="28" name="pointer"></OfSvg>
+            </div>
+          </template>
+          <span class="hover-pointer" @click="closeChat">关闭聊天</span>
+        </n-popover>
       </div>
       <div class="cb-body over-auto h-100">
+        <!-- 时间 -->
+        <div class="flex-center-center ft-13 ft-color-tips mt-8" v-if="chatData.length === 0">
+          <div class="cbb-tips">发起你们的第一句聊天吧，比如："你好"</div>
+        </div>
         <div class="cbb-box" v-for="(item, index) in chatData" :key="index">
           <!-- 时间 -->
           <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.tab">
@@ -131,18 +139,19 @@ const props = defineProps({
     default: false
   }
 });
-const emit = defineEmits(['sendCallBack']);
+const emit = defineEmits(['sendCallBack', 'closeChat']);
+
+// 关闭聊天
+const closeChat = () => {
+  if (nowChatUid) nowChatUid(-99);
+  emit('closeChat');
+};
 
 // 消息与上一条消息时间标
 const chatTabOne = (data: message) => {
   if (chatData.value.length === 0) data.tab = true;
   else data.tab = countTimeDiff(chatData.value[chatData.value.length - 1].date, data.date, 60) >= 10;
   return data;
-};
-
-// 指定两消息是否需要时间标
-const chatTabDiff = (data: message, lastDate: message) => {
-  return countTimeDiff(data.date, lastDate.date, 60) >= 10;
 };
 
 // 消息列表是否需要时间标
@@ -215,7 +224,6 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
 };
 
 // 接口请求数据
-const loding = ref(true);
 const chatData = ref([] as any);
 const page = ref(1);
 const next = ref(false);
@@ -224,7 +232,7 @@ const eqChatData = () => {
 };
 // 数据公共
 const eqChatCom = (needBootom: boolean = true) => {
-  lodingNewMessage.value = true;
+  lodingMessage.value = true;
   eqChat(props.user.relationUid, page.value)
     .then((res: Result) => {
       let data = [] as message[];
@@ -248,10 +256,9 @@ const eqChatCom = (needBootom: boolean = true) => {
       }
     })
     .finally(() => {
-      lodingNewMessage.value = false;
-      if (!needBootom) return;
       setTimeout(() => {
-        loding.value = false;
+        lodingMessage.value = false;
+        if (!needBootom) return;
         scrollToButtom();
         addListener();
         listenerScrollToTop(true);
@@ -373,7 +380,6 @@ const reissue = async (message: string, type: number) => {
     const response = await fetch(message);
     const blob = await response.blob();
     const file = new File([blob], 'chat-image', { type: blob.type });
-    console.log(file);
     beforeUpload({ file: { file: file } as UploadFileInfo, fileList: [] });
     return;
   }
@@ -390,10 +396,10 @@ const scrollToButtom = () => {
 };
 
 // 上拉拉取消息
-const lodingNewMessage = ref(false);
+const lodingMessage = ref(false);
 const scrollToTop = () => {
   let scrollDom = document.getElementsByClassName('cb-body')[0];
-  if (scrollDom.scrollTop < 30 && next.value && !lodingNewMessage.value) {
+  if (scrollDom.scrollTop < 30 && next.value && !lodingMessage.value) {
     eqChatCom(false);
   }
 };
@@ -409,7 +415,7 @@ const listenerScrollToTop = (state: boolean) => {
 // 初始化数据
 const initData = () => {
   chatData.value = [];
-  loding.value = true;
+  lodingMessage.value = false;
   page.value = 1;
   sendVal.value = '';
   moreCheckState.value = false;

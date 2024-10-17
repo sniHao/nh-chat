@@ -4,7 +4,7 @@
       <input type="text" placeholder="请输入邮箱" v-model="data.mail" required />
     </div>
     <div class="lb-tp-tepwd mt-18" v-if="cutUp == 1">
-      <input type="password" placeholder="请输入密码" v-model="data.password" required @keyup.enter="goLogin"/>
+      <input type="password" placeholder="请输入密码" v-model="data.password" required @keyup.enter="goLogin" />
     </div>
     <!-- 验证码 -->
     <div class="lb-tp-tepwd flex-center mt-18" v-if="cutUp == 2">
@@ -95,7 +95,10 @@ const loginCode = () => {
 };
 const loginResultCom = (res: Result) => {
   loding.value = 0;
-  if (res.code !== 200) return tips('error', res.msg);
+  if (res.code !== 200) {
+    data.password = '';
+    return tips('error', res.msg);
+  }
   store.saveToken(res.data);
   emit('showLogin', { win: false, state: true });
 };

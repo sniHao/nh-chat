@@ -62,7 +62,7 @@
         </div>
       </div>
       <!-- 聊天框 -->
-      <ChatFrame :user="nowUser" @sendCallBack="sendCallBack" :isPhoneUnfold="isPhoneUnfold"></ChatFrame>
+      <ChatFrame :user="nowUser" :isPhoneUnfold="isPhoneUnfold" @sendCallBack="sendCallBack" @closeChat="closeChat"></ChatFrame>
     </div>
     <!-- 弹框 -->
     <n-modal v-model:show="showModal">
@@ -139,6 +139,12 @@ const sendCallBack = (res: { val: string; type: number; uid: number }) => {
   sortData();
 };
 
+// 关闭回调
+const closeChat = () => {
+  checkId.value = -99;
+  nowUser.value = {};
+};
+
 // 发起聊天
 const sendChat = (uid: number) => {
   goChat(uid).then((res: Result) => {
@@ -163,7 +169,7 @@ const addTopList = (data: Relation) => {
 };
 
 // 选择用户
-const checkId = ref(-1);
+const checkId = ref(-99);
 const nowUser = ref({} as any);
 const showChat = (user: any) => {
   if (nowUser.value?.id === user.id) return;

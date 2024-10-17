@@ -9,6 +9,9 @@ export const useStore = defineStore('nh', {
     };
   },
   actions: {
+    clearToken(): void {
+      this.token = '';
+    },
     saveToken(token: string): void {
       this.token = token;
     },
