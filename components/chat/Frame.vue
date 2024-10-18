@@ -750,7 +750,7 @@ onBeforeUnmount(() => {
       background-color: unset;
     }
     :deep(.n-input__textarea-el) {
-      color: white !important;
+      color: white;
     }
     :deep(.n-input-wrapper) {
       resize: unset;

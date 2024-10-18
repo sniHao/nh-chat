@@ -157,7 +157,7 @@ const goGithub = () => {
 
 // 说明文档
 const goDocs = () => {
-  router.push('/docs');
+  router.push('/docs/nh-chat');
 };
 
 // 登录
