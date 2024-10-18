@@ -9,7 +9,7 @@
           <span class="ft-26 ft-color-tips-3">好用、不夸张的聊天框架🥰</span>
           <div class="mt-16">
             <n-button round strong type="primary" color="#ff6700" @click="goTry">在线体验</n-button>
-            <n-button round strong type="primary" color="#9300ff" class="ml-14">使用手册</n-button>
+            <n-button round strong type="primary" color="#9300ff" class="ml-14" @click="goUse">使用手册</n-button>
           </div>
         </div>
         <div class="lottiePop-p" ref="lottiePop"></div>
@@ -40,7 +40,7 @@
   <!-- end -->
   <div class="w-100 flex-center-onely">
     <div class="w-100">
-      <n-divider style="--n-color: rgb(255 103 0/ 30%);margin-bottom: unset;" />
+      <n-divider style="--n-color: rgb(255 103 0/ 30%); margin-bottom: unset" />
       <div class="flex-center-center pd-sx-12">
         <span class="ft-color-tips">备案号xxx</span>
       </div>
@@ -54,6 +54,10 @@ const router = useRouter();
 
 const goTry = () => {
   router.push('/try');
+};
+
+const goUse = () => {
+  router.push('/docs/down');
 };
 
 const technology = ref([

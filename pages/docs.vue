@@ -35,7 +35,7 @@ const anchorCallBack = (val: string[]) => {
   anchor.value = val;
 };
 
-const check = ref('nh-chat');
+const check = ref('nh-chat'); 
 const collapsed = ref(false);
 const upCheck = (key: string, item: MenuOption): void => {
   if (key === check.value) return;
@@ -56,9 +56,14 @@ const menuOptions: MenuOption[] = [
   },
   {
     type: 'group',
-    label: '人物2',
-    key: 'haha'
-  }
+    label: '使用指南',
+    children: [
+      {
+        label: '下载',
+        key: 'down'
+      }
+    ]
+  },
 ];
 </script>
 

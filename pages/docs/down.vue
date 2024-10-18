@@ -1,6 +1,6 @@
 <template>
     <div class="pd-12 flex-zy">
-      <ContentDoc path="/nh-chat" />
+      <ContentDoc path="/down" />
     </div>
   </template>
   
@@ -9,7 +9,7 @@
   
   const emit = defineEmits(['anchor']);
   onMounted(async () => {
-    const articles = await queryContent('nh-chat').find();
+    const articles = await queryContent('down').find();
     emit(
       'anchor',
       articles[0].body?.children.filter((item) => item.props?.id).map((item) => item.props?.id)
