@@ -1,10 +1,8 @@
 <template>
-  <div class="pd-12 flex-zy"><ContentDoc :path="'/' + url" class="md" /></div>
+  <ContentDoc :path="'/' + url" class="md" />
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
-
 const emit = defineEmits(['anchor']);
 const url = ref('structure');
 onMounted(async () => {
@@ -16,17 +14,4 @@ onMounted(async () => {
 });
 </script>
 
-<style lang="scss" scoped>
-:deep(.md) {
-  a {
-    text-decoration: none;
-  }
-  h2 a {
-    color: $ft-color;
-  }
-  p a,
-  li a {
-    color: $ft-color-2;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

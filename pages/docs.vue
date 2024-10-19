@@ -14,9 +14,9 @@
           <n-menu :collapsed="collapsed" :collapsed-width="0" :options="menuOptions" :value="check" :on-update:value="upCheck" />
         </n-layout-sider>
         <n-layout>
-          <div class="pd-12 flex-zy">
+          <div class="pd-12 flex-zy" :class="isSmallWin ? '' : 'layout'">
             <NuxtPage @anchor="anchorCallBack" />
-            <n-anchor :show-rail="false" :show-background="true" class="anchor-style">
+            <n-anchor :show-rail="false" :show-background="true" class="anchor-style" v-show="!isSmallWin">
               <n-anchor-link :title="item" :href="`#${item}`" v-for="(item, index) in anchor" :key="index" />
             </n-anchor>
           </div>
@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
 import type { MenuOption } from 'naive-ui';
+const isSmallWin = inject('isSmallWin');
 const router = useRouter();
 const route = useRoute();
 
@@ -71,12 +72,31 @@ const menuOptions: MenuOption[] = [
   }
 ];
 
-onMounted(() => {
-  check.value = route.path.replace('/docs/', '') || 'nh-chat';
+watchEffect(() => {
+  if (route.path) check.value = route.path.replace('/docs/', '') || 'nh-chat';
 });
 </script>
 
 <style lang="scss" scoped>
+:deep(.md) {
+  width: 100%;
+  a {
+    text-decoration: none;
+  }
+  h2 a {
+    color: $ft-color;
+  }
+  p a,
+  li a {
+    color: $ft-color-2;
+  }
+  pre {
+    background-color: #2c3344;
+    padding: 13px;
+    box-sizing: border-box;
+    border-radius: 5px;
+  }
+}
 :deep(.n-anchor-link--active) {
   background-color: $ft-color;
   border-radius: $px-5;
@@ -85,8 +105,11 @@ onMounted(() => {
   width: $px-800;
   flex-grow: 1; /* 右边盒子自适应宽度 */
 }
+.layout {
+  width: calc(100% - $px-160 - $px-20);
+}
 .anchor-style {
-  min-width: $px-160;
+  width: $px-160;
   position: fixed;
   right: $px-20;
 }
