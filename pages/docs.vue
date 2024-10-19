@@ -29,13 +29,14 @@
 <script setup lang="ts">
 import type { MenuOption } from 'naive-ui';
 const router = useRouter();
+const route = useRoute();
 
 const anchor = ref([] as string[]);
 const anchorCallBack = (val: string[]) => {
   anchor.value = val;
 };
 
-const check = ref('nh-chat'); 
+const check = ref('');
 const collapsed = ref(false);
 const upCheck = (key: string, item: MenuOption): void => {
   if (key === check.value) return;
@@ -61,10 +62,18 @@ const menuOptions: MenuOption[] = [
       {
         label: '下载',
         key: 'down'
+      },
+      {
+        label: '项目结构',
+        key: 'structure'
       }
     ]
-  },
+  }
 ];
+
+onMounted(() => {
+  check.value = route.path.replace('/docs/', '') || 'nh-chat';
+});
 </script>
 
 <style lang="scss" scoped>

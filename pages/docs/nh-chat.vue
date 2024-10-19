@@ -1,6 +1,6 @@
 <template>
   <div class="pd-12 flex-zy">
-    <ContentDoc path="/nh-chat" />
+    <ContentDoc :path="'/' + url" class="md" />
   </div>
 </template>
 
@@ -8,6 +8,7 @@
 import { onMounted } from 'vue';
 
 const emit = defineEmits(['anchor']);
+const url = ref('nh-chat');
 onMounted(async () => {
   const articles = await queryContent('nh-chat').find();
   emit(
@@ -17,4 +18,17 @@ onMounted(async () => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+:deep(.md) {
+  a {
+    text-decoration: none;
+  }
+  h2 a {
+    color: $ft-color;
+  }
+  p a,
+  li a {
+    color: $ft-color-2;
+  }
+}
+</style>
