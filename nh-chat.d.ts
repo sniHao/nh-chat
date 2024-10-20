@@ -26,7 +26,7 @@ declare global {
     date: string;
     message: string;
     tab: boolean;
-    state: boolean;
+    state: number;
     check: boolean;
   }
 }

@@ -61,8 +61,19 @@
                     <span v-if="item.type === 0">{{ item.message }}</span>
                     <n-image v-else class="chat-image" :src="item.message" />
                   </div>
-                  <div class="flex-end mr-6 hover-pointer" v-if="!item.state" @click="reissue(item.message, item.type)">
-                    <OfSvg name="message-fail" fill="red" :width="24" :height="24"></OfSvg>
+                  <!-- 消息状态 -->
+                  <div class="flex-end mr-6">
+                    <!-- 失败 -->
+                    <OfSvg
+                      class="hover-pointer"
+                      name="message-fail"
+                      fill="red"
+                      :width="24"
+                      :height="24"
+                      v-if="item.state === 2"
+                      @click="reissue(item.message, item.type)"></OfSvg>
+                    <!-- 加载中 -->
+                    <OfSvg class="message-loading" name="message-loading" fill="#d2d2d2" :width="24" :height="24" v-if="item.state === 0"></OfSvg>
                   </div>
                 </div>
               </div>
@@ -157,7 +168,7 @@ const chatTabOne = (data: message) => {
 // 消息列表是否需要时间标
 const chatTab = (data: message[]) => {
   for (let i = data.length - 1; i >= 0; i--) {
-    data[i].state = true;
+    data[i].state = 0;
     data[i].check = false;
     if (i === 0) {
       data[i].tab = true;
@@ -288,7 +299,7 @@ const addStaticDataCom = (id: number, date: Date, message: string, type: number)
     sendUid: undefined,
     type: type,
     tab: false,
-    state: true,
+    state: 1,
     check: false
   };
 };
@@ -310,6 +321,10 @@ const valChange = () => {
 // 发送消息
 const sendInfo = () => {
   if (!sendInfoPre()) return;
+  const pointer = pushDataOneCom(-88, props.user.uid, props.user.relationUid, 0, sendVal.value, 0);
+  emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
+  sendVal.value = '';
+  scrollToButtom();
   sendMessage({
     receiveUid: props.user.relationUid,
     message: sendVal.value,
@@ -320,10 +335,8 @@ const sendInfo = () => {
         res.data = randomNumber();
         if (firstMessage.value) simReissue(3);
       }
-      pushDataOneCom(res.data, props.user.uid, props.user.relationUid, 0, sendVal.value, res.code === 200);
-      emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
-      sendVal.value = '';
-      scrollToButtom();
+      chatData.value[pointer].id = res.data;
+      chatData.value[pointer].state = res.code === 200 ? 1 : 2;
     })
     .finally(() => {
       firstMessage.value = false;
@@ -342,7 +355,7 @@ const simReissue = (id: number) => {
 };
 
 // 推送单条消息
-const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: boolean, sendState: number = 1) => {
+const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: boolean, sendState: number = 1): number => {
   chatData.value.push(
     chatTabOne({
       id: id,
@@ -358,6 +371,7 @@ const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: n
       check: false
     })
   );
+  return chatData.value.length - 1;
 };
 
 // 发送消息前置处理
@@ -471,10 +485,11 @@ const listenerMessage = (e: MouseEvent) => {
     }
   }
   if (index === -1) return;
+  nowCheckData.value = chatData.value[index];
+  if (nowCheckData.value.state === 0) return;
   showRightBtnMessage.value = true;
   rightBtnLeft.value = e.x;
   rightBtnTop.value = e.y;
-  nowCheckData.value = chatData.value[index];
   czList.value = [
     { id: 0, name: '复制内容', incident: () => copyMessage() },
     { id: 1, name: '删除消息', incident: () => delMessageGo([nowCheckData.value.id]) }
