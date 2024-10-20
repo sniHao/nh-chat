@@ -104,6 +104,21 @@ const { dialog } = createDiscreteApi(['dialog']);
 const store = useStore();
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 
+// ===================================其他功能===================================//
+// 提示
+const welcome = () => {
+  if (store.not_tips == 'false')
+    dialog.warning({
+      title: 'Hi~👋',
+      content: '您当前为体验模式，数据不会保留。建议您登录后与好友开启实时聊天哦🎉',
+      positiveText: '别提醒我了',
+      onPositiveClick: () => {
+        store.stopTips();
+      },
+      negativeText: '知道啦'
+    });
+};
+
 // 通讯样式
 const userClass = (item: Relation) => {
   return {
@@ -117,6 +132,7 @@ const isPhoneCallBack = (state: boolean) => {
   isPhoneUnfold.value = !state;
 };
 
+// ===================================聊天Frame.vue回调===================================//
 // 发送消息回调
 const ofNewMessage = inject<(message: any) => void>('ofNewMessage');
 const sendCallBack = (res: { val: string; type: number; uid: number }) => {
@@ -143,6 +159,21 @@ const sendCallBack = (res: { val: string; type: number; uid: number }) => {
 const closeChat = () => {
   checkId.value = -99;
   nowUser.value = {};
+};
+
+// ===================================搜索操作===================================//
+// 搜索
+const showModal = ref(false);
+const searchVal = ref('');
+const hasUser = ref<any>();
+const goSearch = () => {
+  if (!isEmail(searchVal.value)) return tips('error', '请输入正确的邮箱格式📫');
+  hasUser.value = {};
+  eqUserMail(searchVal.value).then((res) => {
+    if (res.code !== 200) return tips('error', res.msg);
+    hasUser.value = res.data;
+    showModal.value = true;
+  });
 };
 
 // 发起聊天
@@ -179,36 +210,7 @@ const showChat = (user: any) => {
   if (isSmallWin.value) isPhoneUnfold.value = true;
 };
 
-// 搜索
-const showModal = ref(false);
-const searchVal = ref('');
-const hasUser = ref<any>();
-const goSearch = () => {
-  if (!isEmail(searchVal.value)) return tips('error', '请输入正确的邮箱格式📫');
-  hasUser.value = {};
-  eqUserMail(searchVal.value).then((res) => {
-    if (res.code !== 200) return tips('error', res.msg);
-    hasUser.value = res.data;
-    showModal.value = true;
-  });
-};
-
-// 查询用户通讯录
-const userList = ref([] as Relation[]);
-const eqUserList = () => {
-  eqRelation()
-    .then((res: Result): void => {
-      if (!res.code || res.code === 403) {
-        welcome();
-        staticUser();
-        return;
-      }
-      userList.value = res.data;
-      sortData();
-    })
-    .finally(() => addListener());
-};
-
+// ===================================静态数据【用于体验时】===================================//
 // 静态用户通讯录
 const staticUser = () => {
   userList.value = [];
@@ -228,6 +230,24 @@ const staticUser = () => {
   sortData();
 };
 
+// ===================================获取通讯录数据===================================//
+// 查询用户通讯录
+const userList = ref([] as Relation[]);
+const eqUserList = () => {
+  eqRelation()
+    .then((res: Result): void => {
+      if (!res.code || res.code === 403) {
+        welcome();
+        staticUser();
+        return;
+      }
+      userList.value = res.data;
+      sortData();
+    })
+    .finally(() => addListener());
+};
+
+// ===================================右键操作===================================//
 // 创建监听
 const tapAndHold = ref(false);
 const addListener = () => {
@@ -302,6 +322,7 @@ const topChatGo = (state: number) => {
     sortData();
   });
 };
+
 // 排序数据
 const sortData = () => {
   userList.value.sort((a, b) => {
@@ -347,20 +368,7 @@ const closeRightBtnCom = (state: boolean) => {
   state ? dom.addEventListener('click', closeRightBtn) : dom.removeEventListener('click', closeRightBtn);
 };
 
-// 提示
-const welcome = () => {
-  if (store.not_tips == 'false')
-    dialog.warning({
-      title: 'Hi~👋',
-      content: '您当前为体验模式，数据不会保留。建议您登录后与好友开启实时聊天哦🎉',
-      positiveText: '别提醒我了',
-      onPositiveClick: () => {
-        store.stopTips();
-      },
-      negativeText: '知道啦'
-    });
-};
-
+// ===================================组件初始化操作===================================//
 watch(
   () => store.go_chat_u,
   () => {

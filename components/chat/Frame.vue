@@ -152,6 +152,7 @@ const props = defineProps({
 });
 const emit = defineEmits(['sendCallBack', 'closeChat']);
 
+// ===================================其他功能===================================//
 // 关闭聊天
 const closeChat = () => {
   if (nowChatUid) nowChatUid(-99);
@@ -198,7 +199,113 @@ const chooseEmoji = (val: string) => {
   } else sendVal.value += val;
 };
 
-// 图片前置校验
+// 滚动条居底
+const scrollToButtom = () => {
+  setTimeout(() => {
+    let scrollDom = document.getElementsByClassName('cb-body')[0];
+    scrollDom.scrollTop = scrollDom.scrollHeight;
+  }, 100);
+};
+
+// 监听滚动条
+const listenerScrollToTop = (state: boolean) => {
+  let scrollDom = document.getElementsByClassName('cb-body')[0];
+  if (!scrollDom) return;
+  const throttledScrollToTop = throttle(scrollToTop, 50);
+  if (state) scrollDom.addEventListener('scroll', throttledScrollToTop);
+  else scrollDom.removeEventListener('scroll', throttledScrollToTop);
+};
+
+// ===================================发送消息===================================//
+// 回车处理
+const sendVal = ref('');
+const inputMaxNumber = ref(2000);
+const handleKeyUp = (e: KeyboardEvent) => {
+  if (e.key !== 'Enter') return;
+  if (e.shiftKey) return;
+  if (e.altKey) return (sendVal.value += '\n');
+  e.preventDefault();
+  sendInfo();
+};
+
+// 输入框字数限制
+const valChange = () => {
+  if (sendVal.value.length > inputMaxNumber.value) return (sendVal.value = sendVal.value.slice(0, inputMaxNumber.value));
+};
+
+// 发送消息
+const sendInfo = () => {
+  if (!sendInfoPre()) return;
+  const pointer = pushDataOneCom(-88, props.user.uid, props.user.relationUid, 0, sendVal.value, 0);
+  emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
+  sendVal.value = '';
+  scrollToButtom();
+  sendMessage({
+    receiveUid: props.user.relationUid,
+    message: sendVal.value,
+    type: 0
+  })
+    .then((res: Result) => {
+      if (res.code !== 200) {
+        res.data = randomNumber();
+        if (firstMessage.value) simReissue(3);
+      }
+      chatData.value[pointer].id = res.data;
+      chatData.value[pointer].state = res.code === 200 ? 1 : 2;
+    })
+    .finally(() => {
+      firstMessage.value = false;
+    });
+};
+
+// 推送单条消息
+const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: boolean, sendState: number = 1): number => {
+  chatData.value.push(
+    chatTabOne({
+      id: id,
+      sendUid: sendUid,
+      receiveUid: receiveUid,
+      type: type,
+      sendState: sendState,
+      receiveState: 1,
+      date: getTimeFormat(new Date()),
+      message: message,
+      tab: false,
+      state: state,
+      check: false
+    })
+  );
+  return chatData.value.length - 1;
+};
+
+// 发送消息前置处理
+const sendInfoPre = (): boolean => {
+  if (sendVal.value.length === 0) return false;
+  if (sendVal.value.split('\n').length > 20) {
+    notification['error']({
+      content: '超出长度20行的限制',
+      duration: 2500,
+      keepAliveOnHover: true
+    });
+    return false;
+  }
+  return true;
+};
+
+// 发送失败重试
+const reissue = async (message: string, type: number) => {
+  if (type === 1) {
+    const response = await fetch(message);
+    const blob = await response.blob();
+    const file = new File([blob], 'chat-image', { type: blob.type });
+    beforeUpload({ file: { file: file } as UploadFileInfo, fileList: [] });
+    return;
+  }
+  sendVal.value = message;
+  sendInfo();
+};
+
+// 发送图片前置校验
 const upLoadCheck = (file: File | null | undefined) => {
   if (!file) {
     tips('error', '文件异常👾');
@@ -214,8 +321,9 @@ const upLoadCheck = (file: File | null | undefined) => {
   }
   return true;
 };
-// 图片
-const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }) => {
+
+// 发送图片
+const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }): boolean => {
   const file = data.file.file as File;
   const result = upLoadCheck(file);
   if (!result) return false;
@@ -233,15 +341,55 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
   reader.readAsDataURL(file as any);
   return true;
 };
+// ===================================静态数据【用于体验时】===================================//
+//未登录静态数据
+const eqChatDataStatic = () => {
+  let data = [];
+  const initMessage = ['欢迎体验nh-chat👋。需要提醒的是，当前为体验模式，数据不会被保存', '你可以尝试向我发送消息哟，体验不同的功能。'];
+  for (let i = 0; i < 2; i++) {
+    data.push(addStaticDataCom(i, new Date(new Date().getTime() - 1000 * 60 * 50 + 1000 * 60 * 11 * i), initMessage[i], 0));
+  }
+  return data;
+};
 
-// 接口请求数据
+// 添加静态消息公共
+const addStaticDataCom = (id: number, date: Date, message: string, type: number) => {
+  return {
+    date: getTimeFormat(date),
+    id: id,
+    message: message,
+    receiveState: 1,
+    receiveUid: -1,
+    sendState: 1,
+    sendUid: undefined,
+    type: type,
+    tab: false,
+    state: 1,
+    check: false
+  };
+};
+
+// 模拟回复
+const firstMessage = ref(true);
+const simReissue = (id: number) => {
+  setTimeout(() => {
+    const message = '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰';
+    pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, true);
+    emit('sendCallBack', { val: truncate(message), type: 0, uid: props.user.relationUid });
+    scrollToButtom();
+  }, 2000);
+};
+
+// ===================================获取聊天数据===================================//
+// 获取聊天数据
 const chatData = ref([] as any);
 const page = ref(1);
 const next = ref(false);
 const eqChatData = () => {
   eqChatCom();
 };
-// 数据公共
+
+// 数据公共处理
 const eqChatCom = (needBootom: boolean = true) => {
   lodingMessage.value = true;
   eqChat(props.user.relationUid, page.value)
@@ -277,138 +425,6 @@ const eqChatCom = (needBootom: boolean = true) => {
     });
 };
 
-//未登录静态数据
-const eqChatDataStatic = () => {
-  let data = [];
-  const initMessage = ['欢迎体验nh-chat👋。需要提醒的是，当前为体验模式，数据不会被保存', '你可以尝试向我发送消息哟，体验不同的功能。'];
-  for (let i = 0; i < 2; i++) {
-    data.push(addStaticDataCom(i, new Date(new Date().getTime() - 1000 * 60 * 50 + 1000 * 60 * 11 * i), initMessage[i], 0));
-  }
-  return data;
-};
-
-// 添加静态消息公共
-const addStaticDataCom = (id: number, date: Date, message: string, type: number) => {
-  return {
-    date: getTimeFormat(date),
-    id: id,
-    message: message,
-    receiveState: 1,
-    receiveUid: -1,
-    sendState: 1,
-    sendUid: undefined,
-    type: type,
-    tab: false,
-    state: 1,
-    check: false
-  };
-};
-
-// 私信
-const sendVal = ref('');
-const inputMaxNumber = ref(2000);
-const handleKeyUp = (e: KeyboardEvent) => {
-  if (e.key !== 'Enter') return;
-  if (e.shiftKey) return;
-  if (e.altKey) return (sendVal.value += '\n');
-  e.preventDefault();
-  sendInfo();
-};
-// 输入框字数限制
-const valChange = () => {
-  if (sendVal.value.length > inputMaxNumber.value) return (sendVal.value = sendVal.value.slice(0, inputMaxNumber.value));
-};
-// 发送消息
-const sendInfo = () => {
-  if (!sendInfoPre()) return;
-  const pointer = pushDataOneCom(-88, props.user.uid, props.user.relationUid, 0, sendVal.value, 0);
-  emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
-  sendVal.value = '';
-  scrollToButtom();
-  sendMessage({
-    receiveUid: props.user.relationUid,
-    message: sendVal.value,
-    type: 0
-  })
-    .then((res: Result) => {
-      if (res.code !== 200) {
-        res.data = randomNumber();
-        if (firstMessage.value) simReissue(3);
-      }
-      chatData.value[pointer].id = res.data;
-      chatData.value[pointer].state = res.code === 200 ? 1 : 2;
-    })
-    .finally(() => {
-      firstMessage.value = false;
-    });
-};
-
-// 模拟回复
-const firstMessage = ref(true);
-const simReissue = (id: number) => {
-  setTimeout(() => {
-    const message = '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰';
-    pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, true);
-    emit('sendCallBack', { val: truncate(message), type: 0, uid: props.user.relationUid });
-    scrollToButtom();
-  }, 2000);
-};
-
-// 推送单条消息
-const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: boolean, sendState: number = 1): number => {
-  chatData.value.push(
-    chatTabOne({
-      id: id,
-      sendUid: sendUid,
-      receiveUid: receiveUid,
-      type: type,
-      sendState: sendState,
-      receiveState: 1,
-      date: getTimeFormat(new Date()),
-      message: message,
-      tab: false,
-      state: state,
-      check: false
-    })
-  );
-  return chatData.value.length - 1;
-};
-
-// 发送消息前置处理
-const sendInfoPre = () => {
-  if (sendVal.value.length === 0) return false;
-  if (sendVal.value.split('\n').length > 20) {
-    notification['error']({
-      content: '超出长度20行的限制',
-      duration: 2500,
-      keepAliveOnHover: true
-    });
-    return false;
-  }
-  return true;
-};
-
-// 发送失败重试
-const reissue = async (message: string, type: number) => {
-  if (type === 1) {
-    const response = await fetch(message);
-    const blob = await response.blob();
-    const file = new File([blob], 'chat-image', { type: blob.type });
-    beforeUpload({ file: { file: file } as UploadFileInfo, fileList: [] });
-    return;
-  }
-  sendVal.value = message;
-  sendInfo();
-};
-
-// 滚动条居底
-const scrollToButtom = () => {
-  setTimeout(() => {
-    let scrollDom = document.getElementsByClassName('cb-body')[0];
-    scrollDom.scrollTop = scrollDom.scrollHeight;
-  }, 100);
-};
-
 // 上拉拉取消息
 const lodingMessage = ref(false);
 const scrollToTop = () => {
@@ -417,26 +433,8 @@ const scrollToTop = () => {
     eqChatCom(false);
   }
 };
-// 监听滚动条
-const listenerScrollToTop = (state: boolean) => {
-  let scrollDom = document.getElementsByClassName('cb-body')[0];
-  if (!scrollDom) return;
-  const throttledScrollToTop = throttle(scrollToTop, 50);
-  if (state) scrollDom.addEventListener('scroll', throttledScrollToTop);
-  else scrollDom.removeEventListener('scroll', throttledScrollToTop);
-};
 
-// 初始化数据
-const initData = () => {
-  chatData.value = [];
-  lodingMessage.value = false;
-  page.value = 1;
-  sendVal.value = '';
-  moreCheckState.value = false;
-  saveChecked.value = [];
-};
-
-// 右键监听
+// ===================================右键操作===================================//
 const tapAndHold = ref(false);
 const addListener = () => {
   tapAndHold.value = false;
@@ -604,6 +602,17 @@ const closeRightBtnCom = (state: boolean) => {
   state ? dom.addEventListener('click', closeRightBtn) : dom.removeEventListener('click', closeRightBtn);
 };
 
+// ===================================组件初始化操作===================================//
+// 初始化数据
+const initData = () => {
+  chatData.value = [];
+  lodingMessage.value = false;
+  page.value = 1;
+  sendVal.value = '';
+  moreCheckState.value = false;
+  saveChecked.value = [];
+};
+
 // 选择用户做出改变
 const nowChatUid = inject<(uid: number) => void>('getNowChatUid');
 watch(
@@ -634,6 +643,7 @@ watch(
   }
 );
 
+// 组件初开始和结束
 onMounted(() => {
   closeRightBtnCom(true);
 });
