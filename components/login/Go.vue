@@ -9,7 +9,7 @@
     <!-- 验证码 -->
     <div class="lb-tp-tepwd flex-center mt-18" v-if="cutUp == 2">
       <input type="number" placeholder="验证码" v-model="data.code" required style="width: 62%" />
-      <n-button class="btn-w" v-if="codeState == 1" type="text" @click="getCode">获取验证码</n-button>
+      <n-button class="btn-w" v-if="codeState == 1" type="text" @click="getCode" :disabled="goSend">{{ goSend ? '发送中...' : '获取验证码' }}</n-button>
       <n-button class="btn-w" v-if="codeState == 2" type="text" disabled>{{ countDown }}秒</n-button>
     </div>
     <template v-if="loding === 0">
@@ -49,12 +49,15 @@ const data = reactive({
 const codeState = ref(1);
 
 const countDown = ref(0);
+const goSend = ref(false);
 const getCode = () => {
   if (!isEmail(data.mail)) return tips('error', '请输入正确的邮箱格式📫');
+  goSend.value = true;
   welcomeCode(data.mail).then((res) => {
+    goSend.value = false;
     if (res.code !== 200) return tips('error', res.msg);
-    tips('success', res.msg);
     codeState.value = 2;
+    tips('success', res.msg);
     countDown.value = 60;
     let times = setInterval(() => {
       countDown.value--;

@@ -168,6 +168,7 @@ const goLogin = () => {
 // 切换主题
 const modeStyle = ref(true);
 const switchMode = () => {
+  if (modeStyle.value) tips('warning', '在做啦在做啦，现在还没做好呢🐞');
   theme(!modeStyle.value);
   modeStyle.value = !modeStyle.value;
 };
@@ -180,7 +181,9 @@ const getStar = () => {
 const initData = ref(userInfo as unknown as { state: boolean; uInfo: { name: string; photo: string } });
 onMounted(() => {
   getStar();
-  newName.value = initData?.value.uInfo.name ?? '';
+  setTimeout(() => {
+    newName.value = initData?.value.uInfo.name ?? '';
+  }, 20);
 });
 </script>
 

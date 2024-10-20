@@ -33,7 +33,7 @@
         <div class="flex-center-center pd-6 ml-10 mr-10" style="width: unset" v-for="(item, index) in sponsor" :key="index">
           <div class="ft-28 home-ft-color-2 hover-pointer">{{ item.name }}</div>
         </div>
-        <n-button color="rgb(147, 0, 255)" size="large" dashed round>成为赞助商</n-button>
+        <n-button color="rgb(147, 0, 255)" size="large" dashed round @click="love">成为赞助商</n-button>
       </div>
     </div>
   </div>
@@ -52,6 +52,9 @@
 import lottie from 'lottie-web';
 const router = useRouter();
 
+const love = () => {
+  window.location.href = 'mailto:snihao6@qq.com';
+};
 const goTry = () => {
   router.push('/try');
 };
