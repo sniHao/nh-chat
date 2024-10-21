@@ -1,7 +1,7 @@
 # <p align="center">![nh-chat](./public/md-name.png)</p>
-<div style="text-align: center;font-size:36px"><strong>完整的源代码</strong></div>
-<div style="text-align: center;font-size:36px"><strong>清晰的说明文档</strong></div>
-<div style="text-align: center;font-size:36px"><strong>好用、不夸张的聊天框架🥰</strong></div>
+<h3 align="center">完整的源代码</h3>
+<h3 align="center">清晰的说明文档</h3>
+<h3 align="center">好用、不夸张的聊天框架🥰</h3>
 
 ## 项目介绍👋
 
