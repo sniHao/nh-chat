@@ -35,5 +35,16 @@ export default defineNuxtConfig({
         resolvers: [NaiveUiResolver()]
       })
     ]
+  },
+  app: {
+    head: {
+      title: 'nh-chat',
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { hid: 'description', name: 'description', content: '完整的源代码；清晰的说明文档好用、不夸张的聊天框架' }
+      ],
+      link: [{ rel: 'icon', type: 'image/png', href: '/chat.png' }]
+    }
   }
 });

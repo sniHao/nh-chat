@@ -169,7 +169,7 @@ const chatTabOne = (data: message) => {
 // 消息列表是否需要时间标
 const chatTab = (data: message[]) => {
   for (let i = data.length - 1; i >= 0; i--) {
-    data[i].state = 0;
+    data[i].state = 1;
     data[i].check = false;
     if (i === 0) {
       data[i].tab = true;
@@ -238,11 +238,12 @@ const sendInfo = () => {
   if (!sendInfoPre()) return;
   const pointer = pushDataOneCom(-88, props.user.uid, props.user.relationUid, 0, sendVal.value, 0);
   emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
+  let data = sendVal.value;
   sendVal.value = '';
   scrollToButtom();
   sendMessage({
     receiveUid: props.user.relationUid,
-    message: sendVal.value,
+    message: data,
     type: 0
   })
     .then((res: Result) => {
@@ -259,7 +260,7 @@ const sendInfo = () => {
 };
 
 // 推送单条消息
-const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: boolean, sendState: number = 1): number => {
+const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: number, sendState: number = 1): number => {
   chatData.value.push(
     chatTabOne({
       id: id,
@@ -323,7 +324,7 @@ const upLoadCheck = (file: File | null | undefined) => {
 };
 
 // 发送图片
-const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }): boolean => {
+const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }): Promise<boolean> => {
   const file = data.file.file as File;
   const result = upLoadCheck(file);
   if (!result) return false;
@@ -331,11 +332,18 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
   reader.onload = function (e: any) {
     const fd = new FormData();
     fd.append('file', file);
+
+    const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0);
+    emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
+    scrollToButtom();
+
     sendMessageImage(fd, props.user.relationUid).then((res) => {
       if (res.code !== 200) res.data = randomNumber();
-      pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 1, e.target.result, res.code === 200);
-      emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
-      scrollToButtom();
+      chatData.value[pointer].id = res.data;
+      chatData.value[pointer].state = res.code === 200 ? 1 : 2;
+      // pushDataOneCom(res.data, props.user.uid, props.user.receiveUid, 1, e.target.result, res.code === 200);
+      // emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
+      // scrollToButtom();
     });
   };
   reader.readAsDataURL(file as any);
@@ -374,7 +382,7 @@ const firstMessage = ref(true);
 const simReissue = (id: number) => {
   setTimeout(() => {
     const message = '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰';
-    pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, true);
+    pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, 1);
     emit('sendCallBack', { val: truncate(message), type: 0, uid: props.user.relationUid });
     scrollToButtom();
   }, 2000);
@@ -637,7 +645,7 @@ watch(
       newData.sendState = 2;
       newData.message = '对方撤回了一条消息';
     } else {
-      pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, true, data.state);
+      pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, 1, data.state);
       scrollToButtom();
     }
   }
