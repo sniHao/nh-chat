@@ -5,7 +5,7 @@ const { notification } = createDiscreteApi(['notification']);
 const { loadingBar } = createDiscreteApi(['loadingBar']);
 //1. 创建axios对象
 const requests = axios.create({
-  baseURL: 'https://www.notes-something.fun/api/',
+  baseURL: 'https://www.notes-something.fun/nh/',
   timeout: 20000
 });
 
