@@ -4,6 +4,9 @@ import Components from 'unplugin-vue-components/vite';
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers';
 
 export default defineNuxtConfig({
+  build: {
+    transpile: ['vueuc'] 
+  },
   modules: ['nuxtjs-naive-ui', '@pinia/nuxt', '@nuxtjs/mdc', '@nuxt/content'],
   compatibilityDate: '2024-04-03',
   $production: {

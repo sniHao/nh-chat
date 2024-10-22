@@ -118,7 +118,7 @@ const goUpPwd = () => {
 const pwd = ref('');
 const showSetPwd = ref(false);
 const setPwd = () => {
-  const regex = /^(?=\S)(?!.*\s)[A-Za-z0-9!@#$%^&*()_+]{6,14}$/;
+  const regex = /^(?=\S)(?!.*\s)[A-Za-z0-9!@#$%^&*()_+.]{6,14}$/;
   if (!regex.test(pwd.value)) return tips('error', '密码格式错误');
   adPassWord(pwd.value).then((res: Result) => {
     if (res.code !== 200) return tips('error', res.msg);

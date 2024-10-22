@@ -41,8 +41,8 @@
   <div class="w-100 flex-center-onely">
     <div class="w-100">
       <n-divider style="--n-color: rgb(255 103 0/ 30%); margin-bottom: unset" />
-      <div class="flex-center-center pd-sx-12">
-        <span class="ft-color-tips">备案号xxx</span>
+      <div class="flex-center-center pd-sx-12 ft-color">
+        <a href="https://beian.miit.gov.cn/" target="_blank" style="text-decoration: none; color: #ff6700">蜀ICP备2022016728号-3</a>
       </div>
     </div>
   </div>
@@ -70,7 +70,7 @@ const technology = ref([
   },
   {
     name: '后端🚀',
-    list: ['JDK21', 'SpringBoot3', 'MyBatis-Plus', 'SpringSecurity', 'JWT', 'Swagger3']
+    list: ['JDK21', 'SpringBoot3', 'MyBatis-Plus', 'SpringSecurity', 'Maven3.8+', 'JWT', 'Swagger3']
   },
   {
     name: '消息👨‍🚀',

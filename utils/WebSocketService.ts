@@ -14,7 +14,7 @@ export default class WebSocketService {
   constructor(private params: string) {}
 
   connect(): void {
-    this.socket = new WebSocket('ws://127.0.0.1:8087/socket.chat/' + this.params);
+    this.socket = new WebSocket('wss://www.notes-something.fun/wss/socket.chat/' + this.params);
     this.socket.onopen = () => {
       this.state = this.socket?.readyState ?? 0;
     };

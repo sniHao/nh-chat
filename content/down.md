@@ -22,3 +22,4 @@ npm run dev
 ```bash
 npm run build
 ```
+详情参考官网：[https://nuxt.com.cn/docs/getting-started/deployment](https://nuxt.com.cn/docs/getting-started/deployment)
