@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import WebSocketService from './utils/WebSocketService';
 import { createDiscreteApi } from 'naive-ui';
-import { userInfo, eqUserBasics } from '~/api/index';
+import { userInfo, eqUserBasics, hasPwd } from '~/api/index';
 const { notification } = createDiscreteApi(['notification']);
 const router = useRouter();
 const store = useStore();
@@ -82,7 +82,16 @@ const goChat = (id: number) => {
 const showLogin = ref(false);
 const showLoginEvent = (val: { win: boolean; state: boolean }) => {
   showLogin.value = val.win;
-  if (val.state) location.reload();
+  if (val.state) {
+    hasPwd()
+      .then((res: Result) => {
+        if (res.code !== 200 || !res.data) return store.initPwd();
+        store.setPwd();
+      })
+      .finally(() => {
+        location.reload();
+      });
+  }
 };
 
 // 窗口大小变化

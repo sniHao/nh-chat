@@ -34,6 +34,7 @@
           <span>抱歉，您已设置了密码，目前暂不支持修改</span>
         </template>
         <template v-else>
+          <div class="flex-center-center ft-color-hui mb-14">设置一个密码，方便后续再来👋</div>
           <div class="flex-down-center">
             <n-input maxlength="14" show-count clearable v-model:value="pwd" placeholder="长度为6-14位，不那么简单的密码" />
           </div>
@@ -126,6 +127,7 @@ const setPwd = () => {
     pwd.value = '';
     canUp.value = false;
     tips('success', res.msg);
+    store.initPwd();
   });
 };
 const cancelPwd = () => {
@@ -175,7 +177,14 @@ const switchMode = () => {
 
 const githubStar = ref(0);
 const getStar = () => {
-  // https://api.github.com/repos/sniHao/nh-chat
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://api.github.com/repos/sniHao/nh-chat', true);
+  xhr.send(JSON.stringify(null));
+  xhr.onreadystatechange = function () {
+    if (xhr.status === 200 && xhr.readyState === 4) {
+      githubStar.value = JSON.parse(xhr.response)?.stargazers_count || 0;
+    }
+  };
 };
 
 const initData = ref(userInfo as unknown as { state: boolean; uInfo: { name: string; photo: string } });
@@ -183,6 +192,10 @@ onMounted(() => {
   getStar();
   setTimeout(() => {
     newName.value = initData?.value.uInfo.name ?? '';
+    if (store.set_pw === 'true') {
+      showSetPwd.value = true;
+      canUp.value = true;
+    }
   }, 20);
 });
 </script>

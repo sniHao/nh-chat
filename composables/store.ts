@@ -5,7 +5,8 @@ export const useStore = defineStore('nh', {
     return {
       token: '' as string,
       not_tips: 'false' as string,
-      go_chat_u: -99
+      go_chat_u: -99,
+      set_pw: 'false' as string
     };
   },
   actions: {
@@ -23,6 +24,12 @@ export const useStore = defineStore('nh', {
     },
     initGoChat() {
       this.go_chat_u = -99;
+    },
+    setPwd() {
+      this.set_pw = 'true';
+    },
+    initPwd() {
+      this.set_pw = 'false';
     }
   },
   persist: process.client && {
