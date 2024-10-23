@@ -45,7 +45,8 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: '完整的源代码；清晰的说明文档好用、不夸张的聊天框架' }
+        { hid: 'description', name: 'description', content: '完整的源代码；清晰的说明文档好用、不夸张的聊天框架' },
+        { hid: 'baidu-site-verification', name: 'baidu-site-verification', content: 'codeva-7bAJ1HcyqV' },
       ],
       link: [{ rel: 'icon', type: 'image/png', href: '/chat.png' }]
     }
