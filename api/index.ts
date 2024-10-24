@@ -39,3 +39,7 @@ export const delChat = (relationId: number) => request({ url: 'chat/delChat/' + 
 export const revocationMessage = (mid: number) => request({ url: 'chat/revocationMessage/' + mid, method: 'put' });
 
 export const delMessage = (data: number[]) => request({ url: 'chat/delMessage', method: 'post', data });
+
+export const notes = () => request({ url: 'sys/notes', method: 'get' });
+
+export const notesCounts = () => request({ url: 'sys/notesCounts', method: 'get' });

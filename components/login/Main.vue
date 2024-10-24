@@ -15,9 +15,15 @@
           </div>
           <LoginGo @cuts="clickEven" @showLogin="showLoginEvent" :cutUp="cut" />
         </div>
-        <div class="mt-30 flex-center-center flex-down">
-          <n-divider><span>体验人数</span></n-divider>
-          <div class="ft-b">{{ count }}</div>
+        <div class="mt-30 flex-center-center">
+          <div class="flex-down-center">
+            <div>注册人数</div>
+            <div>{{ count }}</div>
+          </div>
+          <div class="flex-down-center ml-22">
+            <div>体验人数</div>
+            <div>{{ tryCount }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -25,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { eqUserCount } from '@/api/index';
+import { eqUserCount, notesCounts } from '~/api/index';
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const emit = defineEmits(['showLogin']);
 
@@ -48,9 +54,13 @@ const showLoginEvent = (show: { win: boolean; state: boolean }) => {
 };
 
 const count = ref(0);
+const tryCount = ref(0);
 onMounted(() => {
   eqUserCount().then((res) => {
     if (res.code === 200) count.value = res.data;
+  });
+  notesCounts().then((res) => {
+    if (res.code === 200) tryCount.value = res.data;
   });
 });
 </script>
