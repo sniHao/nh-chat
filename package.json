@@ -1,0 +1,29 @@
+{
+  "name": "nh-chat-page",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "pinia": "^2.2.4",
+    "pinia-plugin-persistedstate": "^4.1.2",
+    "sass": "^1.80.4",
+    "unplugin-auto-import": "^0.18.3",
+    "unplugin-vue-components": "^0.27.4",
+    "vue": "^3.5.12",
+    "vue-router": "^4.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.9",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "naive-ui": "^2.40.1",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.9",
+    "vue-tsc": "^2.1.6"
+  }
+}
