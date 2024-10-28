@@ -36,6 +36,17 @@ public class ChatSocket {
     private Long userId;
 
     /**
+     * 自定义验证token的方法【重写】
+     *
+     * @param token 用户token
+     * @throws ChatException 验证失败需抛出异常中断连接
+     */
+    protected Long validateToken(String token) throws ChatException {
+        if ("12".equals(token)) throw new ChatException(ResultCode.NO_LOGIN.tips(), ResultCode.NO_LOGIN.value());
+        return 12L;
+    }
+
+    /**
      * 连接建立成功调用的方法
      *
      * @param session 会话
@@ -44,9 +55,7 @@ public class ChatSocket {
      */
     @OnOpen
     public boolean onOpen(Session session, @PathParam("token") String token) throws ChatException {
-        RedisUtil redisUtil = BeanUtil.getBean(RedisUtil.class);
-//        Long uid = TokenUtil.userTokenNotException(token, redisUtil);
-        Long uid = 21L;
+        Long uid = validateToken(token);
         if (Objects.isNull(uid)) throw new ChatException(ResultCode.NO_LOGIN.tips(), ResultCode.NO_LOGIN.value());
         this.session = session;
         this.userId = uid;
