@@ -65,6 +65,14 @@ const menuOptions: MenuOption[] = [
         key: 'down'
       },
       {
+        label: '前端配置',
+        key: 'page-config'
+      },
+      {
+        label: '后端配置',
+        key: 'rear-config'
+      },
+      {
         label: '项目结构',
         key: 'structure'
       }
@@ -95,6 +103,20 @@ watchEffect(() => {
     padding: 13px;
     box-sizing: border-box;
     border-radius: 5px;
+    overflow: auto;
+    code {
+      color: #f57622;
+    }
+  }
+
+  thead tr {
+    background-color: #f57622;
+    color: #ffffff;
+    text-align: left;
+  }
+  th,
+  td {
+    padding: $px-12 $px-15;
   }
 }
 :deep(.n-anchor-link--active) {

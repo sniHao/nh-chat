@@ -19,7 +19,7 @@ npm i -D nh-chat
 
 下载下面的SDK包，解压移动到你的maven仓库中，最后在你的项目中引入。
 下载地址：[SDK压缩包](https://www.notes-something.fun/im/sdk/nh.zip)
-```bash
+```java
 <dependency>
     <groupId>nh.chat</groupId>
     <artifactId>nh-chat-rear</artifactId>
@@ -31,4 +31,8 @@ npm i -D nh-chat
 下载地址：[SQL文件](https://www.notes-something.fun/im/sql/nh-chat.sql)
 
 ## 最后唠叨
-完成以上3步，就可以开始使用聊天框架了🎉。对的没错，就是这么快捷方便。但需要注意的是，以上步骤完成。只能用于个人体验，接入到线上项目中，还需要进行一些简单的配置。放心，一切都会很简单，详细配置见下章。
+完成以上3步，就可以开始使用聊天框架了🎉。
+
+对的没错，就是这么快捷方便。但需要注意的是，以上步骤完成。只能用于个人体验，接入到线上项目中，还需要进行一些简单的配置。
+
+放心，一切都会很简单，详细配置见下章。
