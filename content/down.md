@@ -1,25 +1,34 @@
 # 下载
 
-前往[GitHub](https://github.com/sniHao/nh-chat)或[Gitee](https://gitee.com/snihao/nh-chat)将代码clone到你的本地，然后按照以下步骤操作。
+本框架需要你注意以下的环境，否则可能会出现一些问题。
 
-## 安装依赖
+## 依赖
 
-该项目的node.js版本为**v18.18.0**，npm版本为**9.8.1**，建议使用差距不那么大的版本，否则可能会出现一些问题。
+node.js版本为**v18.18.0**，npm版本为**9.8.1**
+jdk版本为**17.0.8**，maven版本为**3.8.1**
+建议使用相等或以上的版本，否则可能会出现一些问题。
 
+
+## 前端安装
+
+使用 npm 安装。
 ```bash
-npm i
+npm i -D nh-chat
 ```
+## 后端安装
 
-## 启动项目
-
+下载下面的SDK包，解压移动到你的maven仓库中，最后在你的项目中引入。
+下载地址：[SDK压缩包](https://www.notes-something.fun/im/sdk/nh.zip)
 ```bash
-npm run dev
+<dependency>
+    <groupId>nh.chat</groupId>
+    <artifactId>nh-chat-rear</artifactId>
+    <version>1.10.28</version>
+</dependency>
 ```
+## SQL文件安装
+下载下面的SQL文件，导入到你的数据库中。
+下载地址：[SQL文件](https://www.notes-something.fun/im/sql/nh-chat.sql)
 
-需要注意的是，项目中存在后端接口，需要你结合自己项目的后端去做修改，详细的目录结构在下节介绍。若未启动后端接口，会有服务连接失败等等弹窗，可以自行调整这些操作。未启动后端服务，可以进行体验但不会进行数据保存。详细的文档请参考**项目结构**。
-## 打包项目
-
-```bash
-npm run build
-```
-详情参考官网：[https://nuxt.com.cn/docs/getting-started/deployment](https://nuxt.com.cn/docs/getting-started/deployment)
+## 最后唠叨
+完成以上3步，就可以开始使用聊天框架了🎉。对的没错，就是这么快捷方便。但需要注意的是，以上步骤完成。只能用于个人体验，接入到线上项目中，还需要进行一些简单的配置。放心，一切都会很简单，详细配置见下章。
