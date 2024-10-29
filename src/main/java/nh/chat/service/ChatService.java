@@ -38,6 +38,7 @@ public class ChatService {
     private final MessageMapper messageMapper;
     private final ChatSocket chatSocket;
     private final AsyncCom asyncCom;
+    private final FileUtil fileUtil;
 
 
     public List<RelationVo> eqRelation(Long uid) {
@@ -147,7 +148,7 @@ public class ChatService {
     }
 
     public Long sendMessageImage(Long uid, MultipartFile file, Long receiveUid) throws ChatException, IOException {
-        String url = FileUtil.uploadImg(file);
+        String url = fileUtil.uploadImg(file);
         return sendMessageCom(uid, receiveUid, url, ChatCode.MESSAGE_TYPE_IMAGE.value());
     }
 

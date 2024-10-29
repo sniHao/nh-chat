@@ -46,10 +46,9 @@ public class ChatSocket extends TextWebSocketHandler {
      *
      * @param session 会话
      * @param message 消息
-     * @throws Exception e
      */
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) {
 
     }
 
@@ -70,10 +69,9 @@ public class ChatSocket extends TextWebSocketHandler {
      *
      * @param session 会话
      * @param status  状态
-     * @throws Exception e
      */
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status){
         Long uid = (Long) session.getAttributes().get("uid");
         if (uid != null) webSocketMap.remove(uid);
     }

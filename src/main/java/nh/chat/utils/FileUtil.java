@@ -1,16 +1,24 @@
 package nh.chat.utils;
 
 import cn.hutool.core.util.RandomUtil;
+import jakarta.annotation.Resource;
 import nh.chat.exception.ChatException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
+@Component
 public class FileUtil {
     private static final Logger logger = LoggerFactory.getLogger(FileUtil.class);
+
+
+    @Resource
+    private Environment environment;
 
     /**
      * 上传图片到服务器
@@ -19,7 +27,7 @@ public class FileUtil {
      * @return
      * @throws ChatException
      */
-    public static String uploadImg(MultipartFile file) throws ChatException {
+    public String uploadImg(MultipartFile file) throws ChatException {
         if (file.isEmpty()) throw new ChatException("图片空异常");
         String fileName = file.getOriginalFilename();
         if (fileName == null || StringUtils.isEmpty(fileName.trim())) throw new ChatException("图片空昵称异常");
@@ -29,7 +37,7 @@ public class FileUtil {
             throw new ChatException("只支持jpg、jpeg和png格式图片");
         String newFileName = RandomUtil.randomString(14) + "." + fileSuffix;
         try {
-            return FileUtil.comUpImg(file, newFileName);
+            return this.comUpImg(file, newFileName);
         } catch (Exception e) {
             throw new ChatException("服务器异常,发送失败");
         }
@@ -43,9 +51,13 @@ public class FileUtil {
      * @return 服务器图片的位置
      * @throws ChatException c
      */
-    public static String comUpImg(MultipartFile file, String fileName) throws ChatException {
+    public String comUpImg(MultipartFile file, String fileName) throws ChatException {
+        String memoryAddress = environment.getProperty("nh-chat.memory-address");
+        String websiteAddress = environment.getProperty("nh-chat.website-address");
+        if (memoryAddress == null) memoryAddress = "D:/nh-chat/images";
+        if (websiteAddress == null) websiteAddress = "D:/nh-chat/images/";
         try {
-            File newFile = new File("/home/nh-chat/chat/permit/images");
+            File newFile = new File(memoryAddress);
             if (!newFile.exists()) {
                 boolean resMkdirs = newFile.mkdirs();
                 if (!resMkdirs) throw new ChatException("服务器异常");
@@ -57,7 +69,7 @@ public class FileUtil {
                 if (!resNewFile) throw new ChatException("服务器异常");
             }
             file.transferTo(lastFile);
-            return "https://www.notes-something.fun/im/images/" + fileName;
+            return websiteAddress + fileName;
         } catch (Exception e) {
             throw new ChatException("服务器异常");
         }
