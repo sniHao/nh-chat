@@ -1,17 +1,15 @@
 package nh.chat.utils;
 
-import nh.chat.common.AsyncCom;
-import nh.chat.constant.ResultCode;
-import nh.chat.exception.ChatException;
-import jakarta.websocket.*;
-import jakarta.websocket.server.PathParam;
-import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,85 +20,61 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 @Slf4j
-@ServerEndpoint("/socket.chat/{token}")
-public class ChatSocket {
-    private static final Logger logger = LoggerFactory.getLogger(ChatSocket.class);
-    /**
-     * concurrent包的线程安全Map，用来存放每个客户端对应的MyWebSocket对象
-     */
-    private static final ConcurrentHashMap<Long, ChatSocket> webSocketMap = new ConcurrentHashMap<>();
-    /**
-     * 与某个客户端的连接会话，需要通过它来给客户端发送数据
-     */
-    private Session session;
-    private Long userId;
+public class ChatSocket extends TextWebSocketHandler {
+    private static final ConcurrentHashMap<Long, WebSocketSession> webSocketMap = new ConcurrentHashMap<>();
 
     /**
-     * 自定义验证token的方法【重写】
-     *
-     * @param token 用户token
-     * @throws ChatException 验证失败需抛出异常中断连接
-     */
-    protected Long validateToken(String token) throws ChatException {
-        if ("12".equals(token)) throw new ChatException(ResultCode.NO_LOGIN.tips(), ResultCode.NO_LOGIN.value());
-        return 12L;
-    }
-
-    /**
-     * 连接建立成功调用的方法
+     * 建立连接 @OnOpen
      *
      * @param session 会话
-     * @param token   用户token
-     * @return boolean
      */
-    @OnOpen
-    public boolean onOpen(Session session, @PathParam("token") String token) throws ChatException {
-        Long uid = validateToken(token);
-        if (Objects.isNull(uid)) throw new ChatException(ResultCode.NO_LOGIN.tips(), ResultCode.NO_LOGIN.value());
-        this.session = session;
-        this.userId = uid;
-        webSocketMap.put(this.userId, this);
-        return true;
-    }
-
-    /**
-     * 连接关闭调用的方法
-     */
-    @OnClose
-    public void onClose() {
-        try {
-            if (!Objects.isNull(this.userId)) webSocketMap.remove(this.userId);
-        } catch (Exception e) {
-            logger.error("关闭连接异常: {}", this.userId);
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) {
+        HttpHeaders headers = session.getHandshakeHeaders();
+        List<String> author = headers.get("Authorization");
+        if (Objects.isNull(author) || author.isEmpty()) return;
+        Long uid = Long.valueOf(author.get(0));
+        WebSocketSession state = webSocketMap.get(uid);
+        if (!Objects.isNull(state)) {
+            webSocketMap.remove(uid);
         }
+        webSocketMap.put(uid, session);
     }
 
     /**
-     * 收到客户端消息后调用的方法
+     * 接收消息事件 @OnMessage
      *
-     * @param message 客户端发送过来的消息体
-     */
-    @OnMessage
-    public void onMessage(String message) throws IOException {
-        AsyncCom asyncCom = BeanUtil.getBean(AsyncCom.class);
-        asyncCom.clearNotRead(Long.valueOf(message));
-    }
-
-    /**
-     * 发送消息
-     *
-     * @param uid     用户Id
+     * @param session 会话
      * @param message 消息
+     * @throws Exception e
+     */
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
+
+    }
+
+    /**
+     * 发消息
+     *
+     * @param uid     用户id
+     * @param message 消息体
      * @throws IOException e
      */
-    public void sendMessage(Long uid,
-                            String message) throws IOException {
+    public void sendMessage(Long uid, String message) throws IOException {
         if (webSocketMap.containsKey(uid))
-            webSocketMap.get(uid).session.getBasicRemote().sendText(message);
+            webSocketMap.get(uid).sendMessage(new TextMessage(message));
     }
 
-    @OnError
-    public void onError(@PathParam("token") String token, Session session, Throwable t) {
-//        logger.error("连接错误，{}", (t.getMessage() == null ? ResultCode.NO_LOGIN.tips() : null));
+    /**
+     * socket 断开连接时 @OnClose
+     *
+     * @param session 会话
+     * @param status  状态
+     * @throws Exception e
+     */
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+        Long uid = (Long) session.getAttributes().get("uid");
+        if (uid != null) webSocketMap.remove(uid);
     }
 }
