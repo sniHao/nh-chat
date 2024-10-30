@@ -100,19 +100,31 @@ watchEffect(() => {
   }
   pre {
     background-color: #2c3344;
-    padding: 13px;
+    padding: $px-12;
     box-sizing: border-box;
-    border-radius: 5px;
+    border-radius: $px-5;
     overflow: auto;
     code {
-      color: #f57622;
+      color: #d56e00;
     }
   }
 
+  code{
+    background-color: #2c3344;
+    padding: $px-4;
+    box-sizing: border-box;
+    border-radius: $px-4;
+  }
+  table {
+    border-collapse: collapse;
+    border: $px-1 solid white;
+    width: 100%;
+  }
   thead tr {
     background-color: #f57622;
     color: #ffffff;
     text-align: left;
+    border-bottom: $px-1 solid white;
   }
   th,
   td {

@@ -18,7 +18,9 @@
 ## 配置文件 application.yml
 
 在配置文件中添加以下配置。
+
 **memory-address：** 聊天中图片的存储地址，默认是`D:/nh-chat/images`
+
 **website-address：** 聊天中图片的显示地址，默认是`D:/nh-chat/images/`
 
 ```yaml
@@ -29,12 +31,14 @@ nh-chat:
 
 ## 过滤器
 
-接口中存在权限问题，如果你不进行配置，则表示使用的接口都没有权限认证。建议进行配置。
+接口中存在权限问题，如果你不进行配置，则表示使用的接口都没有权限认证，建议进行配置。
 
 在项目中新建 filter 文件夹，里面有 3 个文件`ApiInterceptor`、`NhConfig`、`SocketInterceptor`。
 **ApiInterceptor：** 接口过滤器
 **SocketInterceptor：** Socket 握手过滤器
 **NhConfig：** 过滤器的配置类
+
+**注：配置完后，请注意让包被扫描到，否则会无效。**
 
 具体的内容可以参考如下，具体需要根据你的权限校验规则进行调整。
 
@@ -49,9 +53,18 @@ public class ApiInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        // 进行token校验，通过将用户ID设置到请求属性中，key:uid
+        // 进行token校验，通过则将用户ID设置到请求属性中，key:uid
         String token = request.getHeader("Authorization");
-        Long uid = TokenUtil.userCheckToken(token, redisUtil);
+        Long uid = TokenUtil.userTokenNotException(token, redisUtil);
+        if (Objects.isNull(uid)) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter writer = response.getWriter();
+            writer.write("{\"msg\": \"请先登录\",\"code\": 403}");
+            writer.flush();
+            return false;
+        }
         request.setAttribute("uid", uid);
         return true;
     }
@@ -62,18 +75,26 @@ public class ApiInterceptor implements HandlerInterceptor {
 
 ```java
 public class SocketInterceptor implements HandshakeInterceptor {
+
+    private String splitUrl;
+
+    SocketInterceptor(String url) {
+        this.splitUrl = url;
+    }
+
     @Resource
     private RedisUtil redisUtil;
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler handler, Map<String, Object> map) throws Exception {
-        List<String> header = request.getHeaders().get("Authorization");
-        if (header == null || header.size() == 0) return false;
-        String token = header.get(0);
+        // 若放行连接，请在request的头部添加"Authorization"字段，值为用户的id;
+        HttpServletRequest req = ((ServletServerHttpRequest) request).getServletRequest();
+        String token = req.getRequestURI().replace(splitUrl, "");
         Long uid = TokenUtil.userTokenNotException(token, redisUtil);
         if (Objects.isNull(uid)) return false;
-        header.clear();
-        header.add(uid.toString());
+        List<String> strings = request.getHeaders().get("Authorization");
+        if (strings != null) strings.clear();
+        request.getHeaders().add("Authorization", String.valueOf(uid));
         return true;
     }
 
@@ -92,10 +113,11 @@ public class NhConfig implements WebSocketConfigurer, WebMvcConfigurer {
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry webSocketHandlerRegistry) {
         webSocketHandlerRegistry
-                .addHandler(new ChatSocket(), "/socket.chat")
-                .addInterceptors(new SocketInterceptor())
+                .addHandler(new ChatSocket(), "/socket.chat/**")
+                .addInterceptors(new SocketInterceptor("/socket.chat/"))
                 .setAllowedOrigins("*");
     }
+
 
     //==================接口过滤=============//
     @Resource
@@ -126,6 +148,6 @@ public class NhConfig implements WebSocketConfigurer, WebMvcConfigurer {
 ]
 ```
 
-- 参数为用户的 uid，数组形式 [uid1，uid2]，可能有一个可能有多个，因为通讯录存在多数的用户，需要一个 ID 集，返回值为 Result。
+- 参数为用户的 uid，数组形式 \[uid1，uid2\]，可能有一个可能有多个，因为通讯录存在多数的用户，需要一个 ID 集，返回值为 Result。
 
 **`注意在前端进行配置该接口`**
