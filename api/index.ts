@@ -2,7 +2,7 @@ import request from './request';
 
 export const userInfo = () => request({ url: 'user/userInfo', method: 'get' });
 
-export const eqUserBasics = (uid: number) => request({ url: 'user/eqUserBasics/' + uid, method: 'get' });
+export const eqUserBasics = (data: any) => request({ url: 'user/eqUserBasics', method: 'get', data });
 
 export const eqUserMail = (mail: string) => request({ url: 'user/eqUserMail/' + mail, method: 'get' });
 

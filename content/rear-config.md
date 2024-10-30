@@ -136,18 +136,32 @@ public class NhConfig implements WebSocketConfigurer, WebMvcConfigurer {
 因为项目存在用户头像和昵称问题，所以需要额外的接口来获取用户的头像和昵称。
 但这并不是必须的，如果未提供，用户的头像和昵称都将显示默认数据。
 
-**结果请自定义一个 VO 进行封装，需要有以下三个属性。将以下结果统称为 Result**
+**类型：POST**
+
+**参数：@RequestBody Long[] uIds**
+
+**返回值：结果请自定义一个 VO 进行封装，需要有以下三个属性。将以下结果统称为 Result**
 
 ```java
-[{
-  uid:用户ID,
-  name:用户昵称,
-  photo:用户头像
-},
-...
-]
-```
+{
+    data:[{
+            uid:用户ID,
+            name:用户昵称,
+            photo:用户头像
+            },
+            ...
+        ]
+}
 
-- 参数为用户的 uid，数组形式 \[uid1，uid2\]，可能有一个可能有多个，因为通讯录存在多数的用户，需要一个 ID 集，返回值为 Result。
+```
+示例：
+```java
+    @Operation(summary = "获取用户基础信息可多个")
+    @PostMapping("eqUserBasics")
+    public Result<?> eqUserBasics(@RequestBody Long[] uIds) throws ChatException {
+        return Result.success("ok", BeanCopy.BEANCOPY.userBasicsVo(userService.eqUser(uIds)));
+    }
+```
+- **注意将数据结果用 data 赋值返回，前端只会读取 data 的值。**
 
 **`注意在前端进行配置该接口`**

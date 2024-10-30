@@ -3,19 +3,24 @@
 下面是一个全面的示例，当然你可能不会使用所有的配置项。为了方便让你理解，这里做了详细的 demo。
 
 ```vue
-<NhChat inputTips="输入Ta的账号-发起聊天"
- :searchUserResult="searchUserResult"
-  baseUrl="http://localhost:34560" 
+<NhChat
+  inputTips="输入Ta的账号-发起聊天"
+  :searchUserResult="searchUserResult"
+  baseUrl="http://localhost:34560"
+  :userInfo="userInfo"
+  eqUserInfo=""
   @searchUser="searchUser"></NhChat>
 ```
 
 ## 传递
 
-| 属性             | 类型                               | 默认值                    | 说明             |
-| ---------------- | ---------------------------------- | ------------------------- | ---------------- |
-| inputTips        | `string`                           | `'输入Ta的账号-发起聊天'` | 搜索框的提示文字 |
-| searchUserResult | `Array[{uid:xx name:xx photo:xx}]` | `[]`                      | 搜索用户的结果集 |
-| baseUrl          | `string`                           | `'http://localhost:8087'`   | 接口的地址       |
+| 属性             | 类型                               | 默认值                                 | 说明                                                 |
+| ---------------- | ---------------------------------- | -------------------------------------- | ---------------------------------------------------- |
+| inputTips        | `string`                           | `'输入Ta的账号-发起聊天'`              | 搜索框的提示文字                                     |
+| searchUserResult | `Array[{uid:xx name:xx photo:xx}]` | `[]`                                   | 搜索用户的结果集                                     |
+| baseUrl          | `string`                           | `'http://localhost:8087'`              | 接口的地址                                           |
+| userInfo         | `{uid:xx name:xx photo:xx}`        | `{uid:-1, name: "默认", photo: "默" }` | 当前用户的基本信息(用户 uid、昵称、头像)             |
+| eqUserInfo       | `string`                           | `''`                                   | 接口地址，获取用户集的昵称和头像。**详细看后端配置** |
 
 ## 回调
 

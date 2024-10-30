@@ -40,7 +40,7 @@ let saveInfo = ref([] as any);
 const ofNewMessage = (msg: any) => {
   if (msg.message.length > 30) msg.message = msg.message.substring(0, 30) + '...';
   if (msg.type === 1) msg.message = '[图片]';
-  eqUserBasics(msg.receiveUid).then((res: Result) => {
+  eqUserBasics([msg.receiveUid]).then((res: Result) => {
     let name = res.code === 200 ? res.data.name : '未知用户';
     if (saveInfo.value.length > 3) {
       saveInfo.value.shift();
