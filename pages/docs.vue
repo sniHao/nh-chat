@@ -71,10 +71,6 @@ const menuOptions: MenuOption[] = [
       {
         label: '后端配置',
         key: 'rear-config'
-      },
-      {
-        label: '项目结构',
-        key: 'structure'
       }
     ]
   }
@@ -109,7 +105,7 @@ watchEffect(() => {
     }
   }
 
-  code{
+  code {
     background-color: #2c3344;
     padding: $px-4;
     box-sizing: border-box;
