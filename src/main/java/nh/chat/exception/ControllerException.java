@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /**
@@ -22,6 +23,10 @@ public class ControllerException {
     @ResponseBody
     @ExceptionHandler(value = Exception.class)
     public Result<?> exceptionHandler(Exception e) {
+        if (e.toString().startsWith("ChatException(")) {
+            ArrayList<Object> list = upError(e.toString().replace("ChatException(", "").replace(")", ""));
+            return Result.error(list.get(0).toString(), Integer.parseInt(list.get(1).toString()));
+        }
         logger.error("系统异常:" + e);
         return Result.error("系统异常");
     }
@@ -33,5 +38,27 @@ public class ControllerException {
             logger.error("业务异常:{} , {}", e.getCode(), e.getMsg());
         if (Objects.isNull(e.getCode())) return Result.error(e.getMsg());
         return Result.error(e.getMsg(), e.getCode());
+    }
+
+    /**
+     * 异常回抛
+     *
+     * @param str 异常内容
+     * @return ArrayList
+     */
+    public ArrayList<Object> upError(String str) {
+        String[] parts = str.split(",");
+        ArrayList<Object> list = new ArrayList<>();
+        for (String part : parts) {
+            String[] keyValue = part.split("=");
+            if (keyValue.length == 2) {
+                if (keyValue[0].trim().equals("msg")) {
+                    list.add(keyValue[1].trim());
+                } else if (keyValue[0].trim().equals("code")) {
+                    list.add(keyValue[1].trim());
+                }
+            }
+        }
+        return list;
     }
 }
