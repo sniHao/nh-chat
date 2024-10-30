@@ -2,8 +2,6 @@ import { createApp } from "vue";
 import "@/assets/css/nh.scss";
 import "@/assets/css/index.scss";
 import App from "./App.vue";
-// 引入Axios
-import axios from "axios";
 //引入router
 import router from "@/router/index";
 
@@ -16,8 +14,6 @@ pinia.use(piniaPluginPersistedstate);
 const app = createApp(App);
 app.use(pinia);
 
-// 全局Axios
-app.config.globalProperties.$axios = axios;
 // 使用路由
 app.use(router);
 

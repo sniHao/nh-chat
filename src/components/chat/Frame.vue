@@ -76,9 +76,8 @@
                   <div
                     class="user-head flex-center-center mr-4"
                     :style="'background-color:' + tranColor(user.photo)"
-                  >
-                    {{ user.photo }}
-                  </div>
+                    v-html="computePhoto(user.photo)"
+                  ></div>
                   <div class="cbbm-box cbbm-box-left flex">
                     <span v-if="item.type === 0">{{ item.message }}</span>
                     <n-image v-else class="chat-image" :src="item.message" />
@@ -100,10 +99,11 @@
                 <div class="cbb-main flex-right">
                   <div
                     class="user-head flex-center-center ml-4"
-                    :style="'background-color:' + tranColor(userInfo.photo)"
-                  >
-                    {{ userInfo.photo }}
-                  </div>
+                    :style="
+                      'background-color:' + tranColor(param.userInfo.photo)
+                    "
+                    v-html="computePhoto(param.userInfo.photo)"
+                  ></div>
                   <div class="cbbm-box cbbm-box-right flex">
                     <span v-if="item.type === 0">{{ item.message }}</span>
                     <n-image v-else class="chat-image" :src="item.message" />
@@ -227,6 +227,9 @@
 import { createDiscreteApi } from "naive-ui";
 const { notification } = createDiscreteApi(["notification"]);
 import type { UploadFileInfo } from "naive-ui";
+import { countTimeDiff, cutChatTime, getTimeFormat } from "@/utils/TimeUtil";
+import { throttle } from "@/utils/domUtils";
+import { tranColor, truncate, tips, computePhoto } from "@/utils/OtherUtils";
 import {
   eqChat,
   sendMessage,
@@ -244,7 +247,8 @@ const webSocketService = inject<WebSocketService>(
   "webSocketService"
 ) as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>("isSmallWin") || ref(false);
-const userInfo = inject<Ref<any>>("userInfo");
+
+const param = inject<Ref<Object>>("param") || ref({});
 
 const props = defineProps({
   user: {

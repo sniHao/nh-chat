@@ -9,7 +9,6 @@ declare module 'vue' {
   export interface GlobalComponents {
     EmoJi: typeof import('./src/components/of/EmoJi.vue')['default']
     Frame: typeof import('./src/components/chat/Frame.vue')['default']
-    HelloWorld: typeof import('./src/components/chat/HelloWorld.vue')['default']
     Loader: typeof import('./src/components/of/Loader.vue')['default']
     Main: typeof import('./src/components/chat/Main.vue')['default']
     NBadge: typeof import('naive-ui')['NBadge']

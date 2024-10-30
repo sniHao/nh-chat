@@ -48,14 +48,8 @@
               <div
                 class="user-head flex-center-center"
                 :style="'background-color:' + tranColor(item.photo)"
-              >
-                <template v-if="item.photo.length > 5">
-                  <img :src="item.photo" />
-                </template>
-                <template v-else>
-                  {{ item.photo }}
-                </template>
-              </div>
+                v-html="computePhoto(item.photo)"
+              ></div>
             </n-badge>
             <div class="user-main">
               <div class="flex-center-zy">
@@ -132,9 +126,8 @@
           <div
             class="user-head flex-center-center"
             :style="'background-color:' + tranColor(item.photo)"
-          >
-            {{ item.photo }}
-          </div>
+            v-html="computePhoto(item.photo)"
+          ></div>
           <div class="ft-16 ft-b ml-10">{{ item.name }}</div>
         </div>
         <n-button
@@ -169,8 +162,15 @@
 <script setup lang="ts">
 import { createDiscreteApi } from "naive-ui";
 const { dialog } = createDiscreteApi(["dialog"]);
-import { eqRelation, eqUserMail, goChat, delChat, topChat } from "@/api/index";
-import { tips, tranColor } from "@/utils/OtherUtils";
+import { eqRelation, goChat, delChat, topChat } from "@/api/index";
+import {
+  tips,
+  tranColor,
+  setUser,
+  truncate,
+  computePhoto,
+} from "@/utils/OtherUtils";
+import { countTimeDiff, reckonTime, getTimeFormat } from "@/utils/TimeUtil";
 import RightButton from "../of/RightButton.vue";
 import Frame from "./Frame.vue";
 import NullChat from "../svg/NullChat.vue";
@@ -180,6 +180,7 @@ const webSocketService = inject<WebSocketService>(
   "webSocketService"
 ) as WebSocketService;
 import { useStore } from "@/store";
+import axios from "axios";
 const store = useStore();
 const isSmallWin = inject<Ref<boolean>>("isSmallWin") || ref(false);
 const param = inject<Ref<Object>>("param") || ref({});
@@ -202,6 +203,7 @@ const userClass = (item: Relation) => {
     userTop: item.top === 1,
   };
 };
+
 // 手机状态下展开和收缩
 const isPhoneUnfold = ref(false);
 const isPhoneCallBack = (state: boolean) => {
@@ -252,9 +254,12 @@ const goSearch = () => {
 const sendChat = (uid: number) => {
   goChat(uid).then((res: Result) => {
     if (res.code !== 200) return tips("error", res.msg);
-    addTopList(res.data);
-    showChat(res.data);
-    sortData();
+    setUser([res.data], param.eqUserInfo).then((data: any) => {
+      addTopList(data[0]);
+      showChat(data[0]);
+      sortData();
+      searchVal.value = "";
+    });
   });
   showModal.value = false;
 };
@@ -289,8 +294,10 @@ const eqUserList = () => {
   eqRelation()
     .then((res: Result): void => {
       if (res.code !== 200) return;
-      userList.value = res.data;
-      sortData();
+      setUser(res.data, param.eqUserInfo).then((res) => {
+        userList.value = res;
+        sortData();
+      });
     })
     .finally(() => addListener());
 };

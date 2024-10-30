@@ -5,7 +5,7 @@
 <script setup lang="ts">
 import WebSocketService from "@/utils/WebSocketService";
 import { createDiscreteApi } from "naive-ui";
-import { userInfo, eqUserBasics } from "@/api/index";
+import { eqUserBasics } from "@/api/index";
 const { notification } = createDiscreteApi(["notification"]);
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
@@ -34,6 +34,14 @@ const props = defineProps({
   searchUserResult: {
     type: Array, //uid name photo
     default: [],
+  },
+  eqUserInfo: {
+    type: String,
+    default: "",
+  },
+  userInfo: {
+    type: Object as unknown as userInfo,
+    default: () => ({ uid: -1, name: "默认", photo: "默" }),
   },
 });
 provide("param", props);
@@ -113,16 +121,6 @@ const resize = () => {
 };
 provide("isSmallWin", isSmallWin);
 
-// 用户数据
-const uInfo = ref({} as any);
-const eqUser = () => {
-  userInfo().then((res) => {
-    if (res.code !== 200) return tips("error", res.msg);
-    uInfo.value = res.data;
-  });
-};
-provide("userInfo", uInfo);
-
 // 初始化组件
 const initModule = () => {
   store.initBaseUrl(props.baseUrl);
@@ -133,7 +131,6 @@ onMounted(() => {
   initModule();
   ws.connect();
   resize();
-  eqUser();
   window.addEventListener("resize", resize);
 });
 onUnmounted(() => {

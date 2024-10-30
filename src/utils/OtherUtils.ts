@@ -91,3 +91,49 @@ export const copyImage = (imageUrl: string): Promise<Boolean> => {
 export const sleep = (time: number) => {
   return new Promise((resolve) => setTimeout(resolve, time));
 };
+
+import axios from "axios";
+// 为用户添加昵称和头像属性
+export const setUser = (data: Array<Relation>, url: string) => {
+  return new Promise((resolve) => {
+    if (!url) {
+      data.forEach((item) => {
+        item["name"] = "默认昵称";
+        item["photo"] = "默";
+      });
+      resolve(data);
+    }
+    axios
+      .post(
+        url,
+        data.map((item) => item.relationUid),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+      .then((response) => {
+        if (!response.data.data || response.data.data.length == 0) return;
+        data.forEach((item) => {
+          let user = response.data.data.filter(
+            (ite: userInfo) => ite.uid === item.relationUid
+          )[0];
+          if (user) {
+            item["name"] = user.name;
+            item["photo"] = user.photo;
+          }
+        });
+        resolve(data);
+      })
+      .catch((error) => {
+        tips("error", "服务器异常，获取头像失败");
+      });
+  });
+};
+
+// 头像设置
+export const computePhoto = (photo: string) => {
+  if (photo.startsWith("http")) return `<img src="${photo}" />`;
+  return photo;
+};

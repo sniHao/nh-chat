@@ -32,7 +32,6 @@ export const useStore = defineStore("nh", {
     },
     initBaseUrl(url: string) {
       this.base_url = url;
-      console.log(this.base_url, "--------");
     },
   },
   persist: true,

@@ -3,8 +3,6 @@ body {
   margin: 0;
 }
 
-
-
 .home-bg-color {
   background-color: $bg-color;
 }
@@ -67,6 +65,10 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  img {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 @keyframes circle {
@@ -78,6 +80,6 @@ body {
   }
 }
 
-.ant-modal div[aria-hidden='true'] {
+.ant-modal div[aria-hidden="true"] {
   display: none !important;
 }
