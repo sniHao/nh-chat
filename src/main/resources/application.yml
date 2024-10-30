@@ -1,5 +1,11 @@
 server:
   port: 8087
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/nh_chat?useSSL=true&useUncode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
 mybatis-plus:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: nh.chat.bean.po
