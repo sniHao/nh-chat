@@ -25,14 +25,7 @@
           <div v-else class="pd-zy-12 hover-pointer user" :class="userClass(item)" v-for="(item, index) in userList" :key="item.id" @click="showChat(item)">
             <div class="user-box pd-sx-6 flex-center-zy">
               <n-badge :value="item.notRead" :max="99" :offset="[-5, 5]">
-                <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)">
-                  <template v-if="item.photo.length > 5">
-                    <img :src="item.photo" />
-                  </template>
-                  <template v-else>
-                    {{ item.photo }}
-                  </template>
-                </div>
+                <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)" v-html="computePhoto(item.photo)"></div>
               </n-badge>
               <div class="user-main">
                 <div class="flex-center-zy">
@@ -75,7 +68,7 @@
         </template>
         <div class="flex-center-zy" v-else>
           <div class="flex-center">
-            <div class="user-head flex-center-center" :style="'background-color:' + tranColor(hasUser.photo)">{{ hasUser.photo }}</div>
+            <div class="user-head flex-center-center" :style="'background-color:' + tranColor(hasUser.photo)" v-html="computePhoto(hasUser.photo)"></div>
             <div class="ft-16 ft-b ml-10">{{ hasUser.name }}</div>
           </div>
           <n-button round strong type="primary" color="#9300ff" @click="sendChat(hasUser.uid)">发起聊天</n-button>

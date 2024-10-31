@@ -86,3 +86,10 @@ export const copyImage = (imageUrl: string): Promise<Boolean> => {
     };
   });
 };
+
+
+// 头像设置
+export const computePhoto = (photo: string) => {
+  if (photo.startsWith("http")) return `<img src="${photo}" />`;
+  return photo;
+};

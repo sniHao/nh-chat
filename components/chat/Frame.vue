@@ -44,7 +44,7 @@
               <div class="flex w-100" @click="moreCheckedCallBack(item)" :class="moreCheckState ? 'is-checked' : ''">
                 <n-checkbox :checked="item.check" @update.self:checked="moreCheckedCallBack(item)" v-if="moreCheckState"></n-checkbox>
                 <div class="cbb-main flex">
-                  <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor(user.photo)">{{ user.photo }}</div>
+                  <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor(user.photo)" v-html="computePhoto(user.photo)"></div>
                   <div class="cbbm-box cbbm-box-left flex">
                     <span v-if="item.type === 0">{{ item.message }}</span>
                     <n-image v-else class="chat-image" :src="item.message" />
@@ -56,7 +56,10 @@
               <div class="flex w-100" @click="moreCheckedCallBack(item)" :class="moreCheckState ? 'is-checked' : ''">
                 <n-checkbox :checked="item.check" @update.self:checked.stop="moreCheckedCallBack(item)" v-if="moreCheckState"></n-checkbox>
                 <div class="cbb-main flex-right">
-                  <div class="user-head flex-center-center ml-4" :style="'background-color:' + tranColor(userInfo.uInfo.photo)">{{ userInfo.uInfo.photo }}</div>
+                  <div
+                    class="user-head flex-center-center ml-4"
+                    :style="'background-color:' + tranColor(userInfo.uInfo.photo)"
+                    v-html="computePhoto(userInfo.uInfo.photo)"></div>
                   <div class="cbbm-box cbbm-box-right flex">
                     <span v-if="item.type === 0">{{ item.message }}</span>
                     <n-image v-else class="chat-image" :src="item.message" />
