@@ -5,11 +5,10 @@
 <script setup lang="ts">
 import WebSocketService from "@/utils/WebSocketService";
 import { createDiscreteApi } from "naive-ui";
-import { eqUserBasics } from "@/api/index";
 const { notification } = createDiscreteApi(["notification"]);
 import { useRouter } from "vue-router";
 import { useStore } from "@/store";
-import { tips } from "@/utils/OtherUtils";
+import { setUser } from "@/utils/OtherUtils";
 import Main from "@/components/chat/Main.vue";
 const router = useRouter();
 const store = useStore();
@@ -32,7 +31,7 @@ const props = defineProps({
     default: () => ({}),
   },
   searchUserResult: {
-    type: Array, //uid name photo
+    type: Array,
     default: [],
   },
   eqUserInfo: {
@@ -43,15 +42,19 @@ const props = defineProps({
     type: Object as unknown as userInfo,
     default: () => ({ uid: -1, name: "默认", photo: "默" }),
   },
+  socketUrl: {
+    type: String,
+    default: "ws://localhost:8087/socket.chat/",
+  },
+  token: {
+    type: String,
+    default: "",
+  },
 });
 provide("param", props);
 
-//==============回调=============//
-// 搜索用户
-// const searchUser = (val: string) => {};
-
 // ws状态全局
-const ws = new WebSocketService(store.token);
+const ws = new WebSocketService(props.socketUrl + props.token);
 provide("webSocketService", ws);
 
 // 获取当前聊天的uid
@@ -76,8 +79,8 @@ const ofNewMessage = (msg: any) => {
   if (msg.message.length > 30)
     msg.message = msg.message.substring(0, 30) + "...";
   if (msg.type === 1) msg.message = "[图片]";
-  eqUserBasics(msg.receiveUid).then((res: Result) => {
-    let name = res.code === 200 ? res.data.name : "未知用户";
+  setUser([msg], props.eqUserInfo).then((res: any) => {
+    let name = res[0].name;
     if (saveInfo.value.length > 3) {
       saveInfo.value.shift();
       saveInfo.value[0].destroy();
@@ -125,6 +128,7 @@ provide("isSmallWin", isSmallWin);
 const initModule = () => {
   store.initBaseUrl(props.baseUrl);
   store.base_url = props.baseUrl;
+  store.saveToken(props.token);
 };
 
 onMounted(() => {

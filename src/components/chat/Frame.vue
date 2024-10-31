@@ -229,7 +229,13 @@ const { notification } = createDiscreteApi(["notification"]);
 import type { UploadFileInfo } from "naive-ui";
 import { countTimeDiff, cutChatTime, getTimeFormat } from "@/utils/TimeUtil";
 import { throttle } from "@/utils/domUtils";
-import { tranColor, truncate, tips, computePhoto } from "@/utils/OtherUtils";
+import {
+  tranColor,
+  truncate,
+  tips,
+  computePhoto,
+  randomNumber,
+} from "@/utils/OtherUtils";
 import {
   eqChat,
   sendMessage,

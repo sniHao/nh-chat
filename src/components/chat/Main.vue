@@ -180,7 +180,6 @@ const webSocketService = inject<WebSocketService>(
   "webSocketService"
 ) as WebSocketService;
 import { useStore } from "@/store";
-import axios from "axios";
 const store = useStore();
 const isSmallWin = inject<Ref<boolean>>("isSmallWin") || ref(false);
 const param = inject<Ref<Object>>("param") || ref({});
