@@ -54,6 +54,7 @@ export default defineConfig(({ command, mode }) => {
         entry: path.resolve(__dirname, "src/components/index.js"),
         name: "NhChat",
         fileName: (format) => `nh-chat.${format}.js`,
+        formats: ["cjs"],
       },
       rollupOptions: {
         external: ["vue", "vue-router"],
