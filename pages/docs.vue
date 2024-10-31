@@ -102,6 +102,7 @@ watchEffect(() => {
     overflow: auto;
     code {
       color: #d56e00;
+      font-weight: 600;
     }
   }
 

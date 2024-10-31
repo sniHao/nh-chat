@@ -5,7 +5,9 @@
 ## 依赖
 
 node.js版本为**v18.18.0**，npm版本为**9.8.1**
+
 jdk版本为**17.0.8**，maven版本为**3.8.1**
+
 建议使用相等或以上的版本，否则可能会出现一些问题。
 
 
@@ -18,6 +20,7 @@ npm i -D nh-chat
 ## 后端安装
 
 下载下面的SDK包，解压移动到你的maven仓库中，最后在你的项目中引入。
+
 下载地址：[SDK压缩包](https://www.notes-something.fun/im/sdk/nh.zip)
 ```java
 <dependency>

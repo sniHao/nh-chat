@@ -70,7 +70,7 @@ const technology = ref([
   },
   {
     name: '后端🚀',
-    list: ['JDK21', 'SpringBoot3', 'MyBatis-Plus', 'SpringSecurity', 'Maven3.8+', 'JWT', 'Swagger3']
+    list: ['JDK17', 'SpringBoot3', 'MyBatis-Plus', 'SpringSecurity', 'Maven3.8+', 'JWT', 'Swagger3']
   },
   {
     name: '消息👨‍🚀',

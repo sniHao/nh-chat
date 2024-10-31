@@ -29,14 +29,19 @@ nh-chat:
   website-address: xxxx
 ```
 
-## 过滤器
+## 过滤器\*
 
-接口中存在权限问题，如果你不进行配置，则表示使用的接口都没有权限认证，建议进行配置。
+接口中存在权限问题，如果你不打算权限配置，请也创建以下文件，将示例中的校验规则删除；
+
+**根据示例注解保留必要的代码。**
 
 在项目中新建 filter 文件夹，里面有 3 个文件`ApiInterceptor`、`NhConfig`、`SocketInterceptor`。
-**ApiInterceptor：** 接口过滤器
-**SocketInterceptor：** Socket 握手过滤器
-**NhConfig：** 过滤器的配置类
+
+**`ApiInterceptor：接口过滤器`** 
+
+**`SocketInterceptor：Socket 握手过滤器`** 
+
+**`NhConfig：过滤器的配置类`** 
 
 **注：配置完后，请注意让包被扫描到，否则会无效。**
 
@@ -65,6 +70,8 @@ public class ApiInterceptor implements HandlerInterceptor {
             writer.flush();
             return false;
         }
+
+        // 若不进行拦截，请保留以下代码，uid为用户的id;
         request.setAttribute("uid", uid);
         return true;
     }
@@ -74,6 +81,7 @@ public class ApiInterceptor implements HandlerInterceptor {
 - **SocketInterceptor：**
 
 ```java
+@Data
 public class SocketInterceptor implements HandshakeInterceptor {
 
     private String splitUrl;
@@ -83,7 +91,7 @@ public class SocketInterceptor implements HandshakeInterceptor {
     }
 
     @Resource
-    private RedisUtil redisUtil;
+    private RedisUtil redisUtil = BeanUtil.getBean(RedisUtil.class);
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler handler, Map<String, Object> map) throws Exception {
@@ -94,6 +102,8 @@ public class SocketInterceptor implements HandshakeInterceptor {
         if (Objects.isNull(uid)) return false;
         List<String> strings = request.getHeaders().get("Authorization");
         if (strings != null) strings.clear();
+
+        // 若不进行拦截，请保留以下代码，uid为用户的id;
         request.getHeaders().add("Authorization", String.valueOf(uid));
         return true;
     }
@@ -154,7 +164,9 @@ public class NhConfig implements WebSocketConfigurer, WebMvcConfigurer {
 }
 
 ```
+
 示例：
+
 ```java
     @Operation(summary = "获取用户基础信息可多个")
     @PostMapping("eqUserBasics")
@@ -162,6 +174,7 @@ public class NhConfig implements WebSocketConfigurer, WebMvcConfigurer {
         return Result.success("ok", BeanCopy.BEANCOPY.userBasicsVo(userService.eqUser(uIds)));
     }
 ```
+
 - **注意将数据结果用 data 赋值返回，前端只会读取 data 的值。**
 
 **`注意在前端进行配置该接口`**
