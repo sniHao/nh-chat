@@ -4,13 +4,11 @@ import { createDiscreteApi } from "naive-ui";
 const { notification } = createDiscreteApi(["notification"]);
 const { loadingBar } = createDiscreteApi(["loadingBar"]);
 import { sleep } from "@/utils/OtherUtils";
-import { useStore } from "@/store";
 
 const request = async (objet: any) => {
   await sleep(1);
-  let store = useStore();
   objet.timeout = 20000;
-  objet.baseURL = store.base_url;
+  objet.baseURL = sessionStorage.getItem("baseUrl");
   const of = axios.create(objet);
   const errorTips = [
     ["访问过于频繁，请稍候再试", "别搞别搞别搞😟"],

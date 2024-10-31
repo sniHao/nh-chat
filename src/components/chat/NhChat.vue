@@ -7,11 +7,9 @@ import WebSocketService from "@/utils/WebSocketService";
 import { createDiscreteApi } from "naive-ui";
 const { notification } = createDiscreteApi(["notification"]);
 import { useRouter } from "vue-router";
-import { useStore } from "@/store";
 import { setUser } from "@/utils/OtherUtils";
 import Main from "@/components/chat/Main.vue";
 const router = useRouter();
-const store = useStore();
 
 const props = defineProps({
   baseUrl: {
@@ -49,6 +47,10 @@ const props = defineProps({
   token: {
     type: String,
     default: "",
+  },
+  chatRoute: {
+    type: String,
+    default: "/",
   },
 } as any);
 provide("param", props);
@@ -113,8 +115,8 @@ provide("ofNewMessage", ofNewMessage);
 
 // 查看消息详情
 const goChat = (id: number) => {
-  store.setGoChat(id);
-  router.push("/try");
+  sessionStorage.setItem("go_chat_uid", id);
+  router.push(props.chatRoute);
 };
 
 // 窗口大小变化
@@ -126,9 +128,7 @@ provide("isSmallWin", isSmallWin);
 
 // 初始化组件
 const initModule = () => {
-  store.initBaseUrl(props.baseUrl);
-  store.base_url = props.baseUrl;
-  store.saveToken(props.token);
+  sessionStorage.setItem("baseUrl", props.baseUrl);
 };
 
 onMounted(() => {

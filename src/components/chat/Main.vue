@@ -179,8 +179,6 @@ import WebSocketService from "@/utils/WebSocketService";
 const webSocketService = inject<WebSocketService>(
   "webSocketService"
 ) as WebSocketService;
-import { useStore } from "@/store";
-const store = useStore();
 const isSmallWin = inject<Ref<boolean>>("isSmallWin") || ref(false);
 const param = inject<Ref<any>>("param") as any;
 const emit = defineEmits(["searchUser"]);
@@ -431,18 +429,19 @@ const closeRightBtnCom = (state: boolean) => {
 };
 
 // ===================================组件初始化操作===================================//
+const goUid = ref(sessionStorage.getItem("go_chat_uid"));
 watch(
-  () => store.go_chat_u,
+  () => goUid.value,
   () => {
-    if (store.go_chat_u === -99) return;
+    if (!goUid.value) return;
     upChat();
   }
 );
 // 跳聊天
 const upChat = () => {
-  sendChat(store.go_chat_u);
+  sendChat(goUid.value);
   setTimeout(() => {
-    store.initGoChat();
+    sessionStorage.removeItem("go_chat_uid");
   }, 50);
 };
 
@@ -473,7 +472,7 @@ watch(
 );
 
 onMounted(() => {
-  if (store.go_chat_u !== -99) upChat();
+  if (goUid.value) upChat();
   eqUserList();
   closeRightBtnCom(true);
 });
