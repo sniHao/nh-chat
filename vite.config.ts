@@ -51,7 +51,7 @@ export default defineConfig(({ command, mode }) => {
     },
     build: {
       lib: {
-        entry: path.resolve(__dirname, "src/index.js"),
+        entry: path.resolve(__dirname, "src/components/index.js"),
         name: "NhChat",
         fileName: (format) => `nh-chat.${format}.js`,
       },

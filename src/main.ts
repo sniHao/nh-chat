@@ -10,7 +10,6 @@ import piniaPluginPersistedstate from "pinia-plugin-persistedstate";
 const pinia = createPinia();
 pinia.use(piniaPluginPersistedstate);
 
-// import pinia from "@/store/store";
 const app = createApp(App);
 app.use(pinia);
 

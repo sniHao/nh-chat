@@ -1,6 +1,6 @@
 {
   "name": "nh-chat",
-  "private": true,
+  "private": false,
   "version": "1.10.31",
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "files": [
-    "dist"
+    "dist/*"
   ],
   "main": "dist/nh-chat.umd.js",
   "module": "dist/nh-chat.es.js",
