@@ -4,6 +4,7 @@ import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import { NaiveUiResolver } from "unplugin-vue-components/resolvers";
 import path from "path";
+import dts from "vite-plugin-dts";
 
 const pathSrc = path.resolve(__dirname, "src");
 
@@ -34,6 +35,11 @@ export default defineConfig(({ command, mode }) => {
       Components({
         resolvers: [NaiveUiResolver()],
       }),
+      dts({
+        // 这里定义了需要生成d.ts文件的目录，如果有多个目录，可以使用数组
+        include: ["src/components/**/*.{vue,ts}"],
+        tsconfigPath: "./tsconfig.build.json",
+      }),
     ],
     css: {
       preprocessorOptions: {
@@ -49,16 +55,24 @@ export default defineConfig(({ command, mode }) => {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
       "process.env": env,
     },
+    // 打包配置
     build: {
+      // 打包后的文件输出目录
+      outDir: "dist",
       lib: {
-        entry: path.resolve(__dirname, "src/components/index.js"),
+        //指定组件编译入口文件
+        entry: "./src/components/index.ts",
+        // 组件库名称
         name: "NhChat",
-        fileName: (format) => `nh-chat.${format}.js`,
-        formats: ["cjs"],
+        // 文件名称
+        fileName: "nh-chat",
       },
       rollupOptions: {
+        // 确保外部化处理那些你不想打包进库的依赖
         external: ["vue", "vue-router"],
         output: {
+          exports: "named",
+          // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
           globals: {
             vue: "Vue",
           },

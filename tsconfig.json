@@ -11,6 +11,8 @@
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": true,
     "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "dist",
     "types": ["vite/client", "node"],
     /* 配置@路径 */
     "baseUrl": "./",

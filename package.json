@@ -1,23 +1,28 @@
 {
   "name": "nh-chat",
   "private": false,
-  "version": "1.10.31",
+  "version": "1.10.24",
+  "description": "Use a non-exaggerated chat frame.",
   "type": "module",
+  "main": "dist/nh-chat.js",
+  "module": "dist/nh-chat.umd.cjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "package.json",
+    "README.md",
+    "dist"
+  ],
+  "author": "nihao",
+  "keywords": [
+    "vite",
+    "vue3",
+    "typescript",
+    "chat"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
-  },
-  "files": [
-    "dist/*"
-  ],
-  "main": "dist/nh-chat.umd.js",
-  "module": "dist/nh-chat.es.js",
-  "exports": {
-    ".": {
-      "import": "dist/nh-chat.es.js",
-      "require": "dist/nh-chat.umd.js"
-    }
   },
   "dependencies": {
     "axios": "^1.7.7",
@@ -35,6 +40,7 @@
     "naive-ui": "^2.40.1",
     "typescript": "~5.6.2",
     "vite": "^5.4.9",
+    "vite-plugin-dts": "^4.3.0",
     "vue-tsc": "^2.1.6"
   }
 }

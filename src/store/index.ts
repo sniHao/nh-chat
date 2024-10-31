@@ -1,11 +1,18 @@
 import { defineStore } from "pinia";
 
+interface State {
+  token: string;
+  not_tips: string;
+  go_chat_u: number;
+  set_pw: string;
+  base_url: string;
+}
 export const useStore = defineStore("nh", {
-  state: () => ({
-    token: "" as string,
-    not_tips: "false" as string,
+  state: (): State => ({
+    token: "",
+    not_tips: "false",
     go_chat_u: -99,
-    set_pw: "false" as string,
+    set_pw: "false",
     base_url: "",
   }),
   actions: {

@@ -1,0 +1,21 @@
+{
+    "extends": "@vue/tsconfig/tsconfig.dom.json",
+    "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "src/**/*.d.ts"],
+    //include内容根据具体情况自己定制，我是根据组件库自己修改的，如果没动过原来的应该是,下面这个：
+    //"include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+    "compilerOptions": {
+      "baseUrl": ".",
+      "paths": {
+        "@/*": ["./src/*"]
+      }
+    },
+    "references": [
+      {
+        "path": "./tsconfig.node.json"
+      },
+      {
+        "path": "./tsconfig.app.json"
+      }
+    ]
+  }
+  
