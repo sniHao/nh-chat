@@ -50,7 +50,7 @@ const props = defineProps({
     type: String,
     default: "",
   },
-});
+} as any);
 provide("param", props);
 
 // ws状态全局

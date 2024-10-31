@@ -29,6 +29,7 @@ export default defineConfig(({ command, mode }) => {
             ],
           },
         ],
+        dts: "src/auto-imports.d.ts",
       }),
       Components({
         resolvers: [NaiveUiResolver()],
@@ -55,7 +56,7 @@ export default defineConfig(({ command, mode }) => {
         fileName: (format) => `nh-chat.${format}.js`,
       },
       rollupOptions: {
-        external: ["vue","vue-router"],
+        external: ["vue", "vue-router"],
         output: {
           globals: {
             vue: "Vue",

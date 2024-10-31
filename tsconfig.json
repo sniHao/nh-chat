@@ -11,7 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": true,
     "sourceMap": true,
-    "types": ["vite/client", "node", "pinia-plugin-persist"],
+    "types": ["vite/client", "node"],
     /* 配置@路径 */
     "baseUrl": "./",
     "paths": {

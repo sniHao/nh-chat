@@ -235,6 +235,8 @@ import {
   tips,
   computePhoto,
   randomNumber,
+  copyImage,
+  copyText,
 } from "@/utils/OtherUtils";
 import {
   eqChat,
@@ -254,7 +256,7 @@ const webSocketService = inject<WebSocketService>(
 ) as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>("isSmallWin") || ref(false);
 
-const param = inject<Ref<Object>>("param") || ref({});
+const param = inject<Ref<any>>("param") as any;
 
 const props = defineProps({
   user: {

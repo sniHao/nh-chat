@@ -182,7 +182,7 @@ const webSocketService = inject<WebSocketService>(
 import { useStore } from "@/store";
 const store = useStore();
 const isSmallWin = inject<Ref<boolean>>("isSmallWin") || ref(false);
-const param = inject<Ref<Object>>("param") || ref({});
+const param = inject<Ref<any>>("param") as any;
 const emit = defineEmits(["searchUser"]);
 // ===================================其他功能===================================//
 // 基本样式
@@ -293,7 +293,7 @@ const eqUserList = () => {
   eqRelation()
     .then((res: Result): void => {
       if (res.code !== 200) return;
-      setUser(res.data, param.eqUserInfo).then((res) => {
+      setUser(res.data, param.eqUserInfo).then((res: any) => {
         userList.value = res;
         sortData();
       });

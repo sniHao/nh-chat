@@ -1,7 +1,7 @@
 {
-  "name": "nh-chat-page",
+  "name": "nh-chat",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.10.31",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,12 +11,12 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/nh-chat.umd.js",
-  "module": "./dist/nh-chat.es.js",
+  "main": "dist/nh-chat.umd.js",
+  "module": "dist/nh-chat.es.js",
   "exports": {
     ".": {
-      "import": "./dist/nh-chat.es.js",
-      "require": "./dist/nh-chat.umd.js"
+      "import": "dist/nh-chat.es.js",
+      "require": "dist/nh-chat.umd.js"
     }
   },
   "dependencies": {
