@@ -8,6 +8,17 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/nh-chat.umd.js",
+  "module": "./dist/nh-chat.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/nh-chat.es.js",
+      "require": "./dist/nh-chat.umd.js"
+    }
+  },
   "dependencies": {
     "axios": "^1.7.7",
     "pinia": "^2.2.4",
