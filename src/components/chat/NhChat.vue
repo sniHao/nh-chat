@@ -115,7 +115,7 @@ provide("ofNewMessage", ofNewMessage);
 
 // 查看消息详情
 const goChat = (id: number) => {
-  sessionStorage.setItem("go_chat_uid", id);
+  sessionStorage.setItem("go_chat_uid", id.toString());
   router.push(props.chatRoute);
 };
 

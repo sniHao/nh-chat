@@ -429,7 +429,7 @@ const closeRightBtnCom = (state: boolean) => {
 };
 
 // ===================================组件初始化操作===================================//
-const goUid = ref(sessionStorage.getItem("go_chat_uid"));
+const goUid = ref(sessionStorage.getItem("go_chat_uid") ?? -99);
 watch(
   () => goUid.value,
   () => {
@@ -439,7 +439,7 @@ watch(
 );
 // 跳聊天
 const upChat = () => {
-  sendChat(goUid.value);
+  sendChat(+goUid.value);
   setTimeout(() => {
     sessionStorage.removeItem("go_chat_uid");
   }, 50);
