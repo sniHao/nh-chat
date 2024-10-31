@@ -9,8 +9,8 @@ import java.util.List;
 
 
 @Mapper(componentModel = "spring")
-public interface BeanCopy {
-    BeanCopy BEANCOPY = Mappers.getMapper(BeanCopy.class);
+public interface NhBeanCopy {
+    NhBeanCopy BEANCOPY = Mappers.getMapper(NhBeanCopy.class);
 
     RelationVo relationVo(Relation relation);
 

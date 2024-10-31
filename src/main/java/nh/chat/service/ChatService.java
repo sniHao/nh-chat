@@ -20,7 +20,7 @@ import nh.chat.exception.ChatException;
 import nh.chat.mapper.ChatMapper;
 import nh.chat.mapper.MessageMapper;
 import nh.chat.mapper.RelationMapper;
-import nh.chat.utils.BeanCopy;
+import nh.chat.utils.NhBeanCopy;
 import nh.chat.utils.ChatSocket;
 import nh.chat.utils.FileUtil;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class ChatService {
         LambdaQueryWrapper<Relation> qw = new LambdaQueryWrapper<Relation>()
                 .eq(Relation::getUid, uid).eq(Relation::getState, ChatCode.MESSAGE_HEALTH.value())
                 .orderByDesc(Relation::getLastMessageDate);
-        return BeanCopy.BEANCOPY.relationVos(relationMapper.selectList(qw));
+        return NhBeanCopy.BEANCOPY.relationVos(relationMapper.selectList(qw));
     }
 
     public RelationVo goChat(Long uid, Long receiveUid) throws ChatException {
@@ -56,12 +56,12 @@ public class ChatService {
         if (Objects.isNull(relation)) {
             Relation relationNew = new Relation(uid, receiveUid, date, date);
             relationMapper.insert(relationNew);
-            return BeanCopy.BEANCOPY.relationVo(relationNew);
+            return NhBeanCopy.BEANCOPY.relationVo(relationNew);
         }
         LambdaUpdateWrapper<Relation> uw = new LambdaUpdateWrapper<Relation>()
                 .eq(Relation::getUid, uid).eq(Relation::getRelationUid, receiveUid);
         if (relation.getState() == ChatCode.MESSAGE_HEALTH.value()) {
-            RelationVo relationVo = BeanCopy.BEANCOPY.relationVo(relation);
+            RelationVo relationVo = NhBeanCopy.BEANCOPY.relationVo(relation);
             relationVo.setNotRead(0);
             if (relation.getNotRead() == 0) return relationVo;
             uw.set(Relation::getNotRead, 0);
@@ -70,7 +70,7 @@ public class ChatService {
         }
         uw.set(Relation::getState, ChatCode.MESSAGE_HEALTH.value()).set(Relation::getDate, date);
         relationMapper.update(uw);
-        return BeanCopy.BEANCOPY.relationVo(relation);
+        return NhBeanCopy.BEANCOPY.relationVo(relation);
     }
 
     /**

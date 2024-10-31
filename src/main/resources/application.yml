@@ -10,4 +10,12 @@ mybatis-plus:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: nh.chat.bean.po
 
+---
 
+#redis
+spring:
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: 123456

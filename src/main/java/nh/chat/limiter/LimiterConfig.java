@@ -11,7 +11,7 @@ import org.springframework.scripting.support.ResourceScriptSource;
  * @Author:xph
  * @Date: 2024/10/20 15:20
  */
-@Configuration
+@Configuration("NhLimiterConfig")
 public class LimiterConfig {
     @Bean
     public DefaultRedisScript<Long> limiterScript() {

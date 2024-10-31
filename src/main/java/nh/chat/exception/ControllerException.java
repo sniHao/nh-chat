@@ -4,6 +4,7 @@ import nh.chat.constant.ResultCode;
 import nh.chat.utils.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,6 +18,7 @@ import java.util.Objects;
  * @Date: 2024-09-25 16:36
  */
 @ControllerAdvice
+@Component("NhControllerException")
 public class ControllerException {
     private static final Logger logger = LoggerFactory.getLogger(ControllerException.class);
 

@@ -94,12 +94,6 @@
 			<artifactId>spring-boot-starter-websocket</artifactId>
 			<version>3.3.3</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>druid-spring-boot-starter</artifactId>
-			<version>1.2.23</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
 		<dependency>
 			<groupId>org.springdoc</groupId>

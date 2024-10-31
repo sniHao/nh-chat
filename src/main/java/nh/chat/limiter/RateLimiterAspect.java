@@ -2,6 +2,8 @@ package nh.chat.limiter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nh.chat.constant.ResultCode;
+import nh.chat.exception.ChatException;
 import nh.chat.utils.IpUtil;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -19,7 +21,7 @@ import java.util.List;
 
 @Slf4j
 @Aspect
-@Component
+@Component("NhRateLimiterAspect")
 @RequiredArgsConstructor
 public class RateLimiterAspect {
     private static final Logger logger = LoggerFactory.getLogger(RateLimiterAspect.class);
@@ -28,23 +30,23 @@ public class RateLimiterAspect {
     private final RedisScript<Long> limitScript;
 
     @Before("@annotation(rateLimiter)")
-    public void doBefore(JoinPoint point, RateLimiter rateLimiter) throws RateLimitException {
+    public void doBefore(JoinPoint point, RateLimiter rateLimiter) throws ChatException {
         int time = rateLimiter.time();
         int count = rateLimiter.count();
         String combineKey = getCombineKey(rateLimiter, point);
         List<Object> keys = Collections.singletonList(combineKey);
         Long number = (Long) redisTemplate.execute(limitScript, keys, count, time);
         if (number == null || number.intValue() > count) {
-            throw new RateLimitException("访问过于频繁，请稍候再试");
+            throw new ChatException(ResultCode.OFTEN.tips(), ResultCode.OFTEN.value());
         }
     }
 
     /**
+     * @return String
      * @Description:获取IP或者其他限流方式
      * @author: xph
      * @param[1] rateLimiter
      * @param[2] point
-     * @return String
      * @Date: 2024/10/20 15:45
      */
 
