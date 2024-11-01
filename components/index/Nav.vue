@@ -20,9 +20,10 @@
         </div>
         <template v-else>
           <n-dropdown trigger="click" :options="options" @select="handleSelect">
-            <div class="user-head flex-center-center user-head-nav ml-12 hover-pointer" :style="'background-color:' + tranColor(initData.uInfo.photo)">
-              {{ initData.uInfo.photo }}
-            </div>
+            <div
+              class="user-head flex-center-center user-head-nav ml-12 hover-pointer"
+              :style="'background-color:' + tranColor(initData.uInfo.photo)"
+              v-html="computePhoto(initData.uInfo.photo)"></div>
           </n-dropdown>
         </template>
       </div>
