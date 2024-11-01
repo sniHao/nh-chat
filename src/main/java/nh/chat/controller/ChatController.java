@@ -48,7 +48,7 @@ public class ChatController {
         return Result.success("ok", chatService.eqChat(uid, receiveUid, page));
     }
 
-    @RateLimiter(time = 50, count = 2, limitType = LimiterType.IP)
+    @RateLimiter(time = 50, count = 99, limitType = LimiterType.IP)
     @Operation(summary = "发送普通消息【*：需要校验对方用户是否存在】")
     @PostMapping("sendMessage")
     public Result<?> sendMessage(@RequestAttribute("uid") Long uid, @RequestBody SendMessageDto sendMessageDto) throws ChatException, IOException {
