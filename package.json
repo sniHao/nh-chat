@@ -15,6 +15,7 @@
     "@pinia/nuxt": "^0.5.4",
     "axios": "^1.7.7",
     "lottie-web": "^5.12.2",
+    "nh-chat": "^1.11.2",
     "nuxt": "^3.13.0",
     "nuxtjs-naive-ui": "^1.0.2",
     "pinia": "^2.2.2",

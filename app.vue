@@ -16,67 +16,67 @@ const { notification } = createDiscreteApi(['notification']);
 const router = useRouter();
 const store = useStore();
 // ws状态全局
-const ws = new WebSocketService(store.token);
-provide('webSocketService', ws);
+// const ws = new WebSocketService(store.token);
+// provide('webSocketService', ws);
 
 // 获取当前聊天的uid
-const nowUid = ref(-1);
-const getNowChatUid = (uid: number) => {
-  nowUid.value = uid;
-};
-provide('getNowChatUid', getNowChatUid);
+// const nowUid = ref(-1);
+// const getNowChatUid = (uid: number) => {
+//   nowUid.value = uid;
+// };
+// provide('getNowChatUid', getNowChatUid);
 
-watch(
-  () => ws.pushCount,
-  () => {
-    if (nowUid.value !== ws.newMessage.receiveUid) ofNewMessage(ws.newMessage);
-  },
-  {
-    deep: true
-  }
-);
+// watch(
+//   () => ws.pushCount,
+//   () => {
+//     if (nowUid.value !== ws.newMessage.receiveUid) ofNewMessage(ws.newMessage);
+//   },
+//   {
+//     deep: true
+//   }
+// );
 // 新消息处理
-let saveInfo = ref([] as any);
-const ofNewMessage = (msg: any) => {
-  if (msg.message.length > 30) msg.message = msg.message.substring(0, 30) + '...';
-  if (msg.type === 1) msg.message = '[图片]';
-  eqUserBasics([msg.receiveUid]).then((res: Result) => {
-    let name = res.code === 200 ? res.data.name : '未知用户';
-    if (saveInfo.value.length > 3) {
-      saveInfo.value.shift();
-      saveInfo.value[0].destroy();
-    }
-    const n = notification['info']({
-      content: '你收到了一条来自 ' + name + ' 的消息',
-      meta: () =>
-        h('div', null, [
-          msg.message,
-          h(
-            'span',
-            {
-              onClick: (event) => {
-                event.stopPropagation();
-                n.destroy();
-                goChat(msg.receiveUid);
-              },
-              class: 'tips-link'
-            },
-            '查看详情'
-          )
-        ]),
-      duration: 3500,
-      keepAliveOnHover: true
-    });
-    saveInfo.value.push(n);
-  });
-};
-provide('ofNewMessage', ofNewMessage);
+// let saveInfo = ref([] as any);
+// const ofNewMessage = (msg: any) => {
+//   if (msg.message.length > 30) msg.message = msg.message.substring(0, 30) + '...';
+//   if (msg.type === 1) msg.message = '[图片]';
+//   eqUserBasics([msg.receiveUid]).then((res: Result) => {
+//     let name = res.code === 200 ? res.data.name : '未知用户';
+//     if (saveInfo.value.length > 3) {
+//       saveInfo.value.shift();
+//       saveInfo.value[0].destroy();
+//     }
+//     const n = notification['info']({
+//       content: '你收到了一条来自 ' + name + ' 的消息',
+//       meta: () =>
+//         h('div', null, [
+//           msg.message,
+//           h(
+//             'span',
+//             {
+//               onClick: (event) => {
+//                 event.stopPropagation();
+//                 n.destroy();
+//                 goChat(msg.receiveUid);
+//               },
+//               class: 'tips-link'
+//             },
+//             '查看详情'
+//           )
+//         ]),
+//       duration: 3500,
+//       keepAliveOnHover: true
+//     });
+//     saveInfo.value.push(n);
+//   });
+// };
+// provide('ofNewMessage', ofNewMessage);
 
-// 查看消息详情
-const goChat = (id: number) => {
-  store.setGoChat(id);
-  router.push('/try');
-};
+// // 查看消息详情
+// const goChat = (id: number) => {
+//   store.setGoChat(id);
+//   router.push('/try');
+// };
 
 // 登录框
 const showLogin = ref(false);
@@ -116,13 +116,13 @@ const eqUser = () => {
 provide('userInfo', data);
 
 onMounted(() => {
-  ws.connect();
+  // ws.connect();
   resize();
   eqUser();
   window.addEventListener('resize', resize);
 });
 onUnmounted(() => {
-  ws.close();
+  // ws.close();
   window.removeEventListener('resize', resize);
 });
 </script>
@@ -134,6 +134,7 @@ onUnmounted(() => {
   cursor: pointer;
 }
 .main-body {
+  background-color: $bg-color;
   height: 100vh;
 }
 </style>

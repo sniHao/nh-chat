@@ -2,6 +2,13 @@
 
 下面是一个全面的示例，当然你可能不会使用所有的配置项。为了方便让你理解，这里做了详细的 demo。
 
+引入组件
+
+```vue
+import { NhChat } from 'nh-chat'; 
+import 'nh-chat/dist/assets/nh-style.css';
+```
+
 ```vue
 <NhChat
   inputTips="输入Ta的账号-发起聊天"
@@ -11,6 +18,9 @@
   eqUserInfo=""
   socketUrl="ws://localhost:8087/socket.chat/"
   token=""
+  chatRoute="/"
+  :messageFlicker="true"
+  :experienceMode="true"
   @searchUser="searchUser"></NhChat>
 ```
 
@@ -25,6 +35,9 @@
 | eqUserInfo       | `string`                           | `''`                                   | 接口地址，获取用户集的昵称和头像。**详细看后端配置**                       |
 | socketUrl        | `string`                           | `'ws://localhost:8087/socket.chat/'`   | socket 连接地址，只需传入接口，后面会默认带上 token 值                     |
 | token            | `string`                           | `''`                                   | 用户的 Token 值，后面会将 token 放于请求的头部携带 **Authorization:token** |
+| chatRoute        | `string`                           | `'/'`                                  | 当前消息组件所在路由 (用于查看消息的跳转)                                  |
+| messageFlicker   | `boolean`                          | `true`                                 | 新消息是否开启边框闪烁提醒                                                 |
+| experienceMode   | `boolean`                          | `true`                                 | 是否开启体验模式(接口请求失败时)                                           |
 
 ## 回调
 

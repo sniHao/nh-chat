@@ -197,6 +197,7 @@ watchEffect(() => {
   color: white;
 }
 .docs-main {
+  background-color: $bg-color;
   margin-top: $px-64;
 }
 </style>

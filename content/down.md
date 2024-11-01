@@ -15,7 +15,7 @@ jdk版本为**17.0.8**，maven版本为**3.8.1**
 
 使用 npm 安装。
 ```bash
-npm i -D nh-chat
+npm i nh-chat
 ```
 ## 后端安装
 
