@@ -142,7 +142,95 @@ onUnmounted(() => {
   window.removeEventListener("resize", resize);
 });
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
+@use "@/assets/css/constant.scss";
+@use "@/assets/css/nh.scss";
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.home-bg-color {
+  background-color: $bg-color;
+}
+
+.home-ft-color-2 {
+  color: $ft-color-2;
+}
+.home-ft-color {
+  color: $ft-color;
+}
+.ft-color-white {
+  color: white;
+}
+
+.ft-color-tips {
+  color: $ft-color-tips;
+}
+
+.ft-color-tips-2 {
+  color: $ft-color-tips-2;
+}
+
+.ft-color-tips-3 {
+  color: $ft-color-tips-3;
+}
+
+.ft-color-tips-4 {
+  color: $ft-color-tips-4;
+}
+
+.hover-btn {
+  box-sizing: border-box;
+  border-style: solid;
+  border-width: $px-2;
+  border-color: #ffffff00;
+}
+
+.hover-btn:hover {
+  background-color: $ft-color-op-7;
+  cursor: pointer;
+  border-radius: $px-6;
+  border-color: $ft-color-tips;
+}
+
+.hover-ft:hover {
+  color: $ft-color;
+  cursor: pointer;
+}
+
+.mt-nav {
+  margin-top: $px-64;
+}
+
+.user-head {
+  width: $px-42;
+  height: $px-42;
+  border-radius: 50%;
+  background-color: rgb(255 255 255 / 12%);
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  img {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+@keyframes circle {
+  0% {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+.ant-modal div[aria-hidden="true"] {
+  display: none !important;
+}
+
 .tips-link {
   margin-left: $px-6;
   color: #9300ff;

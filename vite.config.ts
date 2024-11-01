@@ -55,16 +55,10 @@ export default defineConfig(({ command, mode }) => {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
       "process.env": env,
     },
-    // 打包配置
     build: {
-      // 打包后的文件输出目录
-      outDir: "dist",
       lib: {
-        //指定组件编译入口文件
         entry: "./src/components/index.ts",
-        // 组件库名称
         name: "NhChat",
-        // 文件名称
         fileName: "nh-chat",
       },
       rollupOptions: {
@@ -75,6 +69,13 @@ export default defineConfig(({ command, mode }) => {
           // 在 UMD 构建模式下为这些外部化的依赖提供一个全局变量
           globals: {
             vue: "Vue",
+          },
+          assetFileNames(chunkInfo) {
+            if (chunkInfo.name) {
+              const [name, ext] = path.basename(chunkInfo.name).split(".");
+              return `assets/${name.toLocaleLowerCase()}-balabala.${ext}`;
+            }
+            return "";
           },
         },
       },

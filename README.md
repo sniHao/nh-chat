@@ -1,4 +1,4 @@
-# <p align="center">![nh-chat](./public/md-name.png)</p>
+# <p align="center">![nh-chat](./public/images/md-name.png)</p>
 <h3 align="center">完整的源代码</h3>
 <h3 align="center">清晰的说明文档</h3>
 <h3 align="center">好用、不夸张的聊天框架🥰</h3>
@@ -26,19 +26,19 @@
 ## 功能展示🚀
 - 消息全局通知
 
-![nh-chat](./public/chat-inform.png)
+![nh-chat](./public/images/chat-inform.png)
 
 - 聊天框-整体
 
-![nh-chat](./public/message-main.png)
+![nh-chat](./public/images/message-main.png)
 
 - 聊天框-通讯录
 
-![nh-chat](./public/message-left.png)
+![nh-chat](./public/images/message-left.png)
 
 - 聊天框-消息
 
-![nh-chat](./public/message-right.png)
+![nh-chat](./public/images/message-right.png)
 
 ## 下载🤖
 node.js版本为**v18.18.0**，npm版本为**9.8.1**
