@@ -1,30 +1,16 @@
 <template>
-  <div
-    class="chat-main flex"
-    :style="`max-width:${param.style.width};height:${param.style.height}`"
-    :class="mainClass()"
-  >
+  <div class="chat-main flex" :style="`max-width:${param.style.width};height:${param.style.height}`" :class="mainClass()">
     <div class="chat-com flex-down" :class="isPhoneUnfold ? 'shrink' : ''">
       <!-- 搜索 -->
       <div class="pd-12" :class="isPhoneUnfold ? 'shrink' : ''">
         <n-input-group>
           <n-input
-            style="
-              --n-border-hover: 1px solid #ff6700;
-              --n-border-focus: 1px solid #ff6700;
-              --n-box-shadow-focus: 0 0 0 2px rgba(255, 103, 0, 0.2);
-            "
+            style="--n-border-hover: 1px solid #ff6700; --n-border-focus: 1px solid #ff6700; --n-box-shadow-focus: 0 0 0 2px rgba(255, 103, 0, 0.2)"
             :style="{ width: '100%' }"
             :placeholder="param.inputTips"
             v-model:value="searchVal"
-            clearable
-          />
-          <n-input-group-label
-            class="hover-pointer"
-            @click="goSearch"
-            color="#ff6700"
-            >搜索</n-input-group-label
-          >
+            clearable />
+          <n-input-group-label class="hover-pointer" @click="goSearch" color="#ff6700">搜索</n-input-group-label>
         </n-input-group>
       </div>
       <!-- 通讯列表 -->
@@ -35,21 +21,10 @@
             <div class="ft-color-tips">聊天通讯空空的</div>
           </div>
         </template>
-        <div
-          v-else
-          class="pd-zy-12 hover-pointer user"
-          :class="userClass(item)"
-          v-for="(item, index) in userList"
-          :key="item.id"
-          @click="showChat(item)"
-        >
+        <div v-else class="pd-zy-12 hover-pointer user" :class="userClass(item)" v-for="(item, index) in userList" :key="item.id" @click="showChat(item)">
           <div class="user-box pd-sx-6 flex-center-zy">
             <n-badge :value="item.notRead" :max="99" :offset="[-5, 5]">
-              <div
-                class="user-head flex-center-center"
-                :style="'background-color:' + tranColor(item.photo)"
-                v-html="computePhoto(item.photo)"
-              ></div>
+              <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)" v-html="computePhoto(item.photo)"></div>
             </n-badge>
             <div class="user-main">
               <div class="flex-center-zy">
@@ -67,77 +42,28 @@
       </div>
       <!-- phone 通过nav全局引入-->
       <div class="min-icon" v-if="isSmallWin">
-        <Svg
-          :width="32"
-          :height="32"
-          name="close"
-          fill="#ff6700"
-          viewBox="0 0 1139 1024"
-          v-if="!isPhoneUnfold"
-          @click="isPhoneCallBack(isPhoneUnfold)"
-        ></Svg>
-        <Svg
-          :width="32"
-          :height="32"
-          name="open"
-          fill="#ff6700"
-          viewBox="0 0 1139 1024"
-          v-else
-          @click="isPhoneCallBack(isPhoneUnfold)"
-        ></Svg>
+        <Svg :width="32" :height="32" name="close" fill="#ff6700" viewBox="0 0 1139 1024" v-if="!isPhoneUnfold" @click="isPhoneCallBack(isPhoneUnfold)"></Svg>
+        <Svg :width="32" :height="32" name="open" fill="#ff6700" viewBox="0 0 1139 1024" v-else @click="isPhoneCallBack(isPhoneUnfold)"></Svg>
       </div>
     </div>
     <!-- 聊天框 -->
-    <Frame
-      :user="nowUser"
-      :isPhoneUnfold="isPhoneUnfold"
-      @sendCallBack="sendCallBack"
-      @closeChat="closeChat"
-    ></Frame>
+    <Frame :user="nowUser" :isPhoneUnfold="isPhoneUnfold" @sendCallBack="sendCallBack" @closeChat="closeChat"></Frame>
   </div>
   <!-- 弹框 -->
   <n-modal v-model:show="showModal">
-    <n-card
-      style="width: 600px; max-height: 380px"
-      :bordered="false"
-      size="huge"
-      role="dialog"
-      aria-modal="true"
-      class="over-auto"
-    >
+    <n-card style="width: 600px; max-height: 380px" :bordered="false" size="huge" role="dialog" aria-modal="true" class="over-auto">
       <template v-if="param.searchUserResult.length === 0">
         <div class="flex-down-center">
-          <Svg
-            :width="64"
-            :height="64"
-            name="no-user"
-            viewBox="0 0 1139 1024"
-          ></Svg>
+          <Svg :width="64" :height="64" name="no-user" viewBox="0 0 1139 1024"></Svg>
           <span class="ft-16 ft-color-tips mt-12">未找到该用户</span>
         </div>
       </template>
-      <div
-        class="flex-center-zy mb-18"
-        v-else
-        v-for="(item, index) in param.searchUserResult"
-        :key="index"
-      >
+      <div class="flex-center-zy mb-18" v-else v-for="(item, index) in param.searchUserResult" :key="index">
         <div class="flex-center">
-          <div
-            class="user-head flex-center-center"
-            :style="'background-color:' + tranColor(item.photo)"
-            v-html="computePhoto(item.photo)"
-          ></div>
+          <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)" v-html="computePhoto(item.photo)"></div>
           <div class="ft-16 ft-b ml-10">{{ item.name }}</div>
         </div>
-        <n-button
-          round
-          strong
-          type="primary"
-          color="#9300ff"
-          @click="sendChat(item.uid)"
-          >发起聊天</n-button
-        >
+        <n-button round strong type="primary" color="#9300ff" @click="sendChat(item.uid)">发起聊天</n-button>
       </div>
     </n-card>
   </n-modal>
@@ -147,49 +73,33 @@
     title="是否确认删除该聊天"
     positive-text="确认"
     negative-text="点错啦"
-    @positive-click="confirmDelChat"
-  ></n-modal>
+    @positive-click="confirmDelChat"></n-modal>
   <!-- 右键封装 -->
-  <RightButton
-    v-if="showRightBtn"
-    :left="rightBtnLeft"
-    :top="rightBtnTop"
-    :list="czList"
-    @choose="chooseRight"
-  ></RightButton>
+  <RightButton v-if="showRightBtn" :left="rightBtnLeft" :top="rightBtnTop" :list="czList" @choose="chooseRight"></RightButton>
 </template>
 
 <script setup lang="ts">
-import { createDiscreteApi } from "naive-ui";
-const { dialog } = createDiscreteApi(["dialog"]);
-import { eqRelation, goChat, delChat, topChat } from "@/api/index";
-import {
-  tips,
-  tranColor,
-  setUser,
-  truncate,
-  computePhoto,
-} from "@/utils/OtherUtils";
-import { countTimeDiff, reckonTime, getTimeFormat } from "@/utils/TimeUtil";
-import RightButton from "../of/RightButton.vue";
-import Frame from "./Frame.vue";
-import NullChat from "../svg/NullChat.vue";
-import Svg from "../of/Svg.vue";
-import WebSocketService from "@/utils/WebSocketService";
-const webSocketService = inject<WebSocketService>(
-  "webSocketService"
-) as WebSocketService;
-const isSmallWin = inject<Ref<boolean>>("isSmallWin") || ref(false);
-const param = inject<Ref<any>>("param") as any;
-const emit = defineEmits(["searchUser"]);
+import { eqRelation, goChat, delChat, topChat } from '@/api/index';
+import { tips, tranColor, setUser, truncate, computePhoto } from '@/utils/OtherUtils';
+import { countTimeDiff, reckonTime, getTimeFormat } from '@/utils/TimeUtil';
+import { staticUserData, welcome } from '@/utils/staticUtils';
+import RightButton from '../of/RightButton.vue';
+import Frame from './Frame.vue';
+import NullChat from '../svg/NullChat.vue';
+import Svg from '../of/Svg.vue';
+import WebSocketService from '@/utils/WebSocketService';
+const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
+const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
+const param = inject<Ref<any>>('param') as any;
+const emit = defineEmits(['searchUser']);
 // ===================================其他功能===================================//
 // 基本样式
 const mainClass = () => {
   return {
-    "style-dark": param.style.theme === "dark",
-    "style-light": param.style.theme === "light",
-    "w-100": isSmallWin.value,
-    "new-info": newInfo.value,
+    'style-dark': param.style.theme === 'dark',
+    'style-light': param.style.theme === 'light',
+    'w-100': isSmallWin.value,
+    'new-info': newInfo.value
   };
 };
 
@@ -197,7 +107,7 @@ const mainClass = () => {
 const userClass = (item: Relation) => {
   return {
     check: item.id === checkId.value,
-    userTop: item.top === 1,
+    userTop: item.top === 1
   };
 };
 
@@ -207,12 +117,21 @@ const isPhoneCallBack = (state: boolean) => {
   isPhoneUnfold.value = !state;
 };
 
+// 消息闪烁
+const newInfo = ref(false);
+const ofNewInfo = () => {
+  if (!param.messageFlicker) return;
+  newInfo.value = true;
+  setTimeout(() => {
+    newInfo.value = false;
+  }, 600);
+};
 // ===================================聊天Frame.vue回调===================================//
 // 发送消息回调
-const ofNewMessage = inject<(message: any) => void>("ofNewMessage");
+const ofNewMessage = inject<(message: any) => void>('ofNewMessage');
 const sendCallBack = (res: { val: string; type: number; uid: number }) => {
   let message = res.val;
-  if (res.type === 1) message = "[图片]";
+  if (res.type === 1) message = '[图片]';
   for (let i = 0; i < userList.value.length; i++) {
     if (userList.value[i].id === checkId.value) {
       userList.value[i].lastMessage = message;
@@ -221,12 +140,8 @@ const sendCallBack = (res: { val: string; type: number; uid: number }) => {
     }
   }
   if (res.uid) {
-    if (ofNewMessage)
-      ofNewMessage({ message: message, type: res.type, receiveUid: res.uid });
-    newInfo.value = true;
-    setTimeout(() => {
-      newInfo.value = false;
-    }, 600);
+    if (ofNewMessage) ofNewMessage({ message: message, type: res.type, receiveUid: res.uid });
+    ofNewInfo();
   }
   sortData();
 };
@@ -240,22 +155,22 @@ const closeChat = () => {
 // ===================================搜索操作===================================//
 // 搜索
 const showModal = ref(false);
-const searchVal = ref("");
+const searchVal = ref('');
 const goSearch = () => {
   if (!searchVal.value.trim()) return;
   showModal.value = true;
-  emit("searchUser", searchVal.value);
+  emit('searchUser', searchVal.value);
 };
 
 // 发起聊天
 const sendChat = (uid: number) => {
   goChat(uid).then((res: Result) => {
-    if (res.code !== 200) return tips("error", res.msg);
+    if (res.code !== 200) return tips('error', res.msg);
     setUser([res.data], param.eqUserInfo).then((data: any) => {
       addTopList(data[0]);
       showChat(data[0]);
       sortData();
-      searchVal.value = "";
+      searchVal.value = '';
     });
   });
   showModal.value = false;
@@ -284,13 +199,24 @@ const showChat = (user: any) => {
   if (isSmallWin.value) isPhoneUnfold.value = true;
 };
 
+// ===================================静态数据【用于体验时】===================================//
+// 静态用户通讯录
+const staticUser = () => {
+  userList.value = staticUserData();
+  sortData();
+};
+
 // ===================================获取通讯录数据===================================//
 // 查询用户通讯录
 const userList = ref([] as Relation[]);
 const eqUserList = () => {
   eqRelation()
     .then((res: Result): void => {
-      if (res.code !== 200) return;
+      if (res.code !== 200 && param.experienceMode) {
+        welcome();
+        staticUser();
+        return;
+      }
       setUser(res.data, param.eqUserInfo).then((res: any) => {
         userList.value = res;
         sortData();
@@ -303,10 +229,10 @@ const eqUserList = () => {
 // 创建监听
 const tapAndHold = ref(false);
 const addListener = () => {
-  const parentDiv = document.querySelector(".user-list") as HTMLElement;
-  parentDiv.addEventListener("contextmenu", listenerUser);
+  const parentDiv = document.querySelector('.user-list') as HTMLElement;
+  parentDiv.addEventListener('contextmenu', listenerUser);
   let longPressTimer: NodeJS.Timeout;
-  parentDiv.addEventListener("mousedown", (e: MouseEvent) => {
+  parentDiv.addEventListener('mousedown', (e: MouseEvent) => {
     longPressTimer = setTimeout(() => {
       listenerUser(e);
       tapAndHold.value = true;
@@ -315,10 +241,10 @@ const addListener = () => {
       }, 500);
     }, 500);
   });
-  parentDiv.addEventListener("mouseup", () => {
+  parentDiv.addEventListener('mouseup', () => {
     clearTimeout(longPressTimer);
   });
-  parentDiv.addEventListener("mouseleave", () => {
+  parentDiv.addEventListener('mouseleave', () => {
     clearTimeout(longPressTimer);
   });
 };
@@ -336,17 +262,17 @@ const showRightBtn = ref(false);
 const nowCheckData = ref({} as Relation);
 const listenerUser = (e: MouseEvent) => {
   e.preventDefault();
-  const parentDiv = document.querySelector(".user-list");
+  const parentDiv = document.querySelector('.user-list');
   if (!parentDiv) return;
   let target = e.target as HTMLElement;
   let index = 0;
-  if (target.classList.contains("user-list")) return;
-  if (target.classList.contains("user")) {
+  if (target.classList.contains('user-list')) return;
+  if (target.classList.contains('user')) {
     const allSonBoxes = Array.from(parentDiv.children);
     index = allSonBoxes.indexOf(target);
   } else {
     while (target !== parentDiv) {
-      if (target.classList.contains("user")) {
+      if (target.classList.contains('user')) {
         const allSonBoxes = Array.from(parentDiv.children);
         index = allSonBoxes.indexOf(target);
       }
@@ -361,19 +287,17 @@ const listenerUser = (e: MouseEvent) => {
   czList.value = [
     {
       id: 0,
-      name: top === 0 ? "置顶聊天" : "取消置顶",
-      incident: () => topChatGo(top === 0 ? 1 : 0),
+      name: top === 0 ? '置顶聊天' : '取消置顶',
+      incident: () => topChatGo(top === 0 ? 1 : 0)
     },
-    { id: 0, name: "删除聊天", incident: () => delChatGo() },
+    { id: 0, name: '删除聊天', incident: () => delChatGo() }
   ];
 };
 
 // 置顶聊天
 const topChatGo = (state: number) => {
   topChat(nowCheckData.value.id, state).then((res) => {
-    const index = userList.value.findIndex(
-      (item) => item.id === nowCheckData.value.id
-    );
+    const index = userList.value.findIndex((item) => item.id === nowCheckData.value.id);
     const [data] = userList.value.splice(index, 1);
     data.top = state;
     userList.value.unshift(data);
@@ -386,9 +310,7 @@ const sortData = () => {
   userList.value.sort((a, b) => {
     if (a.top === 1 && b.top !== 1) return -1;
     if (b.top === 1 && a.top !== 1) return 1;
-    return countTimeDiff(a.lastMessageDate, b.lastMessageDate, 1000) > 0
-      ? 1
-      : -1;
+    return countTimeDiff(a.lastMessageDate, b.lastMessageDate, 1000) > 0 ? 1 : -1;
   });
 };
 
@@ -399,20 +321,21 @@ const delChatGo = () => {
 };
 const confirmDelChat = () => {
   delChat(nowCheckData.value.id).then((res) => {
-    if (res.code !== 200) return tips("error", res.msg);
+    if (res.code !== 200) {
+      if (!param.experienceMode) return tips('error', res.msg);
+      tips('warning', '体验环境，并没有真正的删除哦');
+    }
     showDelModel.value = false;
-    userList.value = userList.value.filter(
-      (item) => item.id !== nowCheckData.value.id
-    );
+    userList.value = userList.value.filter((item) => item.id !== nowCheckData.value.id);
     if (nowUser.value.id === nowCheckData.value.id) nowUser.value = {};
-    tips("success", res.msg);
+    tips('success', res.msg);
   });
 };
 
 // 销毁监听
 const clearListener = () => {
-  const parentDiv = document.querySelector(".user-list") as HTMLElement;
-  parentDiv.removeEventListener("contextmenu", listenerUser);
+  const parentDiv = document.querySelector('.user-list') as HTMLElement;
+  parentDiv.removeEventListener('contextmenu', listenerUser);
 };
 
 // 关闭右键
@@ -422,14 +345,12 @@ const closeRightBtn = () => {
 
 // 关闭右键公共方法
 const closeRightBtnCom = (state: boolean) => {
-  const dom = document.getElementsByClassName("chat-main")[0];
-  state
-    ? dom.addEventListener("click", closeRightBtn)
-    : dom.removeEventListener("click", closeRightBtn);
+  const dom = document.getElementsByClassName('chat-main')[0];
+  state ? dom.addEventListener('click', closeRightBtn) : dom.removeEventListener('click', closeRightBtn);
 };
 
 // ===================================组件初始化操作===================================//
-const goUid = ref(sessionStorage.getItem("go_chat_uid") ?? -99);
+const goUid = ref(sessionStorage.getItem('go_chat_uid'));
 watch(
   () => goUid.value,
   () => {
@@ -439,32 +360,24 @@ watch(
 );
 // 跳聊天
 const upChat = () => {
+  if (!goUid.value) return;
   sendChat(+goUid.value);
   setTimeout(() => {
-    sessionStorage.removeItem("go_chat_uid");
+    sessionStorage.removeItem('go_chat_uid');
   }, 50);
 };
 
 // 来新消息了
-const newInfo = ref(false);
 const ws = ref(webSocketService);
 watch(
   () => ws.value?.pushCount,
   () => {
     const data = ws.value.newMessage;
-    let newData = userList.value.filter(
-      (item) => item.relationUid === data.receiveUid
-    )[0];
-    newData.lastMessage = truncate(data.message) ?? "-";
-    if (
-      Object.keys(nowUser.value).length === 0 ||
-      nowUser.value.relationUid !== data.receiveUid
-    ) {
-      newInfo.value = true;
+    let newData = userList.value.filter((item) => item.relationUid === data.receiveUid)[0];
+    newData.lastMessage = truncate(data.message) ?? '-';
+    if (Object.keys(nowUser.value).length === 0 || nowUser.value.relationUid !== data.receiveUid) {
       if (data.state !== 2) newData.notRead++;
-      setTimeout(() => {
-        newInfo.value = false;
-      }, 600);
+      ofNewInfo();
     } else {
       ws.value.send(JSON.stringify(nowUser.value.id));
     }

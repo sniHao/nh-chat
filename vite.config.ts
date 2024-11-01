@@ -36,9 +36,8 @@ export default defineConfig(({ command, mode }) => {
         resolvers: [NaiveUiResolver()],
       }),
       dts({
-        // 这里定义了需要生成d.ts文件的目录，如果有多个目录，可以使用数组
         include: ["src/components/**/*.{vue,ts}"],
-        tsconfigPath: "./tsconfig.build.json",
+        tsconfigPath: "./tsconfig.app.json",
       }),
     ],
     css: {
@@ -73,7 +72,7 @@ export default defineConfig(({ command, mode }) => {
           assetFileNames(chunkInfo) {
             if (chunkInfo.name) {
               const [name, ext] = path.basename(chunkInfo.name).split(".");
-              return `assets/${name.toLocaleLowerCase()}-balabala.${ext}`;
+              return `assets/nh-${name.toLocaleLowerCase()}.${ext}`;
             }
             return "";
           },

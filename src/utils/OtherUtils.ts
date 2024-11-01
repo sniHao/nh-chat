@@ -1,13 +1,13 @@
 // 单文字背景色
 export const tranColor = (name: string) => {
-  let res = parseInt(name.charCodeAt(0) + "", 10).toString(16);
+  let res = parseInt(name.charCodeAt(0) + '', 10).toString(16);
   if (res.length === 2) res = res.repeat(2);
-  return "#" + res.slice(1, 4);
+  return '#' + res.slice(1, 4);
 };
 
 // 通知弹窗
-import { createDiscreteApi } from "naive-ui";
-const { notification } = createDiscreteApi(["notification"]);
+import { createDiscreteApi } from 'naive-ui';
+const { notification } = createDiscreteApi(['notification']);
 
 type NotificationType = keyof typeof notification;
 
@@ -15,7 +15,7 @@ export const tips = (type: NotificationType, msg: string) => {
   notification[type]({
     content: msg,
     duration: 2500,
-    keepAliveOnHover: true,
+    keepAliveOnHover: true
   });
 };
 
@@ -28,7 +28,7 @@ export const isEmail = (email: string) => {
 // 字符长度截取
 export const truncate = (str: string) => {
   if (str == null) return null;
-  if (str.length > 30) return str.substring(0, 30) + "...";
+  if (str.length > 30) return str.substring(0, 30) + '...';
   return str;
 };
 
@@ -36,20 +36,20 @@ export const truncate = (str: string) => {
 export const randomNumber = () => {
   const randomNumberString = Math.floor(Math.random() * 100000000000)
     .toString()
-    .padEnd(12, "0");
+    .padEnd(12, '0');
   return randomNumberString;
 };
 
 // 复制文本
 export const copyText = (text: string): boolean => {
-  const textArea = document.createElement("textarea");
+  const textArea = document.createElement('textarea');
   textArea.value = text;
   document.body.appendChild(textArea);
   textArea.select();
   textArea.setSelectionRange(0, 99999);
   let success = false;
   try {
-    success = document.execCommand("copy");
+    success = document.execCommand('copy');
   } catch (err) {
     success = false;
   }
@@ -61,17 +61,17 @@ export const copyText = (text: string): boolean => {
 export const copyImage = (imageUrl: string): Promise<Boolean> => {
   return new Promise((reactive) => {
     const img = new Image();
-    img.crossOrigin = "Anonymous";
+    img.crossOrigin = 'Anonymous';
     img.src = imageUrl;
     img.onload = async () => {
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
       canvas.toBlob(async (blob) => {
         if (blob) {
-          const item = new ClipboardItem({ "image/png": blob });
+          const item = new ClipboardItem({ 'image/png': blob });
           try {
             await navigator.clipboard.write([item]);
             reactive(true);
@@ -79,7 +79,7 @@ export const copyImage = (imageUrl: string): Promise<Boolean> => {
             reactive(false);
           }
         }
-      }, "image/png");
+      }, 'image/png');
     };
     img.onerror = () => {
       reactive(false);
@@ -92,48 +92,49 @@ export const sleep = (time: number) => {
   return new Promise((resolve) => setTimeout(resolve, time));
 };
 
-import axios from "axios";
+import axios from 'axios';
 // 为用户添加昵称和头像属性
 export const setUser = (data: Array<Relation>, url: string) => {
   return new Promise((resolve) => {
-    if (!url) {
-      data.forEach((item) => {
-        item["name"] = "默认昵称";
-        item["photo"] = "默";
-      });
-      resolve(data);
-    }
+    if (!url) resolve(defaultUser(data));
     axios
       .post(
         url,
         data.map((item) => item.relationUid),
         {
           headers: {
-            "Content-Type": "application/json",
-          },
+            'Content-Type': 'application/json'
+          }
         }
       )
       .then((response) => {
-        if (!response.data.data || response.data.data.length == 0) return;
+        if (!response.data.data || response.data.data.length == 0) return resolve(defaultUser(data));
         data.forEach((item) => {
-          let user = response.data.data.filter(
-            (ite: userInfo) => ite.uid === item.relationUid
-          )[0];
+          let user = response.data.data.filter((ite: userInfo) => ite.uid === item.relationUid)[0];
           if (user) {
-            item["name"] = user.name;
-            item["photo"] = user.photo;
+            item['name'] = user.name;
+            item['photo'] = user.photo;
           }
         });
         resolve(data);
       })
       .catch((error) => {
-        tips("error", "服务器异常，获取头像失败");
+        tips('error', '服务器异常，获取头像失败');
       });
   });
 };
 
+// 默认头像昵称
+const defaultUser = (data: Array<Relation>) => {
+  data.forEach((item) => {
+    item['name'] = '默认昵称';
+    item['photo'] = '默';
+  });
+  return data;
+};
+
 // 头像设置
 export const computePhoto = (photo: string) => {
-  if (photo.startsWith("http")) return `<img src="${photo}" />`;
+  if (photo.startsWith('http')) return `<img src="${photo}" />`;
   return photo;
 };
