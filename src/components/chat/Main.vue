@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-main flex" :style="`max-width:${param.style.width};height:${param.style.height}`" :class="mainClass()">
+  <div class="chat-main flex" :style="`width:${param.style.width};max-width:60rem;height:${param.style.height}`" :class="mainClass()">
     <div class="chat-com flex-down" :class="isPhoneUnfold ? 'shrink' : ''">
       <!-- 搜索 -->
       <div class="pd-12" :class="isPhoneUnfold ? 'shrink' : ''">

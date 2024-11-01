@@ -1,4 +1,4 @@
-# <p align="center">![nh-chat](./public/images/md-name.png)</p>
+# <p align="center">![nh-chat](https://gitee.com/snihao/nh-chat/raw/master/public/images/md-name.png)</p>
 <h3 align="center">完整的源代码</h3>
 <h3 align="center">清晰的说明文档</h3>
 <h3 align="center">好用、不夸张的聊天框架🥰</h3>
@@ -26,19 +26,19 @@
 ## 功能展示🚀
 - 消息全局通知
 
-![nh-chat](./public/images/chat-inform.png)
+![nh-chat](https://gitee.com/snihao/nh-chat/raw/master/public/images/chat-inform.png)
 
 - 聊天框-整体
 
-![nh-chat](./public/images/message-main.png)
+![nh-chat](https://gitee.com/snihao/nh-chat/raw/master/public/images/message-main.png)
 
 - 聊天框-通讯录
 
-![nh-chat](./public/images/message-left.png)
+![nh-chat](https://gitee.com/snihao/nh-chat/raw/master/public/images/message-left.png)
 
 - 聊天框-消息
 
-![nh-chat](./public/images/message-right.png)
+![nh-chat](https://gitee.com/snihao/nh-chat/raw/master/public/images/message-right.png)
 
 ## 下载🤖
 node.js版本为**v18.18.0**，npm版本为**9.8.1**
@@ -46,6 +46,9 @@ node.js版本为**v18.18.0**，npm版本为**9.8.1**
 jdk版本为**17.0.8**，maven版本为**3.8.1**
 
 建议使用相等或以上的版本，否则可能会出现一些问题。
+
+
+详细配置请查看官网：[https://www.notes-something.fun/docs/down](https://www.notes-something.fun/docs/down)
 
 ### 前端安装
 
