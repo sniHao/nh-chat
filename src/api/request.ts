@@ -1,37 +1,37 @@
 // 对axios进行二次封装
-import axios from "axios";
-import { createDiscreteApi } from "naive-ui";
-const { notification } = createDiscreteApi(["notification"]);
-const { loadingBar } = createDiscreteApi(["loadingBar"]);
-import { sleep } from "@/utils/OtherUtils";
+import axios from 'axios';
+import { createDiscreteApi } from 'naive-ui';
+const { notification } = createDiscreteApi(['notification']);
+const { loadingBar } = createDiscreteApi(['loadingBar']);
+import { sleep } from '@/utils/OtherUtils';
 
 const request = async (objet: any) => {
   await sleep(1);
   objet.timeout = 20000;
-  objet.baseURL = sessionStorage.getItem("baseUrl");
+  objet.baseURL = sessionStorage.getItem('baseUrl');
   const of = axios.create(objet);
   const errorTips = [
-    ["访问过于频繁，请稍候再试", "别搞别搞别搞😟"],
-    ["网络服务出错啦", "开发被外星人抓走了👾"],
+    ['访问过于频繁，请稍候再试', '别搞别搞别搞😟'],
+    ['网络服务出错啦', '开发被外星人抓走了👾']
   ];
   // 请求拦截器
   of.interceptors.request.use(
     (config) => {
-      const store = localStorage.getItem("nh");
+      const store = localStorage.getItem('nh');
       if (store && JSON.parse(store).token) {
         config.headers.Authorization = JSON.parse(store).token;
       } else {
-        config.headers.Authorization = "null";
+        config.headers.Authorization = 'null';
       }
       loadingBar.start();
       return config;
     },
     (error) => {
-      notification["error"]({
+      notification['error']({
         content: errorTips[1][0],
         meta: errorTips[1][1],
         duration: 2500,
-        keepAliveOnHover: true,
+        keepAliveOnHover: true
       });
       loadingBar.error();
       setTimeout(() => loadingBar.finish());
@@ -47,17 +47,23 @@ const request = async (objet: any) => {
     (error) => {
       loadingBar.error();
       setTimeout(() => loadingBar.finish());
-      const errorMessage =
-        error.response && error.response.status === 500
-          ? errorTips[0]
-          : errorTips[1];
-      notification["error"]({
+      const errorMessage = error.response && error.response.status === 500 ? errorTips[0] : errorTips[1];
+      notification['error']({
         content: errorMessage[0],
         meta: errorMessage[1],
         duration: 2500,
-        keepAliveOnHover: true,
+        keepAliveOnHover: true
       });
-      return Promise.reject(error);
+      return Promise.resolve({
+        data: {
+          message: '服务器异常',
+          code: 500
+        },
+        status: 500,
+        statusText: '服务器异常',
+        headers: {},
+        config: error.config
+      });
     }
   );
   return of;
