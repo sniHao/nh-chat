@@ -32,9 +32,7 @@ public class ChatSocket extends TextWebSocketHandler {
     public void afterConnectionEstablished(WebSocketSession session) {
         HttpHeaders headers = session.getHandshakeHeaders();
         List<String> author = headers.get("Authorization");
-        System.out.println(author + "==");
         if (Objects.isNull(author) || author.isEmpty()) return;
-        System.out.println(author.get(0));
         Long uid = Long.valueOf(author.get(0));
         WebSocketSession state = webSocketMap.get(uid);
         if (!Objects.isNull(state)) webSocketMap.remove(uid);

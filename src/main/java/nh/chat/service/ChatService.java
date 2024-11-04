@@ -121,14 +121,16 @@ public class ChatService {
      * @param state      消息状态
      * @param message    消息内容
      * @param type       类型
-     * @throws IOException r
      */
-    public void pushCom(Long cid, Long uid, Long receiveUid, int state, String message, int type) throws IOException {
+    public void pushCom(Long cid, Long uid, Long receiveUid, int state, String message, int type) {
         PushMessage pushMessage = new PushMessage(cid, uid, state, type, message);
-        chatSocket.sendMessage(receiveUid, JSONObject.toJSONString(pushMessage));
+        try {
+            chatSocket.sendMessage(receiveUid, JSONObject.toJSONString(pushMessage));
+        } catch (Exception ignored) {
+        }
     }
 
-    public Long sendMessageCom(Long uid, Long receiveUid, String message, int type) throws IOException {
+    public Long sendMessageCom(Long uid, Long receiveUid, String message, int type) {
         // 通讯录最后消息
         asyncCom.messageRelation(uid, receiveUid, message, type, false, 1);
         asyncCom.messageRelation(receiveUid, uid, message, type, true, 0);
@@ -143,11 +145,11 @@ public class ChatService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Long sendMessage(Long uid, SendMessageDto sendMessageDto) throws IOException {
+    public Long sendMessage(Long uid, SendMessageDto sendMessageDto) {
         return sendMessageCom(uid, sendMessageDto.getReceiveUid(), sendMessageDto.getMessage(), sendMessageDto.getType());
     }
 
-    public Long sendMessageImage(Long uid, MultipartFile file, Long receiveUid) throws ChatException, IOException {
+    public Long sendMessageImage(Long uid, MultipartFile file, Long receiveUid) throws ChatException {
         String url = fileUtil.uploadImg(file);
         return sendMessageCom(uid, receiveUid, url, ChatCode.MESSAGE_TYPE_IMAGE.value());
     }
