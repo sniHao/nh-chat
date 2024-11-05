@@ -7,9 +7,13 @@
         <div class="ml-16 ft-color-tips hover-ft" :class="isSmallWin ? 'is-small-style' : ''" @click="goDocs">说明文档</div>
       </div>
       <div class="flex-center">
-        <div class="flex-center-center pd-6 hover-btn" @click="switchMode">
+        <!-- <div class="flex-center-center pd-6 hover-btn" @click="switchMode">
           <OfSvg :width="isSmallWin ? 20 : 26" :height="isSmallWin ? 20 : 26" name="system-dark" v-if="modeStyle"></OfSvg>
           <OfSvg :width="isSmallWin ? 20 : 26" :height="isSmallWin ? 20 : 26" name="system-light" v-else></OfSvg>
+        </div> -->
+        <div class="flex-center-center pd-6 hover-btn" @click="goGitee">
+          <OfSvg :width="isSmallWin ? 22 : 28" :height="isSmallWin ? 22 : 28" name="gitee"></OfSvg>
+          <span class="ml-4 ft-color-tips ft-b">{{ giteeStar }}</span>
         </div>
         <div class="flex-center-center pd-6 hover-btn" @click="goGithub">
           <OfSvg :width="isSmallWin ? 22 : 28" :height="isSmallWin ? 22 : 28" viewBox="0 0 512 512" name="github"></OfSvg>
@@ -153,7 +157,12 @@ const goHome = () => {
   router.push('/');
 };
 
-// 演示
+// 跳githee
+const goGitee = () => {
+  window.open('https://gitee.com/snihao/nh-chat', '_blank');
+};
+
+// 跳github
 const goGithub = () => {
   window.open('https://github.com/sniHao/nh-chat', '_blank');
 };
@@ -187,10 +196,22 @@ const getStar = () => {
     }
   };
 };
+const giteeStar = ref(0);
+const geteeStar = () => {
+  let xhr = new XMLHttpRequest();
+  xhr.open('GET', 'https://gitee.com/api/v5/repos/snihao/nh-chat', true);
+  xhr.send(JSON.stringify(null));
+  xhr.onreadystatechange = function () {
+    if (xhr.status === 200 && xhr.readyState === 4) {
+      giteeStar.value = JSON.parse(xhr.response)?.stargazers_count || 0;
+    }
+  };
+};
 
 const initData = ref(userInfo as unknown as { state: boolean; uInfo: { name: string; photo: string } });
 onMounted(() => {
   getStar();
+  geteeStar();
   setTimeout(() => {
     newName.value = initData?.value.uInfo.name ?? '';
     if (store.set_pw === 'true') {
