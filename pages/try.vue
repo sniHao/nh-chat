@@ -1,27 +1,31 @@
 <template>
-  <div class="body w-100 h-100 flex-center-onely">
-    <client-only>
-      <NhChat
-        inputTips="输入Ta的邮箱-发起聊天"
-        :searchUserResult="searchUserResult"
-        baseUrl="https://www.notes-something.fun/nh"
-        :userInfo="userInfo.uInfo"
-        eqUserInfo="https://www.notes-something.fun/nh/user/eqUserBasics"
-        socketUrl="wss://www.notes-something.fun/wss/socket.chat/"
-        :token="token"
-        chatRoute="/try"
-        :messageFlicker="true"
-        :experienceMode="true"
-        @searchUser="searchUser"></NhChat>
-    </client-only>
+  <div class='body w-100 h-100 flex-center-onely'>
+    <div class='flex-center-down'>
+      <div class='mb-22 ft-color-tips'>体验界面：以下为组件直接引用的效果</div>
+      <client-only>
+        <NhChat
+          inputTips='输入Ta的邮箱-发起聊天'
+          :searchUserResult='searchUserResult'
+          baseUrl='https://www.notes-something.fun/nh'
+          :userInfo='userInfo.uInfo'
+          eqUserInfo='https://www.notes-something.fun/nh/user/eqUserBasics'
+          socketUrl='wss://www.notes-something.fun/wss/socket.chat/'
+          :token='token'
+          chatRoute='/try'
+          :messageFlicker='true'
+          :experienceMode='true'
+          @searchUser='searchUser'></NhChat>
+      </client-only>
+    </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang='ts'>
 import { NhChat } from 'nh-chat';
 import 'nh-chat/dist/assets/nh-style.css';
 import { notes } from '~/api/index';
 import { eqUserMail } from '~/api/index';
+
 const userInfo = inject<Ref<any>>('userInfo');
 const store = useStore();
 const token = ref(store.token);
@@ -40,7 +44,7 @@ const searchUser = (val: string) => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang='scss' scoped>
 .body {
   padding: $px-96 $px-32;
   box-sizing: border-box;
