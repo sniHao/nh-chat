@@ -21,7 +21,8 @@
             <div class="ft-color-tips">聊天通讯空空的</div>
           </div>
         </template>
-        <div v-else class="pd-zy-12 hover-pointer user" :class="userClass(item)" v-for="(item, index) in userList" :key="item.id" @click="showChat(item)">
+
+        <div v-else class="pd-zy-12 hover-pointer user user-list-sc" :class="userClass(item)" v-for="(item, index) in userList" :key="item.id" @click="showChat(item)">
           <div class="user-box pd-sx-6 flex-center-zy">
             <n-badge :value="item.notRead" :max="99" :offset="[-5, 5]">
               <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)" v-html="computePhoto(item.photo)"></div>
@@ -429,6 +430,12 @@ onBeforeUnmount(() => {
 }
 .user-list::-webkit-scrollbar {
   width: 0px;
+}
+.user-list-sc {
+  padding-right: $px-4;
+}
+.user-list:hover .user-list-sc {
+  padding-right: 0;
 }
 :deep(.n-input__input-el) {
   color: $ft-color !important;

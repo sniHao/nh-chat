@@ -1,5 +1,4 @@
 <template>
-  <!-- 聊天框 -->
   <div class="chat-body flex-down" :class="isPhoneUnfold ? 'shrink-frame' : ''">
     <div class="chat-body-overlay" v-if="!isPhoneUnfold && isSmallWin"></div>
     <template v-if="Object.keys(props.user).length === 0">
@@ -22,6 +21,7 @@
         </n-popover>
       </div>
       <div class="cb-body over-auto h-100">
+        <div class='cb-body-sc'>
         <!-- 时间 -->
         <div class="flex-center-center ft-13 ft-color-tips mt-8" v-if="chatData.length === 0">
           <div class="cbb-tips">发起你们的第一句聊天吧，比如："你好"</div>
@@ -82,6 +82,7 @@
               </div>
             </template>
           </template>
+        </div>
         </div>
       </div>
       <div class="cb-input">
@@ -201,17 +202,17 @@ const inputInstRef = ref<any>('');
 const chooseEmoji = (val: string) => {
   const inputElement = inputInstRef.value?.$el.querySelector('textarea');
   if (inputElement) {
-    const nowPonit = inputElement.selectionStart + val.length;
+    const nowPoint = inputElement.selectionStart + val.length;
     sendVal.value = sendVal.value.slice(0, inputElement.selectionStart) + val + sendVal.value.slice(inputElement.selectionStart);
     setTimeout(() => {
       inputElement.focus();
-      inputElement.setSelectionRange(nowPonit, nowPonit);
+      inputElement.setSelectionRange(nowPoint, nowPoint);
     });
   } else sendVal.value += val;
 };
 
 // 滚动条居底
-const scrollToButtom = () => {
+const scrollToBottom = () => {
   setTimeout(() => {
     let scrollDom = document.getElementsByClassName('cb-body')[0];
     scrollDom.scrollTop = scrollDom.scrollHeight;
@@ -251,7 +252,7 @@ const sendInfo = () => {
   emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
   let data = sendVal.value;
   sendVal.value = '';
-  scrollToButtom();
+  scrollToBottom();
   sendMessage({
     receiveUid: props.user.relationUid,
     message: data,
@@ -345,7 +346,7 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
     fd.append('file', file);
     const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0);
     emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
-    scrollToButtom();
+    scrollToBottom();
     sendMessageImage(fd, props.user.relationUid).then((res) => {
       if (res.code !== 200) res.data = randomNumber();
       chatData.value[pointer].id = res.data;
@@ -364,7 +365,7 @@ const simReissue = (id: number) => {
     const message = '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰';
     pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, 1);
     emit('sendCallBack', { val: truncate(message), type: 0, uid: props.user.relationUid });
-    scrollToButtom();
+    scrollToBottom();
   }, 2000);
 };
 
@@ -409,7 +410,7 @@ const eqChatCom = (needBootom: boolean = true) => {
         addListener();
         onelyOne.value = true;
         if (!needBootom) return;
-        scrollToButtom();
+        scrollToBottom();
         listenerScrollToTop(true);
       }, 150);
     });
@@ -647,7 +648,7 @@ watch(
       newData.message = '对方撤回了一条消息';
     } else {
       pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, 1, data.state);
-      scrollToButtom();
+      scrollToBottom();
     }
   }
 );
@@ -808,6 +809,12 @@ onBeforeUnmount(() => {
 }
 .cb-body::-webkit-scrollbar {
   width: 0px;
+}
+.cb-body-sc {
+  padding-right: $px-4;
+}
+.cb-body:hover .cb-body-sc {
+  padding-right: 0;
 }
 
 .cb-head {
