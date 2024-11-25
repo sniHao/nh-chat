@@ -1,85 +1,94 @@
 <template>
-  <div class="chat-main flex" :style="`width:${param.style.width};max-width:60rem;height:${param.style.height}`" :class="mainClass()">
-    <div class="chat-com flex-down" :class="isPhoneUnfold ? 'shrink' : ''">
+  <div class='chat-main flex' :style='`width:${param.style.width};max-width:60rem;height:${param.style.height}`'
+       :class='mainClass()'>
+    <div class='chat-com flex-down' :class="isPhoneUnfold ? 'shrink' : ''">
       <!-- 搜索 -->
-      <div class="pd-12" :class="isPhoneUnfold ? 'shrink' : ''">
+      <div class='pd-12' :class="isPhoneUnfold ? 'shrink' : ''">
         <n-input-group>
           <n-input
-            style="--n-border-hover: 1px solid #ff6700; --n-border-focus: 1px solid #ff6700; --n-box-shadow-focus: 0 0 0 2px rgba(255, 103, 0, 0.2)"
+            style='--n-border-hover: 1px solid #ff6700; --n-border-focus: 1px solid #ff6700; --n-box-shadow-focus: 0 0 0 2px rgba(255, 103, 0, 0.2)'
             :style="{ width: '100%' }"
-            :placeholder="param.inputTips"
-            v-model:value="searchVal"
+            :placeholder='param.inputTips'
+            v-model:value='searchVal'
             clearable />
-          <n-input-group-label class="hover-pointer" @click="goSearch" color="#ff6700">搜索</n-input-group-label>
+          <n-input-group-label class='hover-pointer' @click='goSearch' color='#ff6700'>搜索</n-input-group-label>
         </n-input-group>
       </div>
       <!-- 通讯列表 -->
-      <div class="over-auto w-100 h-100 user-list">
-        <template v-if="userList.length === 0">
-          <div class="flex-down-center h-100 flex-center-onely">
+      <div class='over-auto w-100 h-100 user-list'>
+        <template v-if='userList.length === 0'>
+          <div class='flex-down-center h-100 flex-center-onely'>
             <NullChat></NullChat>
-            <div class="ft-color-tips">聊天通讯空空的</div>
+            <div class='ft-color-tips'>聊天通讯空空的</div>
           </div>
         </template>
-
-        <div v-else class="pd-zy-12 hover-pointer user user-list-sc" :class="userClass(item)" v-for="(item, index) in userList" :key="item.id" @click="showChat(item)">
-          <div class="user-box pd-sx-6 flex-center-zy">
-            <n-badge :value="item.notRead" :max="99" :offset="[-5, 5]">
-              <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)" v-html="computePhoto(item.photo)"></div>
-            </n-badge>
-            <div class="user-main">
-              <div class="flex-center-zy">
-                <div class="ft-16 ft-b">{{ item.name }}</div>
-                <div class="ft-13">
-                  {{ reckonTime(item.lastMessageDate) }}
+        <div v-else class='user-list-sc'>
+          <div class='pd-zy-12 hover-pointer user' :class='userClass(item)' v-for='(item, index) in userList'
+               :key='item.id' @click='showChat(item)'>
+            <div class='user-box pd-sx-6 flex-center-zy'>
+              <n-badge :value='item.notRead' :max='99' :offset='[-5, 5]'>
+                <div class='user-head flex-center-center' :style="'background-color:' + tranColor(item.photo)"
+                     v-html='computePhoto(item.photo)'></div>
+              </n-badge>
+              <div class='user-main'>
+                <div class='flex-center-zy'>
+                  <div class='ft-16 ft-b'>{{ item.name }}</div>
+                  <div class='ft-13'>
+                    {{ reckonTime(item.lastMessageDate) }}
+                  </div>
                 </div>
-              </div>
-              <div class="ft-13 ft-over">
-                {{ item.lastMessage }}
+                <div class='ft-13 ft-over'>
+                  {{ item.lastMessage }}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
       <!-- phone 通过nav全局引入-->
-      <div class="min-icon" v-if="isSmallWin">
-        <Svg :width="32" :height="32" name="close" fill="#ff6700" viewBox="0 0 1139 1024" v-if="!isPhoneUnfold" @click="isPhoneCallBack(isPhoneUnfold)"></Svg>
-        <Svg :width="32" :height="32" name="open" fill="#ff6700" viewBox="0 0 1139 1024" v-else @click="isPhoneCallBack(isPhoneUnfold)"></Svg>
+      <div class='min-icon' v-if='isSmallWin'>
+        <Svg :width='32' :height='32' name='close' fill='#ff6700' viewBox='0 0 1139 1024' v-if='!isPhoneUnfold'
+             @click='isPhoneCallBack(isPhoneUnfold)'></Svg>
+        <Svg :width='32' :height='32' name='open' fill='#ff6700' viewBox='0 0 1139 1024' v-else
+             @click='isPhoneCallBack(isPhoneUnfold)'></Svg>
       </div>
     </div>
     <!-- 聊天框 -->
-    <Frame :user="nowUser" :isPhoneUnfold="isPhoneUnfold" @sendCallBack="sendCallBack" @closeChat="closeChat"></Frame>
+    <Frame :user='nowUser' :isPhoneUnfold='isPhoneUnfold' @sendCallBack='sendCallBack' @closeChat='closeChat'></Frame>
   </div>
   <!-- 弹框 -->
-  <n-modal v-model:show="showModal">
-    <n-card style="width: 600px; max-height: 380px" :bordered="false" size="huge" role="dialog" aria-modal="true" class="over-auto">
-      <template v-if="param.searchUserResult.length === 0">
-        <div class="flex-down-center">
-          <Svg :width="64" :height="64" name="no-user" viewBox="0 0 1139 1024"></Svg>
-          <span class="ft-16 ft-color-tips mt-12">未找到该用户</span>
+  <n-modal v-model:show='showModal'>
+    <n-card style='width: 600px; max-height: 380px' :bordered='false' size='huge' role='dialog' aria-modal='true'
+            class='over-auto'>
+      <template v-if='param.searchUserResult.length === 0'>
+        <div class='flex-down-center'>
+          <Svg :width='64' :height='64' name='no-user' viewBox='0 0 1139 1024'></Svg>
+          <span class='ft-16 ft-color-tips mt-12'>未找到该用户</span>
         </div>
       </template>
-      <div class="flex-center-zy mb-18" v-else v-for="(item, index) in param.searchUserResult" :key="index">
-        <div class="flex-center">
-          <div class="user-head flex-center-center" :style="'background-color:' + tranColor(item.photo)" v-html="computePhoto(item.photo)"></div>
-          <div class="ft-16 ft-b ml-10">{{ item.name }}</div>
+      <div class='flex-center-zy mb-18' v-else v-for='(item, index) in param.searchUserResult' :key='index'>
+        <div class='flex-center'>
+          <div class='user-head flex-center-center' :style="'background-color:' + tranColor(item.photo)"
+               v-html='computePhoto(item.photo)'></div>
+          <div class='ft-16 ft-b ml-10'>{{ item.name }}</div>
         </div>
-        <n-button round strong type="primary" color="#9300ff" @click="sendChat(item.uid)">发起聊天</n-button>
+        <n-button round strong type='primary' color='#9300ff' @click='sendChat(item.uid)'>发起聊天</n-button>
       </div>
     </n-card>
   </n-modal>
   <n-modal
-    v-model:show="showDelModel"
-    preset="dialog"
-    title="是否确认删除该聊天"
-    positive-text="确认"
-    negative-text="点错啦"
-    @positive-click="confirmDelChat"></n-modal>
+    v-model:show='showDelModel'
+    preset='dialog'
+    title='是否确认删除该聊天'
+    positive-text='确认'
+    negative-text='点错啦'
+    @positive-click='confirmDelChat'></n-modal>
   <!-- 右键封装 -->
-  <RightButton v-if="showRightBtn" :left="rightBtnLeft" :top="rightBtnTop" :list="czList" @choose="chooseRight"></RightButton>
+  <RightButton v-if='showRightBtn' :left='rightBtnLeft' :top='rightBtnTop' :list='czList'
+               @choose='chooseRight'></RightButton>
 </template>
 
-<script setup lang="ts">
+<script setup lang='ts'>
 import { eqRelation, goChat, delChat, topChat } from '@/api/index';
 import { tips, tranColor, setUser, truncate, computePhoto } from '@/utils/OtherUtils';
 import { countTimeDiff, reckonTime, getTimeFormat } from '@/utils/TimeUtil';
@@ -89,6 +98,7 @@ import Frame from './Frame.vue';
 import NullChat from '../svg/NullChat.vue';
 import Svg from '../of/Svg.vue';
 import WebSocketService from '@/utils/WebSocketService';
+
 const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const param = inject<Ref<any>>('param') as any;
@@ -385,10 +395,23 @@ watch(
   }
 );
 
+// 监听悬浮是否存在滚动条
+const listenerHover = () => {
+  const dom = document.getElementsByClassName('user-list')[0];
+  dom.addEventListener('mouseenter', () => {
+    const hasScrollBar = dom.scrollHeight > dom.clientHeight;
+    if (hasScrollBar) dom.classList.add('user-list-up');
+  });
+  dom.addEventListener('mouseleave', () => {
+    dom.classList.remove('user-list-up');
+  });
+};
+
 onMounted(() => {
   if (goUid.value) upChat();
   eqUserList();
   closeRightBtnCom(true);
+  listenerHover();
 });
 onBeforeUnmount(() => {
   clearListener();
@@ -396,17 +419,20 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang='scss' scoped>
 .style-dark {
   background-color: $bg-color-dark;
   color: white;
+
   .user-main {
     color: $ft-color-tips-dark;
   }
 }
+
 .style-light {
   background-color: $bg-color-light;
   color: black;
+
   .user-main {
     color: $ft-color-tips-light;
   }
@@ -416,11 +442,13 @@ onBeforeUnmount(() => {
   width: $px-36 !important;
   flex-direction: unset !important;
 }
+
 .min-icon {
   position: absolute;
   right: -1px;
   bottom: 50%;
 }
+
 .user-list {
   padding-bottom: $px-4;
 }
@@ -428,15 +456,19 @@ onBeforeUnmount(() => {
 .user-list:hover::-webkit-scrollbar {
   width: $px-4;
 }
+
 .user-list::-webkit-scrollbar {
   width: 0px;
 }
+
 .user-list-sc {
   padding-right: $px-4;
 }
-.user-list:hover .user-list-sc {
+
+.user-list-up:hover .user-list-sc {
   padding-right: 0;
 }
+
 :deep(.n-input__input-el) {
   color: $ft-color !important;
 }
@@ -474,6 +506,7 @@ onBeforeUnmount(() => {
 .user-box {
   border-bottom: $px-1 solid rgb(210 210 210 / 50%);
 }
+
 .user:last-child .user-box:first-child {
   border-bottom: unset;
 }

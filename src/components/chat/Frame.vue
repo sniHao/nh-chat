@@ -1,141 +1,150 @@
 <template>
-  <div class="chat-body flex-down" :class="isPhoneUnfold ? 'shrink-frame' : ''">
-    <div class="chat-body-overlay" v-if="!isPhoneUnfold && isSmallWin"></div>
-    <template v-if="Object.keys(props.user).length === 0">
-      <div class="h-100 w-100 flex-center-center flex-down">
-        <div class="ft-color-tips mt-10 ft-16">选择好友，一起聊聊吧！</div>
+  <div class='chat-body flex-down' :class="isPhoneUnfold ? 'shrink-frame' : ''">
+    <div class='chat-body-overlay' v-if='!isPhoneUnfold && isSmallWin'></div>
+    <template v-if='Object.keys(props.user).length === 0'>
+      <div class='h-100 w-100 flex-center-center flex-down'>
+        <div class='ft-color-tips mt-10 ft-16'>选择好友，一起聊聊吧！</div>
       </div>
     </template>
     <template v-else>
-      <Loader class="loader-abs" style="background-color: #2c334485" v-if="lodingMessage"></Loader>
-      <div class="cb-head flex-center">
-        <div class="cb-head-controls"></div>
-        <div class="w-100 flex-center-center">{{ user.name }}</div>
-        <n-popover trigger="click" placement="bottom">
+      <Loader class='loader-abs' style='background-color: #2c334485' v-if='lodingMessage'></Loader>
+      <div class='cb-head flex-center'>
+        <div class='cb-head-controls'></div>
+        <div class='w-100 flex-center-center'>{{ user.name }}</div>
+        <n-popover trigger='click' placement='bottom'>
           <template #trigger>
-            <div class="cb-head-controls flex-center-onely mr-4 hover-pointer">
-              <Svg :width="28" :height="28" name="pointer"></Svg>
+            <div class='cb-head-controls flex-center-onely mr-4 hover-pointer'>
+              <Svg :width='28' :height='28' name='pointer'></Svg>
             </div>
           </template>
-          <span class="hover-pointer" @click="closeChat">关闭聊天</span>
+          <span class='hover-pointer' @click='closeChat'>关闭聊天</span>
         </n-popover>
       </div>
-      <div class="cb-body over-auto h-100">
+      <div class='cb-body over-auto h-100'>
         <div class='cb-body-sc'>
-        <!-- 时间 -->
-        <div class="flex-center-center ft-13 ft-color-tips mt-8" v-if="chatData.length === 0">
-          <div class="cbb-tips">发起你们的第一句聊天吧，比如："你好"</div>
-        </div>
-        <div class="cbb-box" v-for="(item, index) in chatData" :key="index">
           <!-- 时间 -->
-          <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.tab">
-            <div class="cbb-tips">{{ cutChatTime(item.date) }}</div>
+          <div class='flex-center-center ft-13 ft-color-tips mt-8' v-if='chatData.length === 0'>
+            <div class='cbb-tips'>发起你们的第一句聊天吧，比如："你好"</div>
           </div>
-          <!-- 其他事件 -->
-          <div class="flex-center-center ft-13 ft-color-tips mb-8" v-if="item.sendState === 2 || item.receiveState === 2">
-            <div class="cbb-tips">
-              {{ item.message }}
-              <n-button v-if="reMessageId === item.id" text color="#FF6700" class="ml-4" size="tiny" @click="reEdit">重新编辑</n-button>
+          <div class='cbb-box' v-for='(item, index) in chatData' :key='index'>
+            <!-- 时间 -->
+            <div class='flex-center-center ft-13 ft-color-tips mb-8' v-if='item.tab'>
+              <div class='cbb-tips'>{{ cutChatTime(item.date) }}</div>
             </div>
-          </div>
-          <!-- 消息框 -->
-          <template v-else>
-            <template v-if="item.sendUid !== user.uid">
-              <div class="flex w-100" @click="moreCheckedCallBack(item)" :class="moreCheckState ? 'is-checked' : ''">
-                <n-checkbox :checked="item.check" @update.self:checked="moreCheckedCallBack(item)" v-if="moreCheckState"></n-checkbox>
-                <div class="cbb-main flex">
-                  <div class="user-head flex-center-center mr-4" :style="'background-color:' + tranColor(user.photo)" v-html="computePhoto(user.photo)"></div>
-                  <div class="cbbm-box cbbm-box-left flex">
-                    <span v-if="item.type === 0">{{ item.message }}</span>
-                    <n-image v-else class="chat-image" :src="item.message" />
-                  </div>
-                </div>
+            <!-- 其他事件 -->
+            <div class='flex-center-center ft-13 ft-color-tips mb-8'
+                 v-if='item.sendState === 2 || item.receiveState === 2'>
+              <div class='cbb-tips'>
+                {{ item.message }}
+                <n-button v-if='reMessageId === item.id' text color='#FF6700' class='ml-4' size='tiny' @click='reEdit'>
+                  重新编辑
+                </n-button>
               </div>
-            </template>
+            </div>
+            <!-- 消息框 -->
             <template v-else>
-              <div class="flex w-100" @click="moreCheckedCallBack(item)" :class="moreCheckState ? 'is-checked' : ''">
-                <n-checkbox :checked="item.check" @update.self:checked.stop="moreCheckedCallBack(item)" v-if="moreCheckState"></n-checkbox>
-                <div class="cbb-main flex-right">
-                  <div
-                    class="user-head flex-center-center ml-4"
-                    :style="'background-color:' + tranColor(param.userInfo.photo)"
-                    v-html="computePhoto(param.userInfo.photo)"></div>
-                  <div class="cbbm-box cbbm-box-right flex">
-                    <span v-if="item.type === 0">{{ item.message }}</span>
-                    <n-image v-else class="chat-image" :src="item.message" />
-                  </div>
-                  <!-- 消息状态 -->
-                  <div class="flex-end mr-6">
-                    <!-- 失败 -->
-                    <Svg
-                      class="hover-pointer"
-                      name="message-fail"
-                      fill="red"
-                      :width="24"
-                      :height="24"
-                      v-if="item.state === 2"
-                      @click="reissue(item.message, item.type)"></Svg>
-                    <!-- 加载中 -->
-                    <Svg class="message-loading" name="message-loading" fill="#d2d2d2" :width="24" :height="24" v-if="item.state === 0"></Svg>
+              <template v-if='item.sendUid !== user.uid'>
+                <div class='flex w-100' @click='moreCheckedCallBack(item)' :class="moreCheckState ? 'is-checked' : ''">
+                  <n-checkbox :checked='item.check' @update.self:checked='moreCheckedCallBack(item)'
+                              v-if='moreCheckState'></n-checkbox>
+                  <div class='cbb-main flex'>
+                    <div class='user-head flex-center-center mr-4' :style="'background-color:' + tranColor(user.photo)"
+                         v-html='computePhoto(user.photo)'></div>
+                    <div class='cbbm-box cbbm-box-left flex'>
+                      <span v-if='item.type === 0'>{{ item.message }}</span>
+                      <n-image v-else class='chat-image' :src='item.message' />
+                    </div>
                   </div>
                 </div>
-              </div>
+              </template>
+              <template v-else>
+                <div class='flex w-100' @click='moreCheckedCallBack(item)' :class="moreCheckState ? 'is-checked' : ''">
+                  <n-checkbox :checked='item.check' @update.self:checked.stop='moreCheckedCallBack(item)'
+                              v-if='moreCheckState'></n-checkbox>
+                  <div class='cbb-main flex-right'>
+                    <div
+                      class='user-head flex-center-center ml-4'
+                      :style="'background-color:' + tranColor(param.userInfo.photo)"
+                      v-html='computePhoto(param.userInfo.photo)'></div>
+                    <div class='cbbm-box cbbm-box-right flex'>
+                      <span v-if='item.type === 0'>{{ item.message }}</span>
+                      <n-image v-else class='chat-image' :src='item.message' />
+                    </div>
+                    <!-- 消息状态 -->
+                    <div class='flex-end mr-6'>
+                      <!-- 失败 -->
+                      <Svg
+                        class='hover-pointer'
+                        name='message-fail'
+                        fill='red'
+                        :width='24'
+                        :height='24'
+                        v-if='item.state === 2'
+                        @click='reissue(item.message, item.type)'></Svg>
+                      <!-- 加载中 -->
+                      <Svg class='message-loading' name='message-loading' fill='#d2d2d2' :width='24' :height='24'
+                           v-if='item.state === 0'></Svg>
+                    </div>
+                  </div>
+                </div>
+              </template>
             </template>
-          </template>
-        </div>
+          </div>
         </div>
       </div>
-      <div class="cb-input">
-        <template v-if="moreCheckState">
-          <div class="flex-center-center h-100">
-            <div class="flex-down-center" @click="delMoreChecked">
-              <Svg :width="24" :height="24" fill="#ff6700" class="hover-pointer mb-2" name="del"></Svg>
-              <n-button text color="#ff6700" size="large">删除</n-button>
+      <div class='cb-input'>
+        <template v-if='moreCheckState'>
+          <div class='flex-center-center h-100'>
+            <div class='flex-down-center' @click='delMoreChecked'>
+              <Svg :width='24' :height='24' fill='#ff6700' class='hover-pointer mb-2' name='del'></Svg>
+              <n-button text color='#ff6700' size='large'>删除</n-button>
             </div>
-            <div class="flex-down-center ml-18" @click="cancelMoreChecked">
-              <Svg :width="24" :height="24" fill="#ff670099" class="hover-pointer mb-2" name="cancel"></Svg>
-              <n-button text color="#ff670099" size="large">取消</n-button>
+            <div class='flex-down-center ml-18' @click='cancelMoreChecked'>
+              <Svg :width='24' :height='24' fill='#ff670099' class='hover-pointer mb-2' name='cancel'></Svg>
+              <n-button text color='#ff670099' size='large'>取消</n-button>
             </div>
           </div>
         </template>
         <template v-else>
           <!-- 表情包图片等等 -->
-          <div class="cb-input-controls flex-center">
-            <n-popover trigger="click" raw @update:show="handleUpdateShow">
+          <div class='cb-input-controls flex-center'>
+            <n-popover trigger='click' raw @update:show='handleUpdateShow'>
               <template #trigger>
-                <Svg :width="24" :height="24" class="hover-pointer ml-12" name="emoji"></Svg>
+                <Svg :width='24' :height='24' class='hover-pointer ml-12' name='emoji'></Svg>
               </template>
-              <EmoJi @choose="chooseEmoji" />
+              <EmoJi @choose='chooseEmoji' />
             </n-popover>
-            <n-upload :show-file-list="false" @before-upload="beforeUpload" accept=".png,.jpeg,.jpg">
-              <Svg :width="24" :height="24" class="hover-pointer ml-12" name="up-image"></Svg>
+            <n-upload :show-file-list='false' @before-upload='beforeUpload' accept='.png,.jpeg,.jpg'>
+              <Svg :width='24' :height='24' class='hover-pointer ml-12' name='up-image'></Svg>
             </n-upload>
           </div>
           <!-- 输入框 -->
-          <div class="cb-input-main">
+          <div class='cb-input-main'>
             <n-input
-              ref="inputInstRef"
-              style="--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset"
-              v-model:value="sendVal"
-              type="textarea"
-              @keydown.enter.native="handleKeyUp"
-              @input="valChange"
-              placeholder="说点啥..." />
+              ref='inputInstRef'
+              style='--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset'
+              v-model:value='sendVal'
+              type='textarea'
+              @keydown.enter.native='handleKeyUp'
+              @input='valChange'
+              placeholder='说点啥...' />
           </div>
-          <div class="cb-input-go flex-center-zy pd-zy-6 ft-color-tips">
+          <div class='cb-input-go flex-center-zy pd-zy-6 ft-color-tips'>
             <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
-            <div class="hover-pointer" @click="sendInfo">按Enter键发送</div>
+            <div class='hover-pointer' @click='sendInfo'>按Enter键发送</div>
           </div>
         </template>
       </div>
     </template>
     <!-- 右键封装 -->
-    <RightButton v-if="showRightBtnMessage" :left="rightBtnLeft" :top="rightBtnTop" :list="czList" @choose="chooseRight"></RightButton>
+    <RightButton v-if='showRightBtnMessage' :left='rightBtnLeft' :top='rightBtnTop' :list='czList'
+                 @choose='chooseRight'></RightButton>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang='ts'>
 import { createDiscreteApi } from 'naive-ui';
+
 const { notification } = createDiscreteApi(['notification']);
 import type { UploadFileInfo } from 'naive-ui';
 import { countTimeDiff, cutChatTime, getTimeFormat } from '@/utils/TimeUtil';
@@ -148,6 +157,7 @@ import RightButton from '../of/RightButton.vue';
 import Svg from '../of/Svg.vue';
 import EmoJi from '../of/EmoJi.vue';
 import Loader from '../of/Loader.vue';
+
 const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const param = inject<Ref<any>>('param') as any;
@@ -341,7 +351,7 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
   const result = upLoadCheck(file);
   if (!result) return false;
   const reader = new FileReader();
-  reader.onload = function (e: any) {
+  reader.onload = function(e: any) {
     const fd = new FormData();
     fd.append('file', file);
     const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0);
@@ -631,6 +641,9 @@ watch(
     if (Object.keys(props.user).length === 0) return;
     initData();
     eqChatData();
+    nextTick(() => {
+      listenerHover();
+    });
     if (nowChatUid) nowChatUid(props.user.relationUid);
   }
 );
@@ -653,6 +666,18 @@ watch(
   }
 );
 
+// 监听悬浮是否存在滚动条
+const listenerHover = () => {
+  const dom = document.getElementsByClassName('cb-body')[0];
+  dom.addEventListener('mouseenter', () => {
+    const hasScrollBar = dom.scrollHeight > dom.clientHeight;
+    if (hasScrollBar) dom.classList.add('cb-body-up');
+  });
+  dom.addEventListener('mouseleave', () => {
+    dom.classList.remove('cb-body-up');
+  });
+};
+
 // 组件初开始和结束
 onMounted(() => {
   closeRightBtnCom(true);
@@ -665,11 +690,12 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style lang="scss" scoped>
+<style lang='scss' scoped>
 .is-checked:hover {
   background-color: #4a505d;
   cursor: pointer;
 }
+
 :deep(.n-checkbox-box-wrapper) {
   margin-top: $px-14;
   margin-right: $px-10;
@@ -678,18 +704,23 @@ onBeforeUnmount(() => {
 .shrink-frame {
   width: calc(100% - $px-1) !important;
 }
+
 .message-loading {
   animation: circle 1s linear infinite;
 }
+
 :deep(.n-upload) {
   width: unset;
 }
+
 :deep(.n-upload-trigger) {
   display: flex;
 }
+
 :deep(.n-upload-trigger + .n-upload-file-list) {
   margin-top: unset;
 }
+
 .loader-abs {
   position: absolute;
   background-color: #2c3344;
@@ -699,17 +730,21 @@ onBeforeUnmount(() => {
   left: 0;
   border-radius: $px-12;
 }
+
 :deep(.chat-image img) {
   max-width: 100%;
   max-height: $px-320;
 }
+
 .user-head {
   border-radius: $px-6;
 }
+
 .cbbm-box-left {
   background-color: $ft-color-hui-1;
   margin-left: $px-10;
 }
+
 .cbbm-box-left::after {
   content: '';
   width: 0px;
@@ -723,10 +758,12 @@ onBeforeUnmount(() => {
   left: -$px-16;
   top: $px-11;
 }
+
 .cbbm-box-right {
   background-color: $ft-color-2-hui-1;
   margin-right: $px-10;
 }
+
 .cbbm-box-right::after {
   content: '';
   width: 0px;
@@ -740,6 +777,7 @@ onBeforeUnmount(() => {
   right: -$px-16;
   top: $px-11;
 }
+
 .cbbm-box {
   min-width: $px-38;
   max-width: calc(50% - $px-48);
@@ -748,6 +786,7 @@ onBeforeUnmount(() => {
   box-sizing: border-box;
   position: relative;
   border-radius: $px-8;
+
   span {
     word-wrap: break-word;
     word-break: break-all;
@@ -762,39 +801,49 @@ onBeforeUnmount(() => {
   margin-top: $px-6;
   margin-bottom: $px-6;
 }
+
 .cbb-tips {
   border-radius: $px-4;
   background-color: #8fa2c366;
   padding: $px-2 $px-6;
   box-sizing: border-box;
 }
+
 .cbb-box {
   padding: $px-8 $px-12;
 }
+
 .cb-input {
   height: $px-160;
   border-top: $px-1 solid $ft-color-tips;
+
   .cb-input-main {
     height: calc(100% - $px-32 - $px-32);
     background-color: #2c3344;
+
     .n-input {
       height: 100%;
       background-color: unset;
     }
+
     .n-input:not(.n-input--disabled).n-input--focus {
       background-color: unset;
     }
+
     :deep(.n-input__textarea-el) {
       color: white;
     }
+
     :deep(.n-input-wrapper) {
       resize: unset;
     }
+
     :deep(.n-scrollbar-rail__scrollbar) {
       --n-scrollbar-color: rgba(255, 103, 0, 0.5);
       --n-scrollbar-color-hover: rgba(255, 103, 0);
     }
   }
+
   .cb-input-go,
   .cb-input-controls {
     height: $px-32;
@@ -804,22 +853,27 @@ onBeforeUnmount(() => {
 .cb-body {
   height: calc(100% - $px-2 - $px-48 - $px-160);
 }
+
 .cb-body:hover::-webkit-scrollbar {
   width: $px-4;
 }
+
 .cb-body::-webkit-scrollbar {
   width: 0px;
 }
+
 .cb-body-sc {
   padding-right: $px-4;
 }
-.cb-body:hover .cb-body-sc {
+
+.cb-body-up:hover .cb-body-sc {
   padding-right: 0;
 }
 
 .cb-head {
   height: $px-48;
   border-bottom: $px-1 solid $ft-color-tips;
+
   .cb-head-controls {
     width: $px-32;
   }
@@ -830,6 +884,7 @@ onBeforeUnmount(() => {
   position: relative;
   overflow: hidden;
 }
+
 .chat-body-overlay {
   position: absolute;
   top: 0;
