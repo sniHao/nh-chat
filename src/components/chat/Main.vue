@@ -1,6 +1,6 @@
 <template>
   <div class='chat-main flex'
-       :style='`width:${param.style.width};max-width:60rem;height:${param.style.height};background-color:${param.style.mainColor};
+       :style='`width:${param.width};max-width:60rem;height:${param.height};background-color:${param.style.mainColor};
        color:${param.style.fontColor}`'
        :class='mainClass()'>
     <div class='chat-com flex-down' :class="isPhoneUnfold ? 'shrink' : ''"

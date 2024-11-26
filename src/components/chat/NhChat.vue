@@ -22,10 +22,12 @@ const props = defineProps({
     type: String,
     default: '输入Ta的账号-发起聊天'
   },
+  width: '60rem',
+  height: '40.625rem',
   style: {
     type: Object,
     default: () => ({
-      width: '60rem', height: '40.625rem', mainColor: '#2C3344', fontColor: '#e9e9e9',
+      mainColor: '#2C3344', fontColor: '#e9e9e9',
       leftChatBgColor: 'rgb(213, 92, 14)', rightChatBgColor: 'rgb(126, 10, 218)'
     })
   },

@@ -61,9 +61,9 @@ declare global {
   interface chatProps {
     baseUrl: string,
     inputTips: string,
+    width: string,
+    height: string,
     style: {
-      width: string,
-      height: string,
       mainColor: string,
       fontColor: string,
       leftChatBgColor: string,
