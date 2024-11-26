@@ -10,9 +10,11 @@
 .ml-6 {
   margin-left: 0.375rem;
 }
+
 .mr-7 {
   margin-left: 0.4375rem;
 }
+
 .ml-8 {
   margin-left: 0.5rem;
 }
@@ -205,11 +207,13 @@
   padding: 0.375rem;
   box-sizing: border-box;
 }
+
 .pd-sx-6 {
   padding-top: 0.375rem;
   padding-bottom: 0.375rem;
   box-sizing: border-box;
 }
+
 .pd-zy-6 {
   padding-left: 0.375rem;
   padding-right: 0.375rem;
@@ -226,6 +230,7 @@
   padding-bottom: 0.75rem;
   box-sizing: border-box;
 }
+
 .pd-zy-12 {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
@@ -332,15 +337,18 @@
   display: flex;
   align-items: center;
 }
+
 .flex-wrap {
   display: flex;
   flex-wrap: wrap;
 }
+
 .flex-wrap-center {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
 }
+
 .flex-center-zy {
   display: flex;
   align-items: center;
@@ -417,6 +425,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 // 字体两行超出省略号
 .ft-2-over {
   white-space: normal;
@@ -427,18 +436,23 @@
   -webkit-line-clamp: 2;
   line-clamp: 2;
 }
+
 .min-h-100 {
   min-height: 100%;
 }
+
 .h-100 {
   height: 100%;
 }
+
 .w-1280 {
   width: 80rem;
 }
+
 .w-960 {
   width: 60rem;
 }
+
 .w-min-360 {
   min-width: 22.5rem;
 }
@@ -446,9 +460,11 @@
 .w-100 {
   width: 100% !important;
 }
+
 .w-50 {
   width: 50%;
 }
+
 .move-down-2 {
   transform: translateY(0.125rem);
   vertical-align: middle;
@@ -457,9 +473,11 @@
 .boder-5 {
   border-radius: 0.3125rem;
 }
+
 .boder-10 {
   border-radius: 0.625rem;
 }
+
 .boder-15 {
   border-radius: 0.9375rem;
 }
@@ -467,6 +485,7 @@
 .over-auto {
   overflow: auto;
 }
+
 .over-auto::-webkit-scrollbar {
   width: 0.4rem;
   height: 0.25rem;
@@ -489,4 +508,8 @@
 
 .hover-pointer {
   cursor: pointer;
+}
+
+.pos-r {
+  position: relative;
 }

@@ -1,18 +1,18 @@
-import { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from 'axios';
 
 /* eslint-disable */
-declare module "*.vue" {
-  import type { DefineComponent } from "vue";
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue';
   const component: DefineComponent<{}, {}, any>;
   export default component;
 }
 
-declare module "*.vue" {
-  import Vue from "vue";
+declare module '*.vue' {
+  import Vue from 'vue';
   export default Vue;
 }
 
-declare module "axios" {
+declare module 'axios' {
   interface AxiosInstance {
     (config: AxiosRequestConfig): Promise<any>;
   }
@@ -25,11 +25,13 @@ declare global {
     name: string;
     photo: string;
   }
+
   interface Result {
     code: number;
     data: any;
     msg: string;
   }
+
   interface Relation {
     id: number;
     uid: number;
@@ -41,6 +43,7 @@ declare global {
     name: string;
     photo: string;
   }
+
   interface message {
     id: number;
     sendUid: number | undefined;
@@ -53,5 +56,31 @@ declare global {
     tab: boolean;
     state: number;
     check: boolean;
+  }
+
+  interface chatProps {
+    baseUrl: string,
+    inputTips: string,
+    style: {
+      width: string,
+      height: string,
+      mainColor: string,
+      fontColor: string,
+      leftChatBgColor: string,
+      rightChatBgColor: string
+    },
+    system: {},
+    searchUserResult: [],
+    eqUserInfo: string,
+    userInfo: {
+      uid: number;
+      name: string;
+      photo: string;
+    },
+    socketUrl: string,
+    token: string,
+    chatRoute: string,
+    messageFlicker: boolean,
+    experienceMode: boolean
   }
 }

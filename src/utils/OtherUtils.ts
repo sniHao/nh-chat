@@ -7,6 +7,8 @@ export const tranColor = (name: string) => {
 
 // 通知弹窗
 import { createDiscreteApi } from 'naive-ui';
+import axios from 'axios';
+
 const { notification } = createDiscreteApi(['notification']);
 
 type NotificationType = keyof typeof notification;
@@ -92,7 +94,6 @@ export const sleep = (time: number) => {
   return new Promise((resolve) => setTimeout(resolve, time));
 };
 
-import axios from 'axios';
 // 为用户添加昵称和头像属性
 export const setUser = (data: Array<Relation>, url: string) => {
   return new Promise((resolve) => {
@@ -135,6 +136,22 @@ const defaultUser = (data: Array<Relation>) => {
 
 // 头像设置
 export const computePhoto = (photo: string) => {
-  if (photo.startsWith('http')) return `<img src="${photo}" />`;
+  if (photo.startsWith('http')) return `<img src='${photo}' />`;
   return photo;
+};
+
+// 将dom颜色透明化
+export const setFilterColor = (color: string, newOpacity: number = 0.8): string => {
+  let dom = document.createElement('div');
+  dom.style.backgroundColor = color;
+  document.body.appendChild(dom);
+  const computedStyle = window.getComputedStyle(dom);
+  const bgColor = computedStyle.backgroundColor;
+  const rgbValues = bgColor.match(/\d+/g);
+  if (!rgbValues) return bgColor;
+  let r = parseInt(rgbValues[0]);
+  let g = parseInt(rgbValues[1]);
+  let b = parseInt(rgbValues[2]);
+  document.body.removeChild(dom);
+  return `rgba(${r}, ${g}, ${b}, ${newOpacity})`;
 };

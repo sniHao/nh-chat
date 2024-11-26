@@ -1,10 +1,12 @@
 <template>
-  <div class="right-cz over-auto" :style="'left:' + left + 'px;top:' + top + 'px'">
-    <div class="check hover-pointer pd-6 flex-center-center ft-over" v-for="(item, index) in list" :key="index" @click="choose(item)">{{ item.name }}</div>
+  <div class='right-cz over-auto' :style="'left:' + left + 'px;top:' + top + 'px;background-color:' + bgColor">
+    <div class='check hover-pointer pd-6 flex-center-center ft-over' v-for='(item, index) in list' :key='index'
+         @click='choose(item)'>{{ item.name }}
+    </div>
   </div>
 </template>
 
-<script setup lang="ts">
+<script setup lang='ts'>
 const emit = defineEmits(['choose']);
 const props = defineProps({
   left: {
@@ -18,6 +20,10 @@ const props = defineProps({
   list: {
     default: [],
     type: Array<any>
+  },
+  bgColor: {
+    default: '',
+    type: String
   }
 });
 const choose = (item: any) => {
@@ -25,7 +31,7 @@ const choose = (item: any) => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang='scss' scoped>
 .right-cz {
   position: fixed;
   width: $px-128;
@@ -33,11 +39,10 @@ const choose = (item: any) => {
   max-height: $px-240;
   border-radius: $px-4;
   box-shadow: 0 0 $px-2 $px-1 $ft-color-tips-2;
-  background-color: rgb(142 91 180 / 80%);
   backdrop-filter: blur(0.25rem);
   z-index: 9;
-  color: white;
 }
+
 .check:hover {
   background-color: $bg-color-hover;
 }

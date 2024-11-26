@@ -2,13 +2,15 @@
   <Main></Main>
 </template>
 
-<script setup lang="ts">
+<script setup lang='ts'>
 import WebSocketService from '@/utils/WebSocketService';
 import { createDiscreteApi } from 'naive-ui';
+
 const { notification } = createDiscreteApi(['notification']);
 import { useRouter } from 'vue-router';
-import { setUser } from '@/utils/OtherUtils';
+import { setUser, setFilterColor } from '@/utils/OtherUtils';
 import Main from '@/components/chat/Main.vue';
+
 const router = useRouter();
 
 const props = defineProps({
@@ -22,7 +24,11 @@ const props = defineProps({
   },
   style: {
     type: Object,
-    default: () => ({ width: '60rem', height: '40.625rem', theme: 'dark' })
+    // default: () => ({ width: '60rem', height: '40.625rem', mainColor: '#2C3344', fontColor: '#e9e9e9' })
+    default: () => ({
+      width: '60rem', height: '40.625rem', mainColor: '#2C3344', fontColor: '#e9e9e9',
+      leftChatBgColor: 'rgb(213, 92, 14)', rightChatBgColor: 'rgb(126, 10, 218)'
+    })
   },
   system: {
     type: Object,
@@ -60,8 +66,18 @@ const props = defineProps({
     type: Boolean,
     default: true
   }
-} as any);
+} as chatProps);
 provide('param', props);
+
+const computedStyle = computed(() => {
+  return {
+    'mainColorOpt': setFilterColor(props.style.mainColor),
+    'fontColorOpt': setFilterColor(props.style.fontColor),
+    'fontColorOpt95': setFilterColor(props.style.fontColor, 0.95),
+    'fontColorOpt35': setFilterColor(props.style.fontColor, 0.35)
+  };
+});
+provide('computedStyle', computedStyle);
 
 // ws状态全局
 const ws = new WebSocketService(props.socketUrl + props.token);
@@ -149,9 +165,10 @@ onUnmounted(() => {
   window.removeEventListener('resize', resize);
 });
 </script>
-<style lang="scss">
+<style lang='scss'>
 @use '@/assets/css/constant.scss';
 @use '@/assets/css/nh.scss';
+
 body {
   padding: 0;
   margin: 0;
@@ -164,9 +181,11 @@ body {
 .home-ft-color-2 {
   color: $ft-color-2;
 }
+
 .home-ft-color {
   color: $ft-color;
 }
+
 .ft-color-white {
   color: white;
 }
@@ -220,6 +239,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   box-shadow: 0 0 $px-1 $px-0-5;
+
   img {
     width: 100%;
     height: 100%;
@@ -245,6 +265,7 @@ body {
   font-weight: 600;
   cursor: pointer;
 }
+
 .main-body {
   height: 100vh;
 }

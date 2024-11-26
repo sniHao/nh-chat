@@ -1,17 +1,26 @@
 <template>
-  <div class='chat-main flex' :style='`width:${param.style.width};max-width:60rem;height:${param.style.height}`'
+  <div class='chat-main flex'
+       :style='`width:${param.style.width};max-width:60rem;height:${param.style.height};background-color:${param.style.mainColor};
+       color:${param.style.fontColor}`'
        :class='mainClass()'>
-    <div class='chat-com flex-down' :class="isPhoneUnfold ? 'shrink' : ''">
+    <div class='chat-com flex-down' :class="isPhoneUnfold ? 'shrink' : ''"
+         :style='`border-right: 1px solid ${computedStyle.fontColorOpt}`'>
       <!-- 搜索 -->
       <div class='pd-12' :class="isPhoneUnfold ? 'shrink' : ''">
         <n-input-group>
           <n-input
-            style='--n-border-hover: 1px solid #ff6700; --n-border-focus: 1px solid #ff6700; --n-box-shadow-focus: 0 0 0 2px rgba(255, 103, 0, 0.2)'
-            :style="{ width: '100%' }"
+            :style='`--n-border:1px solid ${computedStyle.fontColorOpt};--n-border-hover: 1px solid ${computedStyle.fontColorOpt};
+              --n-border-focus: 1px solid ${computedStyle.fontColorOpt};
+              --n-placeholder-color:${computedStyle.fontColorOpt};
+              --n-text-color:${param.style.fontColor}`'
             :placeholder='param.inputTips'
             v-model:value='searchVal'
             clearable />
-          <n-input-group-label class='hover-pointer' @click='goSearch' color='#ff6700'>搜索</n-input-group-label>
+          <n-input-group-label class='hover-pointer' @click='goSearch'
+                               :style='`--n-group-label-text-color:${param.style.fontColor};
+                               --n-group-label-border:1px solid ${param.style.fontColor};
+                               --n-group-label-color:${param.style.mainColor}`'>搜索
+          </n-input-group-label>
         </n-input-group>
       </div>
       <!-- 通讯列表 -->
@@ -19,13 +28,14 @@
         <template v-if='userList.length === 0'>
           <div class='flex-down-center h-100 flex-center-onely'>
             <NullChat></NullChat>
-            <div class='ft-color-tips'>聊天通讯空空的</div>
+            <div :style='`color:${computedStyle.fontColorOpt}`'>聊天通讯空空的</div>
           </div>
         </template>
         <div v-else class='user-list-sc'>
-          <div class='pd-zy-12 hover-pointer user' :class='userClass(item)' v-for='(item, index) in userList'
+          <div class='pd-zy-12 hover-pointer user' :class='userClass(item)' v-for='item in userList'
                :key='item.id' @click='showChat(item)'>
-            <div class='user-box pd-sx-6 flex-center-zy'>
+            <div class='user-box pd-sx-6 flex-center-zy'
+                 :style='`border-bottom: 1px solid ${computedStyle.fontColorOpt35}`'>
               <n-badge :value='item.notRead' :max='99' :offset='[-5, 5]'>
                 <div class='user-head flex-center-center' :style="'background-color:' + tranColor(item.photo)"
                      v-html='computePhoto(item.photo)'></div>
@@ -85,6 +95,8 @@
     @positive-click='confirmDelChat'></n-modal>
   <!-- 右键封装 -->
   <RightButton v-if='showRightBtn' :left='rightBtnLeft' :top='rightBtnTop' :list='czList'
+               :style='`color:${param.style.fontColor}`'
+               :bgColor='computedStyle.mainColorOpt'
                @choose='chooseRight'></RightButton>
 </template>
 
@@ -101,14 +113,13 @@ import WebSocketService from '@/utils/WebSocketService';
 
 const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
-const param = inject<Ref<any>>('param') as any;
+const param = inject<Ref<chatProps>>('param') as chatProps;
+const computedStyle = inject<Ref<any>>('computedStyle') as any;
 const emit = defineEmits(['searchUser']);
 // ===================================其他功能===================================//
 // 基本样式
 const mainClass = () => {
   return {
-    'style-dark': param.style.theme === 'dark',
-    'style-light': param.style.theme === 'light',
     'w-100': isSmallWin.value,
     'new-info': newInfo.value
   };
@@ -273,11 +284,11 @@ const showRightBtn = ref(false);
 const nowCheckData = ref({} as Relation);
 const listenerUser = (e: MouseEvent) => {
   e.preventDefault();
-  const parentDiv = document.querySelector('.user-list');
+  const parentDiv = document.querySelector('.user-list-sc');
   if (!parentDiv) return;
   let target = e.target as HTMLElement;
   let index = 0;
-  if (target.classList.contains('user-list')) return;
+  if (target.classList.contains('user-list-sc')) return;
   if (target.classList.contains('user')) {
     const allSonBoxes = Array.from(parentDiv.children);
     index = allSonBoxes.indexOf(target);
@@ -420,23 +431,6 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang='scss' scoped>
-.style-dark {
-  background-color: $bg-color-dark;
-  color: white;
-
-  .user-main {
-    color: $ft-color-tips-dark;
-  }
-}
-
-.style-light {
-  background-color: $bg-color-light;
-  color: black;
-
-  .user-main {
-    color: $ft-color-tips-light;
-  }
-}
 
 .shrink {
   width: $px-36 !important;
@@ -458,7 +452,7 @@ onBeforeUnmount(() => {
 }
 
 .user-list::-webkit-scrollbar {
-  width: 0px;
+  width: 0;
 }
 
 .user-list-sc {
@@ -467,10 +461,6 @@ onBeforeUnmount(() => {
 
 .user-list-up:hover .user-list-sc {
   padding-right: 0;
-}
-
-:deep(.n-input__input-el) {
-  color: $ft-color !important;
 }
 
 .n-input:not(.n-input--disabled).n-input--focus {
@@ -503,10 +493,6 @@ onBeforeUnmount(() => {
   width: calc(100% - 3rem - 0.375rem);
 }
 
-.user-box {
-  border-bottom: $px-1 solid rgb(210 210 210 / 50%);
-}
-
 .user:last-child .user-box:first-child {
   border-bottom: unset;
 }
@@ -520,7 +506,6 @@ onBeforeUnmount(() => {
   position: relative;
   overflow: hidden;
   width: $px-280;
-  border-right: $px-1 solid $ft-color-tips;
 }
 
 .new-info {

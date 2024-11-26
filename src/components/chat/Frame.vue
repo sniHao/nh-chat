@@ -3,38 +3,43 @@
     <div class='chat-body-overlay' v-if='!isPhoneUnfold && isSmallWin'></div>
     <template v-if='Object.keys(props.user).length === 0'>
       <div class='h-100 w-100 flex-center-center flex-down'>
-        <div class='ft-color-tips mt-10 ft-16'>选择好友，一起聊聊吧！</div>
+        <div class='mt-10 ft-16' :style='`color:${computedStyle.fontColorOpt}`'>选择好友，一起聊聊吧！</div>
       </div>
     </template>
     <template v-else>
-      <Loader class='loader-abs' style='background-color: #2c334485' v-if='lodingMessage'></Loader>
-      <div class='cb-head flex-center'>
+      <Loader class='loader-abs' :style='`background-color: ${param.style.mainColor}`' v-if='loadingMessage'>
+        <div>12</div>
+      </Loader>
+      <div class='cb-head flex-center' :style='`border-bottom: 1px solid ${computedStyle.fontColorOpt}`'>
         <div class='cb-head-controls'></div>
         <div class='w-100 flex-center-center'>{{ user.name }}</div>
         <n-popover trigger='click' placement='bottom'>
           <template #trigger>
             <div class='cb-head-controls flex-center-onely mr-4 hover-pointer'>
-              <Svg :width='28' :height='28' name='pointer'></Svg>
+              <Svg :width='28' :height='28' name='pointer' :fill='computedStyle.fontColorOpt'></Svg>
             </div>
           </template>
           <span class='hover-pointer' @click='closeChat'>关闭聊天</span>
         </n-popover>
       </div>
       <div class='cb-body over-auto h-100'>
-        <div class='cb-body-sc'>
-          <!-- 时间 -->
-          <div class='flex-center-center ft-13 ft-color-tips mt-8' v-if='chatData.length === 0'>
-            <div class='cbb-tips'>发起你们的第一句聊天吧，比如："你好"</div>
+        <div class='cb-body-sc' :style='`color:${computedStyle.fontColorOpt95}`'>
+          <div class='flex-center-center ft-13 mt-8' v-if='chatData.length === 0'>
+            <div class='cbb-tips' :style='`background-color: ${computedStyle.fontColorOpt35}`'>
+              发起你们的第一句聊天吧，比如："你好"
+            </div>
           </div>
           <div class='cbb-box' v-for='(item, index) in chatData' :key='index'>
             <!-- 时间 -->
-            <div class='flex-center-center ft-13 ft-color-tips mb-8' v-if='item.tab'>
-              <div class='cbb-tips'>{{ cutChatTime(item.date) }}</div>
+            <div class='flex-center-center ft-13 mb-8' v-if='item.tab'>
+              <div class='cbb-tips' :style='`background-color: ${computedStyle.fontColorOpt35}`'>
+                {{ cutChatTime(item.date) }}
+              </div>
             </div>
             <!-- 其他事件 -->
-            <div class='flex-center-center ft-13 ft-color-tips mb-8'
+            <div class='flex-center-center ft-13 mb-8'
                  v-if='item.sendState === 2 || item.receiveState === 2'>
-              <div class='cbb-tips'>
+              <div class='cbb-tips' :style='`background-color: ${computedStyle.fontColorOpt35}`'>
                 {{ item.message }}
                 <n-button v-if='reMessageId === item.id' text color='#FF6700' class='ml-4' size='tiny' @click='reEdit'>
                   重新编辑
@@ -50,7 +55,8 @@
                   <div class='cbb-main flex'>
                     <div class='user-head flex-center-center mr-4' :style="'background-color:' + tranColor(user.photo)"
                          v-html='computePhoto(user.photo)'></div>
-                    <div class='cbbm-box cbbm-box-left flex'>
+                    <div class='cbbm-box cbbm-box-left flex'
+                         :style='`background-color: ${param.style.leftChatBgColor}`'>
                       <span v-if='item.type === 0'>{{ item.message }}</span>
                       <n-image v-else class='chat-image' :src='item.message' />
                     </div>
@@ -66,7 +72,8 @@
                       class='user-head flex-center-center ml-4'
                       :style="'background-color:' + tranColor(param.userInfo.photo)"
                       v-html='computePhoto(param.userInfo.photo)'></div>
-                    <div class='cbbm-box cbbm-box-right flex'>
+                    <div class='cbbm-box cbbm-box-right flex'
+                         :style='`background-color: ${param.style.rightChatBgColor}`'>
                       <span v-if='item.type === 0'>{{ item.message }}</span>
                       <n-image v-else class='chat-image' :src='item.message' />
                     </div>
@@ -92,7 +99,7 @@
           </div>
         </div>
       </div>
-      <div class='cb-input'>
+      <div class='cb-input' :style='`border-top: 1px solid ${computedStyle.fontColorOpt}`'>
         <template v-if='moreCheckState'>
           <div class='flex-center-center h-100'>
             <div class='flex-down-center' @click='delMoreChecked'>
@@ -110,26 +117,30 @@
           <div class='cb-input-controls flex-center'>
             <n-popover trigger='click' raw @update:show='handleUpdateShow'>
               <template #trigger>
-                <Svg :width='24' :height='24' class='hover-pointer ml-12' name='emoji'></Svg>
+                <Svg :width='24' :height='24' class='hover-pointer ml-12' name='emoji'
+                     :fill='computedStyle.fontColorOpt'></Svg>
               </template>
               <EmoJi @choose='chooseEmoji' />
             </n-popover>
             <n-upload :show-file-list='false' @before-upload='beforeUpload' accept='.png,.jpeg,.jpg'>
-              <Svg :width='24' :height='24' class='hover-pointer ml-12' name='up-image'></Svg>
+              <Svg :width='24' :height='24' class='hover-pointer ml-12' name='up-image'
+                   :fill='computedStyle.fontColorOpt'></Svg>
             </n-upload>
           </div>
           <!-- 输入框 -->
-          <div class='cb-input-main'>
+          <div class='cb-input-main' :style='`background-color: ${param.style.mainColor};`'>
             <n-input
               ref='inputInstRef'
-              style='--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset'
+              :style='`--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset;
+              --n-placeholder-color:${computedStyle.fontColorOpt};--n-text-color:${param.style.fontColor}`'
               v-model:value='sendVal'
               type='textarea'
               @keydown.enter.native='handleKeyUp'
               @input='valChange'
+              placeholder-style='color:red'
               placeholder='说点啥...' />
           </div>
-          <div class='cb-input-go flex-center-zy pd-zy-6 ft-color-tips'>
+          <div class='cb-input-go flex-center-zy pd-zy-6' :style='`color:${computedStyle.fontColorOpt}`'>
             <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
             <div class='hover-pointer' @click='sendInfo'>按Enter键发送</div>
           </div>
@@ -138,6 +149,8 @@
     </template>
     <!-- 右键封装 -->
     <RightButton v-if='showRightBtnMessage' :left='rightBtnLeft' :top='rightBtnTop' :list='czList'
+                 :style='`color:${param.style.fontColor}`'
+                 :bgColor='computedStyle.mainColorOpt'
                  @choose='chooseRight'></RightButton>
   </div>
 </template>
@@ -160,7 +173,11 @@ import Loader from '../of/Loader.vue';
 
 const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
-const param = inject<Ref<any>>('param') as any;
+const param = inject<Ref<chatProps>>('param') as chatProps;
+const computedStyle = inject<Ref<any>>('computedStyle') as any;
+
+document.documentElement.style.setProperty('--left-after', param.style.leftChatBgColor);
+document.documentElement.style.setProperty('--right-after', param.style.rightChatBgColor);
 
 const props = defineProps({
   user: {
@@ -389,8 +406,8 @@ const eqChatData = () => {
 };
 
 // 数据公共处理
-const eqChatCom = (needBootom: boolean = true) => {
-  lodingMessage.value = true;
+const eqChatCom = (needBottom: boolean = true) => {
+  loadingMessage.value = true;
   eqChat(props.user.relationUid, page.value)
     .then((res: Result) => {
       let data = [] as message[];
@@ -402,7 +419,7 @@ const eqChatCom = (needBootom: boolean = true) => {
         next.value = res.data.next;
         if (next.value) page.value++;
       }
-      if (needBootom) chatData.value = chatTab(data);
+      if (needBottom) chatData.value = chatTab(data);
       else {
         data = chatTab([...data, chatData.value[0]]);
         const oldHeight = document.getElementsByClassName('cb-body')[0].scrollHeight || 0;
@@ -416,10 +433,10 @@ const eqChatCom = (needBootom: boolean = true) => {
     })
     .finally(() => {
       setTimeout(() => {
-        lodingMessage.value = false;
+        loadingMessage.value = false;
         addListener();
-        onelyOne.value = true;
-        if (!needBootom) return;
+        onlyOne.value = true;
+        if (!needBottom) return;
         scrollToBottom();
         listenerScrollToTop(true);
       }, 150);
@@ -427,19 +444,19 @@ const eqChatCom = (needBootom: boolean = true) => {
 };
 
 // 上拉拉取消息
-const lodingMessage = ref(false);
+const loadingMessage = ref(false);
 const scrollToTop = () => {
   let scrollDom = document.getElementsByClassName('cb-body')[0];
-  if (scrollDom.scrollTop < 30 && next.value && !lodingMessage.value) {
+  if (scrollDom.scrollTop < 30 && next.value && !loadingMessage.value) {
     eqChatCom(false);
   }
 };
 
 // ===================================右键操作===================================//
 const tapAndHold = ref(false);
-const onelyOne = ref(false);
+const onlyOne = ref(false);
 const addListener = () => {
-  if (onelyOne.value) return;
+  if (onlyOne.value) return;
   tapAndHold.value = false;
   const parentDiv = document.querySelector('.cb-body') as HTMLElement;
   parentDiv.addEventListener('contextmenu', listenerMessage);
@@ -468,7 +485,7 @@ const showRightBtnMessage = ref(false);
 const nowCheckData = ref({} as message);
 const listenerMessage = (e: MouseEvent) => {
   e.preventDefault();
-  const parentDiv = document.querySelector('.cb-body');
+  const parentDiv = document.querySelector('.cb-body-sc');
   if (!parentDiv) return;
   if (moreCheckState.value) return;
   let target = e.target as HTMLElement;
@@ -626,7 +643,7 @@ const closeRightBtnCom = (state: boolean) => {
 // 初始化数据
 const initData = () => {
   chatData.value = [];
-  lodingMessage.value = false;
+  loadingMessage.value = false;
   page.value = 1;
   sendVal.value = '';
   moreCheckState.value = false;
@@ -741,17 +758,21 @@ onBeforeUnmount(() => {
 }
 
 .cbbm-box-left {
-  background-color: $ft-color-hui-1;
   margin-left: $px-10;
+}
+
+:root {
+  --left-after: $ft-color-hui-1;
+  --right-after: $ft-color-2-hui-1;
 }
 
 .cbbm-box-left::after {
   content: '';
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
   border: $px-10 solid;
   border-left: $px-10 solid transparent;
-  border-right: $px-10 solid $ft-color-hui-1;
+  border-right: $px-10 solid var(--left-after);
   border-bottom: $px-10 solid transparent;
   border-top: $px-10 solid transparent;
   position: absolute;
@@ -760,7 +781,6 @@ onBeforeUnmount(() => {
 }
 
 .cbbm-box-right {
-  background-color: $ft-color-2-hui-1;
   margin-right: $px-10;
 }
 
@@ -769,7 +789,7 @@ onBeforeUnmount(() => {
   width: 0px;
   height: 0px;
   border: $px-10 solid;
-  border-left: $px-10 solid $ft-color-2-hui-1;
+  border-left: $px-10 solid var(--right-after);
   border-right: $px-10 solid transparent;
   border-bottom: $px-10 solid transparent;
   border-top: $px-10 solid transparent;
@@ -804,7 +824,6 @@ onBeforeUnmount(() => {
 
 .cbb-tips {
   border-radius: $px-4;
-  background-color: #8fa2c366;
   padding: $px-2 $px-6;
   box-sizing: border-box;
 }
@@ -815,11 +834,9 @@ onBeforeUnmount(() => {
 
 .cb-input {
   height: $px-160;
-  border-top: $px-1 solid $ft-color-tips;
 
   .cb-input-main {
     height: calc(100% - $px-32 - $px-32);
-    background-color: #2c3344;
 
     .n-input {
       height: 100%;
@@ -828,10 +845,6 @@ onBeforeUnmount(() => {
 
     .n-input:not(.n-input--disabled).n-input--focus {
       background-color: unset;
-    }
-
-    :deep(.n-input__textarea-el) {
-      color: white;
     }
 
     :deep(.n-input-wrapper) {
@@ -872,7 +885,6 @@ onBeforeUnmount(() => {
 
 .cb-head {
   height: $px-48;
-  border-bottom: $px-1 solid $ft-color-tips;
 
   .cb-head-controls {
     width: $px-32;
