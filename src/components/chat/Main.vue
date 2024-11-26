@@ -1,6 +1,7 @@
 <template>
   <div class='chat-main flex'
-       :style='`width:${param.width};max-width:60rem;height:${param.height};background-color:${param.style.mainColor};
+       :style='`width:${param.width};max-width:60rem;height:${param.height};
+       background-color:${param.style.mainColor};box-shadow: 0 0 0 $px-1-5 ${computedStyle.fontColorOpt};
        color:${param.style.fontColor}`'
        :class='mainClass()'>
     <div class='chat-com flex-down' :class="isPhoneUnfold ? 'shrink' : ''"
@@ -498,7 +499,6 @@ onBeforeUnmount(() => {
 }
 
 .chat-main {
-  box-shadow: 0 0 0 $px-1-5 $ft-color-tips;
   border-radius: $px-12;
 }
 
