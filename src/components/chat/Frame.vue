@@ -173,7 +173,7 @@ import Loader from '../of/Loader.vue';
 
 const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
-const param = inject<Ref<chatProps>>('param') as chatProps;
+const param = inject<Ref<chatProps>>('param') as chatProps | any;
 const computedStyle = inject<Ref<any>>('computedStyle') as any;
 
 document.documentElement.style.setProperty('--left-after', param.style.leftChatBgColor);

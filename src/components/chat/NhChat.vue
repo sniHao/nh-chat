@@ -22,8 +22,14 @@ const props = defineProps({
     type: String,
     default: '输入Ta的账号-发起聊天'
   },
-  width: '60rem',
-  height: '40.625rem',
+  width: {
+    type: String,
+    default: '60rem'
+  },
+  height: {
+    type: String,
+    default: '40.625rem'
+  },
   style: {
     type: Object,
     default: () => ({
@@ -67,8 +73,8 @@ const props = defineProps({
     type: Boolean,
     default: true
   }
-} as chatProps);
-provide('param', props);
+} as any);
+provide('param', props as chatProps);
 
 const computedStyle = computed(() => {
   return {
