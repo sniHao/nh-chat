@@ -25,7 +25,6 @@ import nh.chat.utils.ChatSocket;
 import nh.chat.utils.FileUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
@@ -131,9 +130,8 @@ public class ChatService {
             if (messageVo.getSendState() == ChatCode.MESSAGE_REVOCATION.value()) return "你：消息已被撤回";
             if (messageVo.getSendState() == ChatCode.MESSAGE_DEL.value()) return "你：消息已被删除";
             return "你：" + messageVo.getMessage();
-        } else {
-            if (messageVo.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) return "对方：消息已被撤回";
         }
+        if (messageVo.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) return "对方：消息已被撤回";
         return "对方：" + messageVo.getMessage();
     }
 
