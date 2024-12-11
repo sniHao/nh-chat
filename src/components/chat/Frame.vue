@@ -49,7 +49,7 @@
             <!-- 消息框 -->
             <template v-else>
               <template v-if='item.sendUid !== user.uid'>
-                <div class='flex w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
+                <div class='flex-down w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
                   <n-checkbox :checked='item.check' @update.self:checked='moreCheckedCallBack(item)'
                               v-if='moreCheckState'></n-checkbox>
                   <div class='cbb-main flex'>
@@ -61,10 +61,17 @@
                       <n-image v-else class='chat-image' :src='item.message' />
                     </div>
                   </div>
+                  <div class='w-100 flex' v-if='item.action === 2'>
+                    <div class='quote quote-left pd-4 ft-over'
+                         :style='`background-color: ${computedStyle.fontColorOpt35}`'
+                         :title='item.quoteMessage'>
+                      {{ item.quoteMessage }}
+                    </div>
+                  </div>
                 </div>
               </template>
               <template v-else>
-                <div class='flex w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
+                <div class='flex-down w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
                   <n-checkbox :checked='item.check' @update.self:checked.stop='moreCheckedCallBack(item)'
                               v-if='moreCheckState'></n-checkbox>
                   <div class='cbb-main flex-right'>
@@ -91,6 +98,13 @@
                       <!-- 加载中 -->
                       <Svg class='message-loading' name='message-loading' fill='#d2d2d2' :width='24' :height='24'
                            v-if='item.state === 0'></Svg>
+                    </div>
+                  </div>
+                  <div class='w-100 flex-right' v-if='item.action === 2'>
+                    <div class='quote quote-right pd-4 ft-over'
+                         :style='`background-color: ${computedStyle.fontColorOpt35}`'
+                         :title='item.quoteMessage'>
+                      {{ item.quoteMessage }}
                     </div>
                   </div>
                 </div>
@@ -393,6 +407,26 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
   reader.readAsDataURL(file as any);
   return true;
 };
+// const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }): Promise<boolean> => {
+//   const file = data.file.file as File;
+//   const result = upLoadCheck(file);
+//   if (!result) return false;
+//   const reader = new FileReader();
+//   reader.onload = function(e: any) {
+//     const fd = new FormData();
+//     fd.append('file', file);
+//     const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0);
+//     emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
+//     scrollToBottom();
+//     sendMessageImage(fd, props.user.relationUid).then((res) => {
+//       if (res.code !== 200) res.data = randomNumber();
+//       chatData.value[pointer].id = res.data;
+//       chatData.value[pointer].state = res.code === 200 ? 1 : 2;
+//     });
+//   };
+//   reader.readAsDataURL(file as any);
+//   return true;
+// };
 // ===================================静态数据【用于体验时】===================================//
 
 // 模拟回复
@@ -737,6 +771,19 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang='scss' scoped>
+.quote-left {
+  margin-left: $px-56;
+}
+
+.quote-right {
+  margin-right: $px-56;
+}
+
+.quote {
+  border-radius: $px-6;
+  max-width: 50%;
+}
+
 .is-choice {
   background-color: #4a505d;
 }
@@ -905,7 +952,7 @@ onBeforeUnmount(() => {
 }
 
 .cb-body::-webkit-scrollbar {
-  width: 0px;
+  width: 0;
 }
 
 .cb-body-sc {
