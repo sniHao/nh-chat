@@ -81,7 +81,8 @@ const computedStyle = computed(() => {
     'mainColorOpt': setFilterColor(props.style.mainColor),
     'fontColorOpt': setFilterColor(props.style.fontColor),
     'fontColorOpt95': setFilterColor(props.style.fontColor, 0.95),
-    'fontColorOpt35': setFilterColor(props.style.fontColor, 0.35)
+    'fontColorOpt35': setFilterColor(props.style.fontColor, 0.35),
+    'rightChatColorOpt': setFilterColor(props.style.rightChatBgColor,0.5)
   };
 });
 provide('computedStyle', computedStyle);

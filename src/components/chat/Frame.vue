@@ -49,7 +49,7 @@
             <!-- 消息框 -->
             <template v-else>
               <template v-if='item.sendUid !== user.uid'>
-                <div class='flex w-100' @click='moreCheckedCallBack(item)' :class="moreCheckState ? 'is-checked' : ''">
+                <div class='flex w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
                   <n-checkbox :checked='item.check' @update.self:checked='moreCheckedCallBack(item)'
                               v-if='moreCheckState'></n-checkbox>
                   <div class='cbb-main flex'>
@@ -64,7 +64,7 @@
                 </div>
               </template>
               <template v-else>
-                <div class='flex w-100' @click='moreCheckedCallBack(item)' :class="moreCheckState ? 'is-checked' : ''">
+                <div class='flex w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
                   <n-checkbox :checked='item.check' @update.self:checked.stop='moreCheckedCallBack(item)'
                               v-if='moreCheckState'></n-checkbox>
                   <div class='cbb-main flex-right'>
@@ -103,12 +103,14 @@
         <template v-if='moreCheckState'>
           <div class='flex-center-center h-100'>
             <div class='flex-down-center' @click='delMoreChecked'>
-              <Svg :width='24' :height='24' fill='#ff6700' class='hover-pointer mb-2' name='del'></Svg>
-              <n-button text color='#ff6700' size='large'>删除</n-button>
+              <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt95' class='hover-pointer mb-2'
+                   name='del'></Svg>
+              <n-button text :color='computedStyle.fontColorOpt95' size='large'>删除</n-button>
             </div>
             <div class='flex-down-center ml-18' @click='cancelMoreChecked'>
-              <Svg :width='24' :height='24' fill='#ff670099' class='hover-pointer mb-2' name='cancel'></Svg>
-              <n-button text color='#ff670099' size='large'>取消</n-button>
+              <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt' class='hover-pointer mb-2'
+                   name='cancel'></Svg>
+              <n-button text :color='computedStyle.fontColorOpt' size='large'>取消</n-button>
             </div>
           </div>
         </template>
@@ -193,6 +195,13 @@ const props = defineProps({
 const emit = defineEmits(['sendCallBack', 'closeChat']);
 
 // ===================================其他功能===================================//
+
+const choiceStyle = (choice: boolean) => {
+  return {
+    'is-choice': choice,
+    'is-checked': moreCheckState.value
+  };
+};
 // 关闭聊天
 const closeChat = () => {
   if (nowChatUid) nowChatUid(-99);
@@ -728,6 +737,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang='scss' scoped>
+.is-choice {
+  background-color: #4a505d;
+}
+
 .is-checked:hover {
   background-color: #4a505d;
   cursor: pointer;

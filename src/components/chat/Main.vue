@@ -34,6 +34,7 @@
         </template>
         <div v-else class='user-list-sc'>
           <div class='pd-zy-12 hover-pointer user' :class='userClass(item)' v-for='item in userList'
+               :style='item.top===1?"background-color: "+ computedStyle.rightChatColorOpt:""'
                :key='item.id' @click='showChat(item)'>
             <div class='user-box pd-sx-6 flex-center-zy'
                  :style='`border-bottom: 1px solid ${computedStyle.fontColorOpt35}`'>
@@ -129,8 +130,7 @@ const mainClass = () => {
 // 通讯样式
 const userClass = (item: Relation) => {
   return {
-    check: item.id === checkId.value,
-    userTop: item.top === 1
+    check: item.id === checkId.value
   };
 };
 
@@ -319,7 +319,7 @@ const listenerUser = (e: MouseEvent) => {
 
 // 置顶聊天
 const topChatGo = (state: number) => {
-  topChat(nowCheckData.value.id, state).then((res) => {
+  topChat(nowCheckData.value.id, state).then(() => {
     const index = userList.value.findIndex((item) => item.id === nowCheckData.value.id);
     const [data] = userList.value.splice(index, 1);
     data.top = state;
@@ -457,7 +457,7 @@ onBeforeUnmount(() => {
 }
 
 .user-list-sc {
-  padding-right: $px-4;
+  padding: 0 $px-4;
 }
 
 .user-list-up:hover .user-list-sc {
@@ -476,10 +476,6 @@ onBeforeUnmount(() => {
 .n-input {
   border-radius: $px-6;
   background-color: rgb(255 255 255 / 12%);
-}
-
-.userTop {
-  background-color: $ft-color-2-op-2 !important;
 }
 
 .user:hover {
