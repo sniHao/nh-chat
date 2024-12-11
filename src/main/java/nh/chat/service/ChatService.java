@@ -126,13 +126,15 @@ public class ChatService {
                 .select(Message::getMessage).leftJoin(Message.class, Message::getId, Chat::getMid)
                 .eq(Chat::getId, quoteId);
         MessageVo messageVo = chatMapper.selectJoinOne(MessageVo.class, eq);
+        String view = "对方：";
         if (uid.equals(messageVo.getSendUid())) {
+            view = "你：";
             if (messageVo.getSendState() == ChatCode.MESSAGE_REVOCATION.value()) return "你：消息已被撤回";
             if (messageVo.getSendState() == ChatCode.MESSAGE_DEL.value()) return "你：消息已被删除";
-            return "你：" + messageVo.getMessage();
         }
         if (messageVo.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) return "对方：消息已被撤回";
-        return "对方：" + messageVo.getMessage();
+        if (messageVo.getType() == ChatCode.MESSAGE_TYPE_IMAGE.value()) return view + "[图片]";
+        return view + messageVo.getMessage();
     }
 
     /**
