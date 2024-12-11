@@ -20,8 +20,8 @@ export const countTimeDiff = (lastTime: string, nowTime?: string, type?: number)
 export const reckonTime = (time: string, showAll?: boolean): string => {
   if (!time) return '-';
   time = time.toString().replace(/-/g, '/'); //转成部分苹果支持的格式
-  let tstamp = new Date().valueOf() - new Date(time).valueOf();
-  if (tstamp < 0) return '刚刚';
+  let tsTemp = new Date().valueOf() - new Date(time).valueOf();
+  if (tsTemp < 0) return '刚刚';
   let second = 1000 * 60; //1分钟内
   let min = 1000 * 60 * 60; //1小时内
   let hour = 1000 * 60 * 60 * 24; //一天内
@@ -32,17 +32,17 @@ export const reckonTime = (time: string, showAll?: boolean): string => {
     case new Date().getFullYear() != new Date(time).getFullYear():
       showAll ? (result = time) : (result = time?.split(' ')[0]);
       break;
-    case tstamp < second:
+    case tsTemp < second:
       result = '刚刚';
       break;
-    case tstamp < min:
-      result = Math.ceil(tstamp / (1000 * 60)) + '分钟前';
+    case tsTemp < min:
+      result = Math.ceil(tsTemp / (1000 * 60)) + '分钟前';
       break;
-    case tstamp < hour:
-      result = Math.ceil(tstamp / (1000 * 60 * 60)) + '小时前';
+    case tsTemp < hour:
+      result = Math.ceil(tsTemp / (1000 * 60 * 60)) + '小时前';
       break;
-    case tstamp < day:
-      result = Math.ceil(tstamp / (1000 * 60 * 60 * 24)) + '天前';
+    case tsTemp < day:
+      result = Math.ceil(tsTemp / (1000 * 60 * 60 * 24)) + '天前';
       break;
     default:
       let splitMon = time.split('/')[1] + '-' + time.split('/')[2];
@@ -60,8 +60,8 @@ export const reckonTime = (time: string, showAll?: boolean): string => {
 export const cutChatTime = (time: string, isShowInfo?: boolean): string => {
   time = time.replace(/-/g, '/'); //转成部分苹果支持的格式
   isShowInfo = isShowInfo ?? true;
-  let tstamp = new Date().valueOf() - new Date(time).valueOf();
-  if (tstamp < 0) return '刚刚';
+  let tsTemp = new Date().valueOf() - new Date(time).valueOf();
+  if (tsTemp < 0) return '刚刚';
   let collect;
   let nowHours = new Date(time).getHours();
   let dataDiff = new Date().getDate() - new Date(time).getDate();
@@ -76,27 +76,27 @@ export const cutChatTime = (time: string, isShowInfo?: boolean): string => {
     timeLast = collect[1].split(':')[0] + ':' + collect[1].split(':')[1];
   } else {
     collect = time.split('/');
-    let collecth = collect[2].split(' ');
+    let splitCollect = collect[2].split(' ');
     let isShowYear = yearDiff == 0 ? '' : collect[0] + '-';
     timeFirst = (isShowYear + collect[1] + '-' + collect[2]).split(' ')[0] + ' ';
-    timeLast = collecth[1].split(':')[0] + ':' + collecth[1].split(':')[1];
+    timeLast = splitCollect[1].split(':')[0] + ':' + splitCollect[1].split(':')[1];
   }
   // 一天外
   switch (true) {
     case nowHours >= 0 && nowHours < 6:
-      result = timeFirst + infoArr[0] + timeLast;
+      result = timeFirst + infoArr[0] + ' ' + timeLast;
       break;
     case nowHours >= 6 && nowHours < 12:
-      result = timeFirst + infoArr[1] + timeLast;
+      result = timeFirst + infoArr[1] + ' ' + timeLast;
       break;
     case nowHours >= 12 && nowHours < 14:
-      result = timeFirst + infoArr[2] + timeLast;
+      result = timeFirst + infoArr[2] + ' ' + timeLast;
       break;
     case nowHours >= 14 && nowHours < 18:
-      result = timeFirst + infoArr[3] + timeLast;
+      result = timeFirst + infoArr[3] + ' ' + timeLast;
       break;
     case nowHours >= 18 && nowHours < 24:
-      result = timeFirst + infoArr[4] + timeLast;
+      result = timeFirst + infoArr[4] + ' ' + timeLast;
       break;
   }
   return result;

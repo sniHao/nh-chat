@@ -29,6 +29,7 @@ export const addStaticDataCom = (id: number, date: Date, message: string, type: 
 };
 
 import { createDiscreteApi } from 'naive-ui';
+
 const { dialog } = createDiscreteApi(['dialog']);
 // 体验模式提示
 export const welcome = () => {

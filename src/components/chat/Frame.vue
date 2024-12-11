@@ -32,7 +32,7 @@
           <div class='cbb-box' v-for='(item, index) in chatData' :key='index'>
             <!-- 时间 -->
             <div class='flex-center-center ft-13 mb-8' v-if='item.tab'>
-              <div class='cbb-tips' :style='`background-color: ${computedStyle.fontColorOpt35}`'>
+              <div class='cbb-tips' :title='item.date' :style='`background-color: ${computedStyle.fontColorOpt35}`'>
                 {{ cutChatTime(item.date) }}
               </div>
             </div>
@@ -130,6 +130,7 @@
           <!-- 输入框 -->
           <div class='cb-input-main' :style='`background-color: ${param.style.mainColor};`'>
             <n-input
+              id='nh-chat-input'
               ref='inputInstRef'
               :style='`--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset;
               --n-placeholder-color:${computedStyle.fontColorOpt};--n-text-color:${param.style.fontColor}`'
@@ -659,6 +660,7 @@ watch(
     initData();
     eqChatData();
     nextTick(() => {
+      listenerCopy();
       listenerHover();
     });
     if (nowChatUid) nowChatUid(props.user.relationUid);
@@ -692,6 +694,24 @@ const listenerHover = () => {
   });
   dom.addEventListener('mouseleave', () => {
     dom.classList.remove('cb-body-up');
+  });
+};
+
+// 监听复制粘贴消息
+const listenerCopy = () => {
+  const pasteArea = document.getElementById('nh-chat-input') as HTMLDivElement;
+  pasteArea.addEventListener('paste', (event: ClipboardEvent) => {
+    const items = event.clipboardData?.items;
+    if (!items) return;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        const file = items[i].getAsFile();
+        if (file) {
+          beforeUpload({ file: { file: file } as UploadFileInfo, fileList: [] });
+          event.preventDefault();
+        }
+      }
+    }
   });
 };
 

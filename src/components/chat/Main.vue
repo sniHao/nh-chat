@@ -44,7 +44,7 @@
               <div class='user-main'>
                 <div class='flex-center-zy'>
                   <div class='ft-16 ft-b'>{{ item.name }}</div>
-                  <div class='ft-13'>
+                  <div class='ft-13' :title='item.lastMessageDate'>
                     {{ reckonTime(item.lastMessageDate) }}
                   </div>
                 </div>
