@@ -30,13 +30,17 @@ public class Chat {
     private int receiveState = 1; //接收用户消息状态
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date date; //发送时间
+    private int action; //消息动作
+    private Long quoteId; //引用消息id
 
-    public Chat(Long id, Long sendUid, Long receiveUid, Long mid, int type, Date date) {
+    public Chat(Long id, Long sendUid, Long receiveUid, Long mid, int type, Date date, int action, Long quoteId) {
         this.id = id;
         this.sendUid = sendUid;
         this.receiveUid = receiveUid;
         this.mid = mid;
         this.type = type;
         this.date = date;
+        this.action = action;
+        this.quoteId = quoteId;
     }
 }

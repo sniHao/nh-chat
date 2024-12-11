@@ -51,7 +51,7 @@ public class ChatController {
     @RateLimiter(time = 50, count = 99, limitType = LimiterType.IP)
     @Operation(summary = "发送普通消息【*：需要校验对方用户是否存在】")
     @PostMapping("sendMessage")
-    public Result<?> sendMessage(@RequestAttribute("uid") Long uid, @RequestBody SendMessageDto sendMessageDto) throws ChatException, IOException {
+    public Result<?> sendMessage(@RequestAttribute("uid") Long uid, @RequestBody SendMessageDto sendMessageDto) throws ChatException {
         if (Objects.isNull(sendMessageDto.getReceiveUid())) throw new ChatException("参数异常");
         if (StringUtils.isEmpty(sendMessageDto.getMessage()) && sendMessageDto.getType() == ChatCode.MESSAGE_TYPE_NORMAL.value())
             throw new ChatException("消息不能为空");
@@ -60,11 +60,10 @@ public class ChatController {
 
     @RateLimiter(time = 50, count = 30, limitType = LimiterType.IP)
     @Operation(summary = "发送图片消息【*：需要校验对方用户是否存在】")
-    @Parameter(name = "receiveUid", description = "消息接收者")
-    @PostMapping("sendMessageImage/{receiveUid}")
-    public Result<?> sendMessageImage(@RequestAttribute("uid") Long uid, MultipartFile file, @PathVariable Long receiveUid) throws ChatException, IOException {
-        if (Objects.isNull(receiveUid) || Objects.isNull(file)) throw new ChatException("参数异常");
-        return Result.success("发送成功", chatService.sendMessageImage(uid, file, receiveUid));
+    @PostMapping("sendMessageImage")
+    public Result<?> sendMessageImage(@RequestAttribute("uid") Long uid, @RequestBody SendMessageDto sendMessageDto) throws ChatException {
+        if (Objects.isNull(sendMessageDto.getReceiveUid()) || Objects.isNull(sendMessageDto.getFile())) throw new ChatException("参数异常");
+        return Result.success("发送成功", chatService.sendMessageImage(uid, sendMessageDto));
     }
 
     @Operation(summary = "通讯录置顶")

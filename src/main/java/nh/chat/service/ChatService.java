@@ -48,7 +48,7 @@ public class ChatService {
         return NhBeanCopy.BEANCOPY.relationVos(relationMapper.selectList(qw));
     }
 
-    public RelationVo goChat(Long uid, Long receiveUid) throws ChatException {
+    public RelationVo goChat(Long uid, Long receiveUid) {
         LambdaQueryWrapper<Relation> qw = new LambdaQueryWrapper<Relation>()
                 .eq(Relation::getUid, uid).eq(Relation::getRelationUid, receiveUid);
         Relation relation = relationMapper.selectOne(qw);
@@ -98,6 +98,9 @@ public class ChatService {
         List<MessageVo> list = new ArrayList<>(messageVoPage.getRecords().stream().filter(item -> {
             if (item.getSendState() == ChatCode.MESSAGE_REVOCATION.value() ||
                     item.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) item.setMessage("撤回了一条消息");
+            if (item.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()) {
+                item.setMessage(eqQuoteMessage(item.getSendUid(), item.getQuoteId()));
+            }
             return true;
         }).toList());
         HashMap<String, Object> map = new HashMap<>();
@@ -110,6 +113,28 @@ public class ChatService {
         }
         map.put("next", next);
         return map;
+    }
+
+    /**
+     * 引用消息查询
+     *
+     * @param uid     用户
+     * @param quoteId 引用消息id
+     * @return 消息
+     */
+    public String eqQuoteMessage(Long uid, Long quoteId) {
+        MPJLambdaWrapper<Chat> eq = new MPJLambdaWrapper<Chat>().selectAll(Chat.class)
+                .select(Message::getMessage).leftJoin(Message.class, Message::getId, Chat::getMid)
+                .eq(Chat::getId, quoteId);
+        MessageVo messageVo = chatMapper.selectJoinOne(MessageVo.class, eq);
+        if (uid.equals(messageVo.getSendUid())) {
+            if (messageVo.getSendState() == ChatCode.MESSAGE_REVOCATION.value()) return "你：消息已被撤回";
+            if (messageVo.getSendState() == ChatCode.MESSAGE_DEL.value()) return "你：消息已被删除";
+            return "你：" + messageVo.getMessage();
+        } else {
+            if (messageVo.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) return "对方：消息已被撤回";
+        }
+        return "对方：" + messageVo.getMessage();
     }
 
     /**
@@ -130,7 +155,7 @@ public class ChatService {
         }
     }
 
-    public Long sendMessageCom(Long uid, Long receiveUid, String message, int type) {
+    public Long sendMessageCom(Long uid, Long receiveUid, String message, int type, int action, Long quoteId) {
         // 通讯录最后消息
         asyncCom.messageRelation(uid, receiveUid, message, type, false, 1);
         asyncCom.messageRelation(receiveUid, uid, message, type, true, 0);
@@ -138,20 +163,42 @@ public class ChatService {
         Long mId = Long.valueOf(RandomUtil.randomNumbers(12));
         messageMapper.insert(new Message(mId, message));
         Long cid = Long.valueOf(RandomUtil.randomNumbers(12));
-        chatMapper.insert(new Chat(cid, uid, receiveUid, mId, type, new Date()));
+        chatMapper.insert(new Chat(cid, uid, receiveUid, mId, type, new Date(), action, quoteId));
         // 推消息
         if (!uid.equals(receiveUid)) pushCom(cid, uid, receiveUid, ChatCode.MESSAGE_HEALTH.value(), message, type);
         return cid;
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public Long sendMessage(Long uid, SendMessageDto sendMessageDto) {
-        return sendMessageCom(uid, sendMessageDto.getReceiveUid(), sendMessageDto.getMessage(), sendMessageDto.getType());
+    public Long sendMessage(Long uid, SendMessageDto dto) throws ChatException {
+        checkMessageAction(uid, dto);
+        return sendMessageCom(uid, dto.getReceiveUid(), dto.getMessage(), dto.getType(), dto.getAction(), dto.getQuoteId());
     }
 
-    public Long sendMessageImage(Long uid, MultipartFile file, Long receiveUid) throws ChatException {
-        String url = fileUtil.uploadImg(file);
-        return sendMessageCom(uid, receiveUid, url, ChatCode.MESSAGE_TYPE_IMAGE.value());
+    public Long sendMessageImage(Long uid, SendMessageDto dto) throws ChatException {
+        checkMessageAction(uid, dto);
+        String url = fileUtil.uploadImg(dto.getFile());
+        return sendMessageCom(uid, dto.getReceiveUid(), url, ChatCode.MESSAGE_TYPE_IMAGE.value(), dto.getAction(), dto.getQuoteId());
+    }
+
+    /**
+     * 消息动作校验
+     *
+     * @param uid 用户id
+     * @param dto 数据
+     * @throws ChatException 异常
+     */
+    public void checkMessageAction(Long uid, SendMessageDto dto) throws ChatException {
+        if (dto.getAction() != ChatCode.MESSAGE_ACTION_TRANSMIT.value() && dto.getAction() != ChatCode.MESSAGE_ACTION_QUOTE.value())
+            throw new ChatException("消息动作异常");
+        if (dto.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()) {
+            if (Objects.isNull(dto.getQuoteId())) throw new ChatException("消息异常，引用消息id不能为空");
+            LambdaQueryWrapper<Chat> eq = new LambdaQueryWrapper<Chat>()
+                    .select(Chat::getSendUid, Chat::getReceiveUid).eq(Chat::getId, dto.getQuoteId());
+            Chat chat = chatMapper.selectOne(eq);
+            if (!chat.getReceiveUid().equals(dto.getQuoteId()) && !chat.getSendUid().equals(uid))
+                throw new ChatException("消息异常，无权限引用该消息");
+        }
     }
 
     /**

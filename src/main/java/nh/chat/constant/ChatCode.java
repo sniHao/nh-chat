@@ -6,6 +6,8 @@ public enum ChatCode {
     MESSAGE_REVOCATION("消息撤回", 2),
     MESSAGE_TYPE_NORMAL("普通消息", 0),
     MESSAGE_TYPE_IMAGE("图片", 1),
+    MESSAGE_ACTION_TRANSMIT("转发", 1),
+    MESSAGE_ACTION_QUOTE("引用", 2),
     CHAT_NO_TOP("不置顶", 0),
     CHAT_TOP("置顶", 1);
 
