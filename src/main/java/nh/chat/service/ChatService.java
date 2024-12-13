@@ -94,11 +94,18 @@ public class ChatService {
         asyncCom.clearRead(uid, receiveUid);
         MPJLambdaWrapper<Chat> qw = setEqChatCom(uid, receiveUid);
         Page<MessageVo> messageVoPage = chatMapper.selectJoinPage(new Page<>(page, 20), MessageVo.class, qw);
+        List<Long> quotes = messageVoPage.getRecords().stream().filter(item -> item.getQuote().getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value())
+                .map(ite -> ite.getQuote().getQuoteId()).toList();
+        List<MessageVo> messageVos = eqAllQuoteMessage(quotes);
         List<MessageVo> list = new ArrayList<>(messageVoPage.getRecords().stream().filter(item -> {
             if (item.getSendState() == ChatCode.MESSAGE_REVOCATION.value() ||
                     item.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) item.setMessage("撤回了一条消息");
-            if (item.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()) {
-                item.setMessage(eqQuoteMessage(item.getSendUid(), item.getQuoteId()));
+            if (item.getQuote().getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()) {
+                List<MessageVo> diffMessage = messageVos.stream().filter(ite -> Objects.equals(ite.getQuote().getQuoteId(), item.getId())).toList();
+                if (!diffMessage.isEmpty()) {
+                    item.getQuote().setQuoteType(diffMessage.get(0).getType());
+                    item.setMessage(eqQuoteMessage(item.getSendUid(), diffMessage.get(0)));
+                }
             }
             return true;
         }).toList());
@@ -117,22 +124,31 @@ public class ChatService {
     /**
      * 引用消息查询
      *
-     * @param uid     用户
-     * @param quoteId 引用消息id
+     * @param quotes 引用消息ids
      * @return 消息
      */
-    public String eqQuoteMessage(Long uid, Long quoteId) {
+    public List<MessageVo> eqAllQuoteMessage(List<Long> quotes) {
         MPJLambdaWrapper<Chat> eq = new MPJLambdaWrapper<Chat>().selectAll(Chat.class)
                 .select(Message::getMessage).leftJoin(Message.class, Message::getId, Chat::getMid)
-                .eq(Chat::getId, quoteId);
-        MessageVo messageVo = chatMapper.selectJoinOne(MessageVo.class, eq);
+                .in(Chat::getId, quotes);
+        return chatMapper.selectJoinList(MessageVo.class, eq);
+    }
+
+    /**
+     * 引用消息查询
+     *
+     * @param uid       用户
+     * @param messageVo 引用消息
+     * @return 消息
+     */
+    public String eqQuoteMessage(Long uid, MessageVo messageVo) {
         String view = "对方：";
         if (uid.equals(messageVo.getSendUid())) {
-            view = "你：";
-            if (messageVo.getSendState() == ChatCode.MESSAGE_REVOCATION.value()) return "你：消息已被撤回";
-            if (messageVo.getSendState() == ChatCode.MESSAGE_DEL.value()) return "你：消息已被删除";
+            view = "我：";
+            if (messageVo.getSendState() == ChatCode.MESSAGE_REVOCATION.value()) return view + "消息已被撤回";
+            if (messageVo.getSendState() == ChatCode.MESSAGE_DEL.value()) return view + "消息已被删除";
         }
-        if (messageVo.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) return "对方：消息已被撤回";
+        if (messageVo.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) return view + "消息已被撤回";
         if (messageVo.getType() == ChatCode.MESSAGE_TYPE_IMAGE.value()) return view + "[图片]";
         return view + messageVo.getMessage();
     }
@@ -189,7 +205,7 @@ public class ChatService {
      * @throws ChatException 异常
      */
     public void checkMessageAction(Long uid, SendMessageDto dto) throws ChatException {
-        if (dto.getAction() != ChatCode.MESSAGE_ACTION_TRANSMIT.value() && dto.getAction() != ChatCode.MESSAGE_ACTION_QUOTE.value())
+        if (dto.getAction() != ChatCode.MESSAGE_ACTION_TRANSMIT.value() && dto.getAction() != ChatCode.MESSAGE_ACTION_QUOTE.value() && dto.getAction() != ChatCode.MESSAGE_ACTION_NULL.value())
             throw new ChatException("消息动作异常");
         if (dto.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()) {
             if (Objects.isNull(dto.getQuoteId())) throw new ChatException("消息异常，引用消息id不能为空");
