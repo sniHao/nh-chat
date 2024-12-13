@@ -24,7 +24,13 @@ export const addStaticDataCom = (id: number, date: Date, message: string, type: 
     type: type,
     tab: false,
     state: 1,
-    check: false
+    check: false,
+    quote: {
+      action: 0,
+      quoteId: 0,
+      quoteType: 0,
+      quoteMessage: ''
+    }
   };
 };
 

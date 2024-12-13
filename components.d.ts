@@ -7,8 +7,11 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    Andex: typeof import('./src/components/chat/frame/Andex.vue')['default']
     EmoJi: typeof import('./src/components/of/EmoJi.vue')['default']
     Frame: typeof import('./src/components/chat/Frame.vue')['default']
+    FrameInput: typeof import('./src/components/chat/FrameInput.vue')['default']
+    FrameRightBtn: typeof import('./src/components/chat/FrameRightBtn.vue')['default']
     Loader: typeof import('./src/components/of/Loader.vue')['default']
     Main: typeof import('./src/components/chat/Main.vue')['default']
     NBadge: typeof import('naive-ui')['NBadge']

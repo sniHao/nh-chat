@@ -155,3 +155,14 @@ export const setFilterColor = (color: string, newOpacity: number = 0.8): string 
   document.body.removeChild(dom);
   return `rgba(${r}, ${g}, ${b}, ${newOpacity})`;
 };
+
+// 获取引用视角
+export const getQuoteView = (message: string): Array<string> => {
+  let index = message.indexOf('：');
+  if (index !== -1) {
+    let firstPart = message.slice(0, index + 1);
+    let secondPart = message.slice(index + 1);
+    return [firstPart, secondPart];
+  }
+  return ['', message];
+};

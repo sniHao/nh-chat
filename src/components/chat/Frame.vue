@@ -50,9 +50,9 @@
             <template v-else>
               <template v-if='item.sendUid !== user.uid'>
                 <div class='flex-down w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
-                  <n-checkbox :checked='item.check' @update.self:checked='moreCheckedCallBack(item)'
-                              v-if='moreCheckState'></n-checkbox>
                   <div class='cbb-main flex'>
+                    <n-checkbox :checked='item.check' @update.self:checked='moreCheckedCallBack(item)'
+                                v-if='moreCheckState'></n-checkbox>
                     <div class='user-head flex-center-center mr-4' :style="'background-color:' + tranColor(user.photo)"
                          v-html='computePhoto(user.photo)'></div>
                     <div class='cbbm-box cbbm-box-left flex'
@@ -61,50 +61,64 @@
                       <n-image v-else class='chat-image' :src='item.message' />
                     </div>
                   </div>
-                  <div class='w-100 flex' v-if='item.action === 2'>
-                    <div class='quote quote-left pd-4 ft-over'
+                  <div class='w-100 flex' v-if='item.quote.action === 2'>
+                    <div class='quote quote-left pd-4 ft-over flex-center'
                          :style='`background-color: ${computedStyle.fontColorOpt35}`'
                          :title='item.quoteMessage'>
-                      {{ item.quoteMessage }}
+                      <template v-for='(ite, index) in getQuoteView(item.quote.quoteMessage)' :key='index'>
+                        <span v-if='index === 0'>{{ ite }}</span>
+                        <span v-if='item.quote.quoteType === 0 && index === 1'
+                              :title='ite'>{{ ite }}</span>
+                        <n-image v-else-if='index === 1' class='quote-image' :src='ite' />
+                      </template>
                     </div>
                   </div>
                 </div>
               </template>
               <template v-else>
                 <div class='flex-down w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
-                  <n-checkbox :checked='item.check' @update.self:checked.stop='moreCheckedCallBack(item)'
-                              v-if='moreCheckState'></n-checkbox>
-                  <div class='cbb-main flex-right'>
-                    <div
-                      class='user-head flex-center-center ml-4'
-                      :style="'background-color:' + tranColor(param.userInfo.photo)"
-                      v-html='computePhoto(param.userInfo.photo)'></div>
-                    <div class='cbbm-box cbbm-box-right flex'
-                         :style='`background-color: ${param.style.rightChatBgColor}`'>
-                      <span v-if='item.type === 0'>{{ item.message }}</span>
-                      <n-image v-else class='chat-image' :src='item.message' />
+                  <div class='cbb-main flex-center-zy'>
+                    <div>
+                      <n-checkbox :checked='item.check' @update.self:checked.stop='moreCheckedCallBack(item)'
+                                  v-if='moreCheckState'></n-checkbox>
                     </div>
-                    <!-- 消息状态 -->
-                    <div class='flex-end mr-6'>
-                      <!-- 失败 -->
-                      <Svg
-                        class='hover-pointer'
-                        name='message-fail'
-                        fill='red'
-                        :width='24'
-                        :height='24'
-                        v-if='item.state === 2'
-                        @click='reissue(item.message, item.type)'></Svg>
-                      <!-- 加载中 -->
-                      <Svg class='message-loading' name='message-loading' fill='#d2d2d2' :width='24' :height='24'
-                           v-if='item.state === 0'></Svg>
+                    <div class='flex-right'>
+                      <div
+                        class='user-head flex-center-center ml-4'
+                        :style="'background-color:' + tranColor(param.userInfo.photo)"
+                        v-html='computePhoto(param.userInfo.photo)'></div>
+                      <div class='cbbm-box cbbm-box-right flex'
+                           :style='`background-color: ${param.style.rightChatBgColor}`'>
+                        <span v-if='item.type === 0'>{{ item.message }}</span>
+                        <n-image v-else class='chat-image' :src='item.message' />
+                      </div>
+                      <!-- 消息状态 -->
+                      <div class='flex-end mr-6'>
+                        <!-- 失败 -->
+                        <Svg
+                          class='hover-pointer'
+                          name='message-fail'
+                          fill='red'
+                          :width='24'
+                          :height='24'
+                          v-if='item.state === 2'
+                          @click='reissue(item.message, item.type)'></Svg>
+                        <!-- 加载中 -->
+                        <Svg class='message-loading' name='message-loading' fill='#d2d2d2' :width='24' :height='24'
+                             v-if='item.state === 0'></Svg>
+                      </div>
                     </div>
                   </div>
-                  <div class='w-100 flex-right' v-if='item.action === 2'>
-                    <div class='quote quote-right pd-4 ft-over'
+                  <div class='w-100 flex-right' v-if='item.quote.action === 2'>
+                    <div class='quote quote-right pd-4 ft-over flex-center'
                          :style='`background-color: ${computedStyle.fontColorOpt35}`'
-                         :title='item.quoteMessage'>
-                      {{ item.quoteMessage }}
+                         :title='item.quote.quoteMessage'>
+                      <template v-for='(ite, index) in getQuoteView(item.quote.quoteMessage)' :key='index'>
+                        <span v-if='index === 0'>{{ ite }}</span>
+                        <span v-if='item.quote.quoteType === 0 && index === 1'
+                              :title='ite'>{{ ite }}</span>
+                        <n-image v-else-if='index === 1' class='quote-image' :src='ite' />
+                      </template>
                     </div>
                   </div>
                 </div>
@@ -113,62 +127,17 @@
           </div>
         </div>
       </div>
-      <div class='cb-input' :style='`border-top: 1px solid ${computedStyle.fontColorOpt}`'>
-        <template v-if='moreCheckState'>
-          <div class='flex-center-center h-100'>
-            <div class='flex-down-center' @click='delMoreChecked'>
-              <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt95' class='hover-pointer mb-2'
-                   name='del'></Svg>
-              <n-button text :color='computedStyle.fontColorOpt95' size='large'>删除</n-button>
-            </div>
-            <div class='flex-down-center ml-18' @click='cancelMoreChecked'>
-              <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt' class='hover-pointer mb-2'
-                   name='cancel'></Svg>
-              <n-button text :color='computedStyle.fontColorOpt' size='large'>取消</n-button>
-            </div>
-          </div>
-        </template>
-        <template v-else>
-          <!-- 表情包图片等等 -->
-          <div class='cb-input-controls flex-center'>
-            <n-popover trigger='click' raw @update:show='handleUpdateShow'>
-              <template #trigger>
-                <Svg :width='24' :height='24' class='hover-pointer ml-12' name='emoji'
-                     :fill='computedStyle.fontColorOpt'></Svg>
-              </template>
-              <EmoJi @choose='chooseEmoji' />
-            </n-popover>
-            <n-upload :show-file-list='false' @before-upload='beforeUpload' accept='.png,.jpeg,.jpg'>
-              <Svg :width='24' :height='24' class='hover-pointer ml-12' name='up-image'
-                   :fill='computedStyle.fontColorOpt'></Svg>
-            </n-upload>
-          </div>
-          <!-- 输入框 -->
-          <div class='cb-input-main' :style='`background-color: ${param.style.mainColor};`'>
-            <n-input
-              id='nh-chat-input'
-              ref='inputInstRef'
-              :style='`--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset;
-              --n-placeholder-color:${computedStyle.fontColorOpt};--n-text-color:${param.style.fontColor}`'
-              v-model:value='sendVal'
-              type='textarea'
-              @keydown.enter.native='handleKeyUp'
-              @input='valChange'
-              placeholder-style='color:red'
-              placeholder='说点啥...' />
-          </div>
-          <div class='cb-input-go flex-center-zy pd-zy-6' :style='`color:${computedStyle.fontColorOpt}`'>
-            <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
-            <div class='hover-pointer' @click='sendInfo'>按Enter键发送</div>
-          </div>
-        </template>
-      </div>
+      <FrameInput :isQuote='isQuote' :clearSendVal='clearSendVal' :moreCheckState='moreCheckState'
+                  :saveChecked='saveChecked' :addSendVal='addSendVal'
+                  @sendMessageEmit='sendMessageEmit' @moreCheckStateEmit='moreCheckStateEmit'
+                  @delMessageEmit='delMessageEmit' @cancelMoreCheckedEmit='cancelMoreCheckedEmit'
+                  @isActionEmit='isActionEmit' @isQuoteEmit='isQuoteEmit' @sendImageEmit='sendImageEmit'></FrameInput>
     </template>
-    <!-- 右键封装 -->
-    <RightButton v-if='showRightBtnMessage' :left='rightBtnLeft' :top='rightBtnTop' :list='czList'
-                 :style='`color:${param.style.fontColor}`'
-                 :bgColor='computedStyle.mainColorOpt'
-                 @choose='chooseRight'></RightButton>
+    <FrameRightBtn :user='props.user' :needListener='needListener' :chatData='chatData'
+                   :moreCheckState='moreCheckState' @nowCheckDataEmit='nowCheckDataEmit'
+                   @isActionEmit='isActionEmit' @isQuoteEmit='isQuoteEmit' @delMessageEmit='delMessageEmit'
+                   @moreCheckStateEmit='moreCheckStateEmit'
+                   @revocationMessageEmit='revocationMessageEmit'></FrameRightBtn>
   </div>
 </template>
 
@@ -176,17 +145,16 @@
 import { createDiscreteApi } from 'naive-ui';
 
 const { notification } = createDiscreteApi(['notification']);
-import type { UploadFileInfo } from 'naive-ui';
 import { countTimeDiff, cutChatTime, getTimeFormat } from '@/utils/TimeUtil';
 import { eqChatDataStatic } from '@/utils/staticUtils';
 import { throttle } from '@/utils/domUtils';
-import { tranColor, truncate, tips, computePhoto, randomNumber, copyImage, copyText } from '@/utils/OtherUtils';
+import { tranColor, truncate, tips, computePhoto, randomNumber, getQuoteView } from '@/utils/OtherUtils';
 import { eqChat, sendMessage, sendMessageImage, revocationMessage, delMessage } from '@/api/index';
 import WebSocketService from '@/utils/WebSocketService';
-import RightButton from '../of/RightButton.vue';
 import Svg from '../of/Svg.vue';
-import EmoJi from '../of/EmoJi.vue';
 import Loader from '../of/Loader.vue';
+import FrameInput from './FrameInput.vue';
+import FrameRightBtn from './FrameRightBtn.vue';
 
 const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
@@ -208,11 +176,65 @@ const props = defineProps({
 });
 const emit = defineEmits(['sendCallBack', 'closeChat']);
 
+// 删除消息
+const delMessageEmit = (ids: number[]) => {
+  delMessage(ids).then((res: Result) => {
+    if (res.code !== 200) {
+      if (!param.experienceMode) return tips('error', res.msg);
+      tips('warning', '体验环境，并没有真正的删除哦');
+    }
+    chatData.value = chatData.value.filter((item: message) => !ids.includes(item.id));
+    if (chatData.value.length === 0) emit('sendCallBack', { val: truncate('消息被删除'), type: 0 });
+    else {
+      const lastData = chatData.value[chatData.value.length - 1];
+      emit('sendCallBack', {
+        val: truncate(lastData.type === 1 ? '[图片]' : lastData.message),
+        type: lastData.type
+      });
+    }
+  });
+};
+
+// 多选
+const moreCheckStateEmit = (state: boolean) => {
+  moreCheckState.value = state;
+};
+
+// 取消多选回调
+const cancelMoreCheckedEmit = () => {
+  saveChecked.value = [];
+  chatData.value.forEach((item: message) => {
+    item.check = false;
+  });
+};
+
+// 多选的值回调
+const nowCheckDataEmit = (data: message) => {
+  moreCheckedCallBack(data, true);
+};
+
+// 撤回消息回调
+const reMessage = ref('');
+const reMessageId = ref(-1);
+const revocationMessageEmit = (data: message) => {
+  if (data.type === 0) {
+    reMessage.value = data.message;
+    reMessageId.value = data.id;
+  }
+  revocationMessage(data.id).then((res: Result) => {
+    if (res.code !== 200) {
+      if (!param.experienceMode) return tips('error', res.msg);
+    }
+    data.message = '你撤回了一条消息';
+    data.sendState = 2;
+    emit('sendCallBack', { val: truncate('你撤回了一条消息'), type: 0 });
+  });
+};
 // ===================================其他功能===================================//
 
 const choiceStyle = (choice: boolean) => {
   return {
-    'is-choice': choice,
+    'is-choice': choice && moreCheckState.value,
     'is-checked': moreCheckState.value
   };
 };
@@ -243,25 +265,6 @@ const chatTab = (data: message[]) => {
   return data;
 };
 
-// 展开关闭表情
-const handleUpdateShow = (state: boolean) => {
-  if (state) inputInstRef.value?.focus();
-};
-
-// 表情回调
-const inputInstRef = ref<any>('');
-const chooseEmoji = (val: string) => {
-  const inputElement = inputInstRef.value?.$el.querySelector('textarea');
-  if (inputElement) {
-    const nowPoint = inputElement.selectionStart + val.length;
-    sendVal.value = sendVal.value.slice(0, inputElement.selectionStart) + val + sendVal.value.slice(inputElement.selectionStart);
-    setTimeout(() => {
-      inputElement.focus();
-      inputElement.setSelectionRange(nowPoint, nowPoint);
-    });
-  } else sendVal.value += val;
-};
-
 // 滚动条居底
 const scrollToBottom = () => {
   setTimeout(() => {
@@ -280,50 +283,63 @@ const listenerScrollToTop = (state: boolean) => {
 };
 
 // ===================================发送消息===================================//
-// 回车处理
-const sendVal = ref('');
-const inputMaxNumber = ref(2000);
-const handleKeyUp = (e: KeyboardEvent) => {
-  if (e.key !== 'Enter') return;
-  if (e.shiftKey) return;
-  if (e.altKey) return (sendVal.value += '\n');
-  e.preventDefault();
-  sendInfo();
+const isActionEmit = (data: number) => {
+  isAction.value = data;
 };
-
-// 输入框字数限制
-const valChange = () => {
-  if (sendVal.value.length > inputMaxNumber.value) return (sendVal.value = sendVal.value.slice(0, inputMaxNumber.value));
+const isQuoteEmit = (data: {
+  id: number,
+  type: number,
+  message: string
+}) => {
+  isQuote.value = data;
 };
-
 // 发送消息
-const sendInfo = () => {
-  if (!sendInfoPre()) return;
-  const pointer = pushDataOneCom(-88, props.user.uid, props.user.relationUid, 0, sendVal.value, 0);
-  emit('sendCallBack', { val: truncate(sendVal.value), type: 0 });
-  let data = sendVal.value;
-  sendVal.value = '';
+const isQuote = ref({
+  id: 0,
+  type: 0,
+  message: ''
+});
+const isAction = ref(0);
+const clearSendVal = ref(false);
+const sendInfo = (message: string) => {
+  const quoteObj = {
+    action: isAction.value,
+    quoteId: isQuote.value.id,
+    quoteType: isQuote.value.type,
+    quoteMessage: isQuote.value.message
+  };
+  const pointer = pushDataOneCom(-88, props.user.uid, props.user.relationUid, 0, message, 0, quoteObj);
+  emit('sendCallBack', { val: truncate(message), type: 0 });
+  clearSendVal.value = true;
   scrollToBottom();
   sendMessage({
     receiveUid: props.user.relationUid,
-    message: data,
-    type: 0
+    message: message,
+    type: 0,
+    action: isAction.value,
+    quote: isQuote.value.id
   })
     .then((res: Result) => {
       if (res.code !== 200) {
         res.data = randomNumber();
-        if (param.experienceMode && firstMessage.value) simReissue(3);
+        if (param.experienceMode && firstMessage.value) simReissue(3, message);
       }
       chatData.value[pointer].id = res.data;
       chatData.value[pointer].state = res.code === 200 ? 1 : 2;
     })
     .finally(() => {
       firstMessage.value = false;
+      clearQuote();
     });
 };
 
+// 发送消息回调
+const sendMessageEmit = (data: string) => {
+  sendInfo(data);
+};
+
 // 推送单条消息
-const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: number, sendState: number = 1): number => {
+const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: number, quoteObj: messageQuote, sendState: number = 1): number => {
   chatData.value.push(
     chatTabOne({
       id: id,
@@ -336,24 +352,11 @@ const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: n
       message: message,
       tab: false,
       state: state,
-      check: false
+      check: false,
+      quote: quoteObj
     })
   );
   return chatData.value.length - 1;
-};
-
-// 发送消息前置处理
-const sendInfoPre = (): boolean => {
-  if (sendVal.value.length === 0) return false;
-  if (sendVal.value.split('\n').length > 20) {
-    notification['error']({
-      content: '超出长度20行的限制',
-      duration: 2500,
-      keepAliveOnHover: true
-    });
-    return false;
-  }
-  return true;
 };
 
 // 发送失败重试
@@ -362,42 +365,35 @@ const reissue = async (message: string, type: number) => {
     const response = await fetch(message);
     const blob = await response.blob();
     const file = new File([blob], 'chat-image', { type: blob.type });
-    beforeUpload({ file: { file: file } as UploadFileInfo, fileList: [] });
+    await beforeUpload(file);
     return;
   }
-  sendVal.value = message;
-  sendInfo();
+  sendInfo(message);
 };
 
-// 发送图片前置校验
-const upLoadCheck = (file: File | null | undefined) => {
-  if (!file) {
-    tips('error', '文件异常👾');
-    return false;
-  }
-  if ((file?.size ?? 0) / 1024 / 1024 > 4) {
-    tips('error', '图片太大了吧，大小不能超过4M🤯');
-    return false;
-  }
-  if (file?.type !== 'image/png' && file?.type !== 'image/jpeg') {
-    tips('error', '只能发送png或jpeg格式的图片文件');
-    return false;
-  }
-  return true;
+// 发送图片回调
+const sendImageEmit = (file: File) => {
+  beforeUpload(file);
 };
 
 // 发送图片
-const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }): Promise<boolean> => {
-  const file = data.file.file as File;
-  const result = upLoadCheck(file);
-  if (!result) return false;
+const beforeUpload = async (file: File): Promise<boolean> => {
   const reader = new FileReader();
   reader.onload = function(e: any) {
     const fd = new FormData();
     fd.append('file', file);
-    const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0);
+    fd.append('action', isAction.value + '');
+    fd.append('quoteId', isQuote.value.id + '');
+    const quoteObj = {
+      action: isAction.value,
+      quoteId: isQuote.value.id,
+      quoteType: isQuote.value.type,
+      quoteMessage: isQuote.value.message
+    };
+    const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0, quoteObj);
     emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
     scrollToBottom();
+    clearQuote();
     sendMessageImage(fd, props.user.relationUid).then((res) => {
       if (res.code !== 200) res.data = randomNumber();
       chatData.value[pointer].id = res.data;
@@ -407,34 +403,26 @@ const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileIn
   reader.readAsDataURL(file as any);
   return true;
 };
-// const beforeUpload = async (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }): Promise<boolean> => {
-//   const file = data.file.file as File;
-//   const result = upLoadCheck(file);
-//   if (!result) return false;
-//   const reader = new FileReader();
-//   reader.onload = function(e: any) {
-//     const fd = new FormData();
-//     fd.append('file', file);
-//     const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0);
-//     emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
-//     scrollToBottom();
-//     sendMessageImage(fd, props.user.relationUid).then((res) => {
-//       if (res.code !== 200) res.data = randomNumber();
-//       chatData.value[pointer].id = res.data;
-//       chatData.value[pointer].state = res.code === 200 ? 1 : 2;
-//     });
-//   };
-//   reader.readAsDataURL(file as any);
-//   return true;
-// };
-// ===================================静态数据【用于体验时】===================================//
 
+// 清除动作
+const clearQuote = () => {
+  isAction.value = 0;
+  isQuote.value = { id: 0, type: 0, message: '' };
+};
+
+// ===================================静态数据【用于体验时】===================================//
 // 模拟回复
 const firstMessage = ref(true);
-const simReissue = (id: number) => {
+const simReissue = (id: number, repMessage: string) => {
   setTimeout(() => {
     const message = '嘿嘿，我是一款好用、不夸张的聊天框架哟🥰';
-    pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, 1);
+    const quoteObj = {
+      action: 2,
+      quoteId: id,
+      quoteType: 0,
+      quoteMessage: '我：' + repMessage
+    };
+    pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, 1, quoteObj);
     emit('sendCallBack', { val: truncate(message), type: 0, uid: props.user.relationUid });
     scrollToBottom();
   }, 2000);
@@ -478,8 +466,7 @@ const eqChatCom = (needBottom: boolean = true) => {
     .finally(() => {
       setTimeout(() => {
         loadingMessage.value = false;
-        addListener();
-        onlyOne.value = true;
+        needListener.value = true;
         if (!needBottom) return;
         scrollToBottom();
         listenerScrollToTop(true);
@@ -497,201 +484,43 @@ const scrollToTop = () => {
 };
 
 // ===================================右键操作===================================//
-const tapAndHold = ref(false);
-const onlyOne = ref(false);
-const addListener = () => {
-  if (onlyOne.value) return;
-  tapAndHold.value = false;
-  const parentDiv = document.querySelector('.cb-body') as HTMLElement;
-  parentDiv.addEventListener('contextmenu', listenerMessage);
-  let longPressTimer: NodeJS.Timeout;
-  parentDiv.addEventListener('mousedown', (e: MouseEvent) => {
-    longPressTimer = setTimeout(() => {
-      listenerMessage(e);
-      tapAndHold.value = true;
-      setTimeout(() => {
-        tapAndHold.value = false;
-      }, 500);
-    }, 500);
-  });
-  parentDiv.addEventListener('mouseup', () => {
-    clearTimeout(longPressTimer);
-  });
-  parentDiv.addEventListener('mouseleave', () => {
-    clearTimeout(longPressTimer);
-  });
-};
-// 右键事件
-const rightBtnLeft = ref(0);
-const rightBtnTop = ref(0);
-const czList = ref();
-const showRightBtnMessage = ref(false);
-const nowCheckData = ref({} as message);
-const listenerMessage = (e: MouseEvent) => {
-  e.preventDefault();
-  const parentDiv = document.querySelector('.cb-body-sc');
-  if (!parentDiv) return;
-  if (moreCheckState.value) return;
-  let target = e.target as HTMLElement;
-  let index = -1;
-  if (target.classList.contains('cbbm-box')) {
-    const allSonBoxes = Array.from(parentDiv.children);
-    index = allSonBoxes.indexOf(eqFather(target));
-  } else {
-    while (target !== parentDiv) {
-      if (target.classList.contains('cbbm-box')) {
-        const allSonBoxes = Array.from(parentDiv.children);
-        index = allSonBoxes.indexOf(eqFather(target));
-      }
-      target = target.parentElement as HTMLElement;
-    }
-  }
-  if (index === -1) return;
-  nowCheckData.value = chatData.value[index];
-  if (nowCheckData.value.state === 0) return;
-  showRightBtnMessage.value = true;
-  rightBtnLeft.value = e.x;
-  rightBtnTop.value = e.y;
-  czList.value = [
-    { id: 0, name: '复制内容', incident: () => copyMessage() },
-    {
-      id: 1,
-      name: '删除消息',
-      incident: () => delMessageGo([nowCheckData.value.id])
-    }
-  ];
-  if (nowCheckData.value.sendUid !== props.user.relationUid && countTimeDiff(nowCheckData.value.date, getTimeFormat(new Date()), 60) < 3) {
-    czList.value.push({
-      id: 2,
-      name: '撤回消息',
-      incident: () => revocationMessageGo()
-    });
-  }
-  czList.value.push({ id: 3, name: '多选', incident: () => moreChecked() });
-};
-
-// 获取父级dom
-const eqFather = (target: HTMLElement) => {
-  while (!target.classList.contains('cbb-box')) {
-    target = target.parentElement as HTMLElement;
-  }
-  return target;
-};
-
-// 选择右键内容回调
-const chooseRight = (item: any) => {
-  item.incident();
-  showRightBtnMessage.value = false;
-};
-
-// 撤回消息
-const reMessage = ref('');
-const reMessageId = ref(-1);
-const revocationMessageGo = () => {
-  showRightBtnMessage.value = false;
-  if (nowCheckData.value.type === 0) {
-    reMessage.value = nowCheckData.value.message;
-    reMessageId.value = nowCheckData.value.id;
-  }
-  revocationMessage(nowCheckData.value.id).then((res: Result) => {
-    if (res.code !== 200) {
-      if (!param.experienceMode) return tips('error', res.msg);
-    }
-    nowCheckData.value.message = '你撤回了一条消息';
-    nowCheckData.value.sendState = 2;
-    emit('sendCallBack', { val: truncate('你撤回了一条消息'), type: 0 });
-  });
-};
+const needListener = ref(false);
 // 重新编辑
+const addSendVal = ref('');
 const reEdit = () => {
-  sendVal.value = reMessage.value;
+  addSendVal.value = reMessage.value;
 };
 
-// 删除聊天
-const delMessageGo = (ids: number[]) => {
-  showRightBtnMessage.value = false;
-  delMessage(ids).then((res: Result) => {
-    if (res.code !== 200) {
-      if (!param.experienceMode) return tips('error', res.msg);
-      tips('warning', '体验环境，并没有真正的删除哦');
-    }
-    chatData.value = chatData.value.filter((item: message) => !ids.includes(item.id));
-    if (chatData.value.length === 0) emit('sendCallBack', { val: truncate('消息被删除'), type: 0 });
-    else {
-      const lastData = chatData.value[chatData.value.length - 1];
-      emit('sendCallBack', {
-        val: truncate(lastData.type === 1 ? '[图片]' : lastData.message),
-        type: lastData.type
-      });
-    }
-  });
-};
-
-// 复制聊天内容
-const copyMessage = () => {
-  if (nowCheckData.value.type === 1) {
-    copyImage(nowCheckData.value.message).then((res) => {
-      res ? tips('success', '图片已复制到粘贴板') : tips('error', '复制失败');
-    });
-    return;
-  }
-  const result = copyText(nowCheckData.value.message);
-  result ? tips('success', '内容已复制到粘贴板') : tips('error', '复制失败');
-};
-
-// 多选
-const moreCheckState = ref(false);
-const moreChecked = () => {
-  moreCheckState.value = true;
-  moreCheckedCallBack(nowCheckData.value);
-};
-// 删除多选内容
-const delMoreChecked = () => {
-  moreCheckState.value = false;
-  delMessageGo(saveChecked.value);
-};
-// 取消多选
-const cancelMoreChecked = () => {
-  moreCheckState.value = false;
-  saveChecked.value = [];
-  chatData.value.forEach((item: message) => {
-    item.check = false;
-  });
-};
 // 多选操作
+const moreCheckState = ref(false);
 const saveChecked = ref([] as number[]);
-const moreCheckedCallBack = (data: message) => {
+const moreCheckedCallBack = (data: message, needFilter?: boolean) => {
+  needFilter = needFilter || false;
   if (!data.check) saveChecked.value.push(data.id);
   else saveChecked.value.splice(saveChecked.value.indexOf(data.id), 1);
-  data.check = !data.check;
+  if (!needFilter) {
+    data.check = !data.check;
+    return;
+  }
+  chatData.value.filter((item: message) => {
+    if (item.id === data.id) {
+      item.check = !data.check;
+      return true;
+    }
+  });
 };
-
-// 销毁监听
-const clearListener = () => {
-  const parentDiv = document.querySelector('.cb-body') as HTMLElement;
-  if (parentDiv) parentDiv.removeEventListener('contextmenu', listenerMessage);
-};
-
-// 关闭右键
-const closeRightBtn = () => {
-  if (!tapAndHold.value) showRightBtnMessage.value = false;
-};
-
-// 关闭右键公共方法
-const closeRightBtnCom = (state: boolean) => {
-  const dom = document.getElementsByClassName('chat-main')[0];
-  state ? dom.addEventListener('click', closeRightBtn) : dom.removeEventListener('click', closeRightBtn);
-};
-
 // ===================================组件初始化操作===================================//
 // 初始化数据
 const initData = () => {
+  clearSendVal.value = false;
   chatData.value = [];
   loadingMessage.value = false;
   page.value = 1;
-  sendVal.value = '';
   moreCheckState.value = false;
   saveChecked.value = [];
+  setTimeout(() => {
+    clearSendVal.value = true;
+  }, 10);
 };
 
 // 选择用户做出改变
@@ -703,7 +532,6 @@ watch(
     initData();
     eqChatData();
     nextTick(() => {
-      listenerCopy();
       listenerHover();
     });
     if (nowChatUid) nowChatUid(props.user.relationUid);
@@ -722,7 +550,13 @@ watch(
       newData.sendState = 2;
       newData.message = '对方撤回了一条消息';
     } else {
-      pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, 1, data.state);
+      const quoteObj = {
+        action: 0,
+        quoteId: 0,
+        quoteType: 0,
+        quoteMessage: ''
+      };
+      pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, 1, quoteObj, data.state);
       scrollToBottom();
     }
   }
@@ -740,37 +574,26 @@ const listenerHover = () => {
   });
 };
 
-// 监听复制粘贴消息
-const listenerCopy = () => {
-  const pasteArea = document.getElementById('nh-chat-input') as HTMLDivElement;
-  pasteArea.addEventListener('paste', (event: ClipboardEvent) => {
-    const items = event.clipboardData?.items;
-    if (!items) return;
-    for (let i = 0; i < items.length; i++) {
-      if (items[i].type.startsWith('image/')) {
-        const file = items[i].getAsFile();
-        if (file) {
-          beforeUpload({ file: { file: file } as UploadFileInfo, fileList: [] });
-          event.preventDefault();
-        }
-      }
-    }
-  });
-};
-
 // 组件初开始和结束
-onMounted(() => {
-  closeRightBtnCom(true);
-});
 onBeforeUnmount(() => {
-  clearListener();
-  closeRightBtnCom(false);
   listenerScrollToTop(false);
   if (nowChatUid) nowChatUid(-99);
 });
+
 </script>
 
 <style lang='scss' scoped>
+.quote-image {
+  max-height: $px-24;
+  max-width: $px-24;
+}
+
+:deep(.quote-image img) {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
 .quote-left {
   margin-left: $px-56;
 }
@@ -804,18 +627,6 @@ onBeforeUnmount(() => {
 
 .message-loading {
   animation: circle 1s linear infinite;
-}
-
-:deep(.n-upload) {
-  width: unset;
-}
-
-:deep(.n-upload-trigger) {
-  display: flex;
-}
-
-:deep(.n-upload-trigger + .n-upload-file-list) {
-  margin-top: unset;
 }
 
 .loader-abs {
@@ -866,8 +677,8 @@ onBeforeUnmount(() => {
 
 .cbbm-box-right::after {
   content: '';
-  width: 0px;
-  height: 0px;
+  width: 0;
+  height: 0;
   border: $px-10 solid;
   border-left: $px-10 solid var(--right-after);
   border-right: $px-10 solid transparent;
@@ -912,36 +723,6 @@ onBeforeUnmount(() => {
   padding: $px-8 $px-12;
 }
 
-.cb-input {
-  height: $px-160;
-
-  .cb-input-main {
-    height: calc(100% - $px-32 - $px-32);
-
-    .n-input {
-      height: 100%;
-      background-color: unset;
-    }
-
-    .n-input:not(.n-input--disabled).n-input--focus {
-      background-color: unset;
-    }
-
-    :deep(.n-input-wrapper) {
-      resize: unset;
-    }
-
-    :deep(.n-scrollbar-rail__scrollbar) {
-      --n-scrollbar-color: rgba(255, 103, 0, 0.5);
-      --n-scrollbar-color-hover: rgba(255, 103, 0);
-    }
-  }
-
-  .cb-input-go,
-  .cb-input-controls {
-    height: $px-32;
-  }
-}
 
 .cb-body {
   height: calc(100% - $px-2 - $px-48 - $px-160);

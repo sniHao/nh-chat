@@ -56,6 +56,14 @@ declare global {
     tab: boolean;
     state: number;
     check: boolean;
+    quote: messageQuote,
+  }
+
+  interface messageQuote {
+    action: number,
+    quoteId: number,
+    quoteType: number,
+    quoteMessage: string,
   }
 
   interface chatProps {
