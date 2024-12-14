@@ -6,7 +6,6 @@
 </template>
 
 <script setup lang='ts'>
-const emit = defineEmits(['event']);
 const computedStyle = inject<Ref<any>>('computedStyle') as any;
 const props = defineProps({
   width: {

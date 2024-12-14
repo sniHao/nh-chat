@@ -1,20 +1,18 @@
 <template>
-  <div class='cb-input' :style='`border-top: 1px solid ${computedStyle.fontColorOpt}`'>
-    <template v-if='moreCheckState'>
-      <div class='flex-center-center h-100'>
-        <div class='flex-down-center' @click='delMoreChecked'>
-          <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt95' class='hover-pointer mb-2'
-               name='del'></Svg>
-          <n-button text :color='computedStyle.fontColorOpt95' size='large'>删除</n-button>
-        </div>
-        <div class='flex-down-center ml-18' @click='cancelMoreChecked'>
-          <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt' class='hover-pointer mb-2'
-               name='cancel'></Svg>
-          <n-button text :color='computedStyle.fontColorOpt' size='large'>取消</n-button>
-        </div>
+  <div class='cb-input pd-1' :style='`box-shadow: 0 0 .4px .4px ${computedStyle.fontColorOpt}`'>
+    <div v-show='moreCheckState' class='flex-center-center h-100'>
+      <div class='flex-down-center' @click='delMoreChecked'>
+        <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt95' class='hover-pointer mb-2'
+             name='del'></Svg>
+        <n-button text :color='computedStyle.fontColorOpt95' size='large'>删除</n-button>
       </div>
-    </template>
-    <template v-else>
+      <div class='flex-down-center ml-18' @click='cancelMoreChecked'>
+        <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt' class='hover-pointer mb-2'
+             name='cancel'></Svg>
+        <n-button text :color='computedStyle.fontColorOpt' size='large'>取消</n-button>
+      </div>
+    </div>
+    <div v-show="!moreCheckState">
       <!-- 表情包图片等等 -->
       <div class='cb-input-controls flex-center'>
         <n-popover trigger='click' raw @update:show='handleUpdateShow'>
@@ -22,7 +20,7 @@
             <Svg :width='24' :height='24' class='hover-pointer ml-12' name='emoji'
                  :fill='computedStyle.fontColorOpt'></Svg>
           </template>
-          <EmoJi @choose='chooseEmoji' />
+          <EmoJi @choose='chooseEmoji'/>
         </n-popover>
         <n-upload :show-file-list='false' @before-upload='beforeUpload' accept='.png,.jpeg,.jpg'>
           <Svg :width='24' :height='24' class='hover-pointer ml-12' name='up-image'
@@ -33,43 +31,48 @@
       <div class='cb-input-main' :style='`background-color: ${param.style.mainColor};`'
            :class="isQuote.id!==0?'cb-input-main-quote':''">
         <n-input
-          id='nh-chat-input'
-          ref='inputInstRef'
-          :style='`--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset;
+            id='nh-chat-input'
+            ref='inputInstRef'
+            :style='`--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset;
               --n-placeholder-color:${computedStyle.fontColorOpt};--n-text-color:${param.style.fontColor}`'
-          v-model:value='sendVal'
-          type='textarea'
-          @keydown.enter.native='handleKeyUp'
-          @input='valChange'
-          placeholder-style='color:red'
-          placeholder='说点啥...' />
+            v-model:value='sendVal'
+            type='textarea'
+            @keydown.enter.native='handleKeyUp'
+            @input='valChange'
+            placeholder-style='color:red'
+            placeholder='说点啥...'/>
       </div>
-      <div class='pd-zy-12 quote-message flex-center-zy ft-13' v-if='isQuote.id!==0'
-           :style='`background-color: ${computedStyle.fontColorOpt35}`'>
-        <div class='w-70 ft-over flex-center' :style='`color:${computedStyle.fontColorOpt}`'>
-          <template v-for='(quote, index) in getQuoteView(isQuote.message)' :key='index'>
-            <span v-if='index === 0'>{{ quote }}</span>
-            <span v-if='isQuote.type === 0 && index === 1'
-                  :title='quote'>{{ quote }}</span>
-            <n-image v-else-if='index === 1' class='quote-image' :src='quote' />
-          </template>
+      <!-- 引用-->
+      <template v-if='isQuote.id!==0'>
+        <div class='pd-zy-12 quote-message flex-center-zy ft-13'
+             :style='`background-color: ${computedStyle.fontColorOpt35}`'>
+          <div class='w-70 flex-center' :style='`color:${computedStyle.fontColorOpt}`'>
+            <template v-for='(quote, index) in getQuoteView(isQuote.message)' :key='index'>
+              <span v-if='index === 0'>{{ quote }}</span>
+              <span class="ft-over" v-if='isQuote.type === 0 && index === 1'
+                    :title='quote'>{{ quote }}</span>
+              <n-image v-else-if='index === 1' class='quote-image' :src='quote'/>
+            </template>
+          </div>
+          <div class='hover-pointer' @click='clearQuote'>取消引用</div>
         </div>
-        <div class='hover-pointer' @click='clearQuote'>取消引用</div>
-      </div>
+      </template>
+      <div class="quote-message" v-else></div>
+      <!-- 发送 -->
       <div class='cb-input-go flex-center-zy pd-zy-6' :style='`color:${computedStyle.fontColorOpt}`'>
         <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
         <div class='hover-pointer' @click='sendInfo'>按Enter键发送</div>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
 <script setup lang='ts'>
-import { createDiscreteApi } from 'naive-ui';
+import {createDiscreteApi} from 'naive-ui';
 
-const { notification } = createDiscreteApi(['notification']);
-import type { UploadFileInfo } from 'naive-ui';
-import { tips, getQuoteView } from '@/utils/OtherUtils';
+const {notification} = createDiscreteApi(['notification']);
+import type {UploadFileInfo} from 'naive-ui';
+import {tips, getQuoteView} from '@/utils/OtherUtils';
 import Svg from '../of/Svg.vue';
 import EmoJi from '../of/EmoJi.vue';
 
@@ -111,7 +114,7 @@ const emit = defineEmits(['sendMessageEmit', 'sendImageEmit', 'isActionEmit', 'i
 //清除引用
 const clearQuote = () => {
   emit('isActionEmit', 0);
-  emit('isQuoteEmit', { com: '', id: 0, data: {} });
+  emit('isQuoteEmit', {com: '', id: 0, data: {}});
 };
 
 // 删除多选内容
@@ -271,7 +274,6 @@ onMounted(() => {
 }
 
 .cb-input {
-  height: $px-160;
 
   .cb-input-main {
     height: calc(100% - $px-32 - $px-32);

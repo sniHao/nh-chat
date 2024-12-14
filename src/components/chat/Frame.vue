@@ -7,15 +7,14 @@
       </div>
     </template>
     <template v-else>
-      <Loader class='loader-abs' :style='`background-color: ${param.style.mainColor}`' v-if='loadingMessage'>
-        <div>12</div>
-      </Loader>
-      <div class='cb-head flex-center' :style='`border-bottom: 1px solid ${computedStyle.fontColorOpt}`'>
+      <Loader class='loader-abs ml-2' :style='`background-color: ${param.style.mainColor}`'
+              v-if='loadingMessage'></Loader>
+      <div class='cb-head flex-center' :style='`box-shadow: 0 0 .4px .4px ${computedStyle.fontColorOpt}`'>
         <div class='cb-head-controls'></div>
         <div class='w-100 flex-center-center'>{{ user.name }}</div>
         <n-popover trigger='click' placement='bottom'>
           <template #trigger>
-            <div class='cb-head-controls flex-center-onely mr-4 hover-pointer'>
+            <div class='cb-head-controls flex-center-only mr-4 hover-pointer'>
               <Svg :width='28' :height='28' name='pointer' :fill='computedStyle.fontColorOpt'></Svg>
             </div>
           </template>
@@ -58,7 +57,7 @@
                     <div class='cbbm-box cbbm-box-left flex'
                          :style='`background-color: ${param.style.leftChatBgColor}`'>
                       <span v-if='item.type === 0'>{{ item.message }}</span>
-                      <n-image v-else class='chat-image' :src='item.message' />
+                      <n-image v-else class='chat-image' :src='item.message'/>
                     </div>
                   </div>
                   <div class='w-100 flex' v-if='item.quote.action === 2'>
@@ -67,9 +66,9 @@
                          :title='item.quoteMessage'>
                       <template v-for='(ite, index) in getQuoteView(item.quote.quoteMessage)' :key='index'>
                         <span v-if='index === 0'>{{ ite }}</span>
-                        <span v-if='item.quote.quoteType === 0 && index === 1'
+                        <span class="ft-over" v-if='item.quote.quoteType === 0 && index === 1'
                               :title='ite'>{{ ite }}</span>
-                        <n-image v-else-if='index === 1' class='quote-image' :src='ite' />
+                        <n-image v-else-if='index === 1' class='quote-image' :src='ite'/>
                       </template>
                     </div>
                   </div>
@@ -77,32 +76,31 @@
               </template>
               <template v-else>
                 <div class='flex-down w-100' @click='moreCheckedCallBack(item)' :class='choiceStyle(item.check)'>
-                  <div class='cbb-main flex-center-zy'>
-                    <div>
-                      <n-checkbox :checked='item.check' @update.self:checked.stop='moreCheckedCallBack(item)'
-                                  v-if='moreCheckState'></n-checkbox>
-                    </div>
+                  <div class='cbb-main pos-r'>
+                    <n-checkbox class="pos-a" :checked='item.check'
+                                @update.self:checked.stop='moreCheckedCallBack(item)'
+                                v-if='moreCheckState'></n-checkbox>
                     <div class='flex-right'>
                       <div
-                        class='user-head flex-center-center ml-4'
-                        :style="'background-color:' + tranColor(param.userInfo.photo)"
-                        v-html='computePhoto(param.userInfo.photo)'></div>
+                          class='user-head flex-center-center ml-4'
+                          :style="'background-color:' + tranColor(param.userInfo.photo)"
+                          v-html='computePhoto(param.userInfo.photo)'></div>
                       <div class='cbbm-box cbbm-box-right flex'
                            :style='`background-color: ${param.style.rightChatBgColor}`'>
                         <span v-if='item.type === 0'>{{ item.message }}</span>
-                        <n-image v-else class='chat-image' :src='item.message' />
+                        <n-image v-else class='chat-image' :src='item.message'/>
                       </div>
                       <!-- 消息状态 -->
                       <div class='flex-end mr-6'>
                         <!-- 失败 -->
                         <Svg
-                          class='hover-pointer'
-                          name='message-fail'
-                          fill='red'
-                          :width='24'
-                          :height='24'
-                          v-if='item.state === 2'
-                          @click='reissue(item.message, item.type)'></Svg>
+                            class='hover-pointer'
+                            name='message-fail'
+                            fill='red'
+                            :width='24'
+                            :height='24'
+                            v-if='item.state === 2'
+                            @click='reissue(item.message, item.type)'></Svg>
                         <!-- 加载中 -->
                         <Svg class='message-loading' name='message-loading' fill='#d2d2d2' :width='24' :height='24'
                              v-if='item.state === 0'></Svg>
@@ -110,14 +108,14 @@
                     </div>
                   </div>
                   <div class='w-100 flex-right' v-if='item.quote.action === 2'>
-                    <div class='quote quote-right pd-4 ft-over flex-center'
+                    <div class='quote quote-right pd-4  ft-over flex-center'
                          :style='`background-color: ${computedStyle.fontColorOpt35}`'
                          :title='item.quote.quoteMessage'>
                       <template v-for='(ite, index) in getQuoteView(item.quote.quoteMessage)' :key='index'>
                         <span v-if='index === 0'>{{ ite }}</span>
-                        <span v-if='item.quote.quoteType === 0 && index === 1'
+                        <span class="ft-over" v-if='item.quote.quoteType === 0 && index === 1'
                               :title='ite'>{{ ite }}</span>
-                        <n-image v-else-if='index === 1' class='quote-image' :src='ite' />
+                        <n-image v-else-if='index === 1' class='quote-image' :src='ite'/>
                       </template>
                     </div>
                   </div>
@@ -142,14 +140,11 @@
 </template>
 
 <script setup lang='ts'>
-import { createDiscreteApi } from 'naive-ui';
-
-const { notification } = createDiscreteApi(['notification']);
-import { countTimeDiff, cutChatTime, getTimeFormat } from '@/utils/TimeUtil';
-import { eqChatDataStatic } from '@/utils/staticUtils';
-import { throttle } from '@/utils/domUtils';
-import { tranColor, truncate, tips, computePhoto, randomNumber, getQuoteView } from '@/utils/OtherUtils';
-import { eqChat, sendMessage, sendMessageImage, revocationMessage, delMessage } from '@/api/index';
+import {countTimeDiff, cutChatTime, getTimeFormat} from '@/utils/TimeUtil';
+import {eqChatDataStatic} from '@/utils/staticUtils';
+import {throttle} from '@/utils/domUtils';
+import {tranColor, truncate, tips, computePhoto, randomNumber, getQuoteView} from '@/utils/OtherUtils';
+import {eqChat, sendMessage, sendMessageImage, revocationMessage, delMessage} from '@/api/index';
 import WebSocketService from '@/utils/WebSocketService';
 import Svg from '../of/Svg.vue';
 import Loader from '../of/Loader.vue';
@@ -184,7 +179,7 @@ const delMessageEmit = (ids: number[]) => {
       tips('warning', '体验环境，并没有真正的删除哦');
     }
     chatData.value = chatData.value.filter((item: message) => !ids.includes(item.id));
-    if (chatData.value.length === 0) emit('sendCallBack', { val: truncate('消息被删除'), type: 0 });
+    if (chatData.value.length === 0) emit('sendCallBack', {val: truncate('消息被删除'), type: 0});
     else {
       const lastData = chatData.value[chatData.value.length - 1];
       emit('sendCallBack', {
@@ -227,7 +222,7 @@ const revocationMessageEmit = (data: message) => {
     }
     data.message = '你撤回了一条消息';
     data.sendState = 2;
-    emit('sendCallBack', { val: truncate('你撤回了一条消息'), type: 0 });
+    emit('sendCallBack', {val: truncate('你撤回了一条消息'), type: 0});
   });
 };
 // ===================================其他功能===================================//
@@ -309,7 +304,7 @@ const sendInfo = (message: string) => {
     quoteMessage: isQuote.value.message
   };
   const pointer = pushDataOneCom(-88, props.user.uid, props.user.relationUid, 0, message, 0, quoteObj);
-  emit('sendCallBack', { val: truncate(message), type: 0 });
+  emit('sendCallBack', {val: truncate(message), type: 0});
   clearSendVal.value = true;
   scrollToBottom();
   sendMessage({
@@ -319,18 +314,18 @@ const sendInfo = (message: string) => {
     action: isAction.value,
     quote: isQuote.value.id
   })
-    .then((res: Result) => {
-      if (res.code !== 200) {
-        res.data = randomNumber();
-        if (param.experienceMode && firstMessage.value) simReissue(3, message);
-      }
-      chatData.value[pointer].id = res.data;
-      chatData.value[pointer].state = res.code === 200 ? 1 : 2;
-    })
-    .finally(() => {
-      firstMessage.value = false;
-      clearQuote();
-    });
+      .then((res: Result) => {
+        if (res.code !== 200) {
+          res.data = randomNumber();
+          if (param.experienceMode && firstMessage.value) simReissue(3, message);
+        }
+        chatData.value[pointer].id = res.data;
+        chatData.value[pointer].state = res.code === 200 ? 1 : 2;
+      })
+      .finally(() => {
+        firstMessage.value = false;
+        clearQuote();
+      });
 };
 
 // 发送消息回调
@@ -341,20 +336,20 @@ const sendMessageEmit = (data: string) => {
 // 推送单条消息
 const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: number, message: string, state: number, quoteObj: messageQuote, sendState: number = 1): number => {
   chatData.value.push(
-    chatTabOne({
-      id: id,
-      sendUid: sendUid,
-      receiveUid: receiveUid,
-      type: type,
-      sendState: sendState,
-      receiveState: 1,
-      date: getTimeFormat(new Date()),
-      message: message,
-      tab: false,
-      state: state,
-      check: false,
-      quote: quoteObj
-    })
+      chatTabOne({
+        id: id,
+        sendUid: sendUid,
+        receiveUid: receiveUid,
+        type: type,
+        sendState: sendState,
+        receiveState: 1,
+        date: getTimeFormat(new Date()),
+        message: message,
+        tab: false,
+        state: state,
+        check: false,
+        quote: quoteObj
+      })
   );
   return chatData.value.length - 1;
 };
@@ -364,7 +359,7 @@ const reissue = async (message: string, type: number) => {
   if (type === 1) {
     const response = await fetch(message);
     const blob = await response.blob();
-    const file = new File([blob], 'chat-image', { type: blob.type });
+    const file = new File([blob], 'chat-image', {type: blob.type});
     await beforeUpload(file);
     return;
   }
@@ -379,7 +374,7 @@ const sendImageEmit = (file: File) => {
 // 发送图片
 const beforeUpload = async (file: File): Promise<boolean> => {
   const reader = new FileReader();
-  reader.onload = function(e: any) {
+  reader.onload = function (e: any) {
     const fd = new FormData();
     fd.append('file', file);
     fd.append('action', isAction.value + '');
@@ -391,7 +386,7 @@ const beforeUpload = async (file: File): Promise<boolean> => {
       quoteMessage: isQuote.value.message
     };
     const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0, quoteObj);
-    emit('sendCallBack', { val: truncate('[图片]'), type: 1 });
+    emit('sendCallBack', {val: truncate('[图片]'), type: 1});
     scrollToBottom();
     clearQuote();
     sendMessageImage(fd, props.user.relationUid).then((res) => {
@@ -407,7 +402,7 @@ const beforeUpload = async (file: File): Promise<boolean> => {
 // 清除动作
 const clearQuote = () => {
   isAction.value = 0;
-  isQuote.value = { id: 0, type: 0, message: '' };
+  isQuote.value = {id: 0, type: 0, message: ''};
 };
 
 // ===================================静态数据【用于体验时】===================================//
@@ -423,7 +418,7 @@ const simReissue = (id: number, repMessage: string) => {
       quoteMessage: '我：' + repMessage
     };
     pushDataOneCom(id, props.user.relationUid, props.user.uid, 0, message, 1, quoteObj);
-    emit('sendCallBack', { val: truncate(message), type: 0, uid: props.user.relationUid });
+    emit('sendCallBack', {val: truncate(message), type: 0, uid: props.user.relationUid});
     scrollToBottom();
   }, 2000);
 };
@@ -441,37 +436,38 @@ const eqChatData = () => {
 const eqChatCom = (needBottom: boolean = true) => {
   loadingMessage.value = true;
   eqChat(props.user.relationUid, page.value)
-    .then((res: Result) => {
-      let data = [] as message[];
-      if (res.code !== 200) {
-        if (!param.experienceMode) return tips('error', res.msg);
-        data = eqChatDataStatic();
-      } else {
-        data = res.data.data;
-        next.value = res.data.next;
-        if (next.value) page.value++;
-      }
-      if (needBottom) chatData.value = chatTab(data);
-      else {
-        data = chatTab([...data, chatData.value[0]]);
-        const oldHeight = document.getElementsByClassName('cb-body')[0].scrollHeight || 0;
-        chatData.value.shift();
-        chatData.value = [...chatTab(data), ...chatData.value];
+      .then((res: Result) => {
+        let data = [] as message[];
+        if (res.code !== 200) {
+          if (!param.experienceMode) return tips('error', res.msg);
+          data = eqChatDataStatic();
+        } else {
+          data = res.data.data;
+          next.value = res.data.next;
+          if (next.value) page.value++;
+        }
+        if (needBottom) chatData.value = chatTab(data);
+        else {
+          data = chatTab([...data, chatData.value[0]]);
+          const oldHeight = document.getElementsByClassName('cb-body')[0].scrollHeight || 0;
+          chatData.value.shift();
+          chatData.value = [...chatTab(data), ...chatData.value];
+          setTimeout(() => {
+            let newDom = document.getElementsByClassName('cb-body')[0];
+            newDom.scrollTop = newDom.scrollHeight - oldHeight;
+          }, 10);
+        }
+      })
+      .finally(() => {
+        needListener.value = false;
         setTimeout(() => {
-          let newDom = document.getElementsByClassName('cb-body')[0];
-          newDom.scrollTop = newDom.scrollHeight - oldHeight;
-        }, 10);
-      }
-    })
-    .finally(() => {
-      setTimeout(() => {
-        loadingMessage.value = false;
-        needListener.value = true;
-        if (!needBottom) return;
-        scrollToBottom();
-        listenerScrollToTop(true);
-      }, 150);
-    });
+          loadingMessage.value = false;
+          needListener.value = true;
+          if (!needBottom) return;
+          scrollToBottom();
+          listenerScrollToTop(true);
+        }, 150);
+      });
 };
 
 // 上拉拉取消息
@@ -526,40 +522,40 @@ const initData = () => {
 // 选择用户做出改变
 const nowChatUid = inject<(uid: number) => void>('getNowChatUid');
 watch(
-  () => props.user,
-  () => {
-    if (Object.keys(props.user).length === 0) return;
-    initData();
-    eqChatData();
-    nextTick(() => {
-      listenerHover();
-    });
-    if (nowChatUid) nowChatUid(props.user.relationUid);
-  }
+    () => props.user,
+    () => {
+      if (Object.keys(props.user).length === 0) return;
+      initData();
+      eqChatData();
+      nextTick(() => {
+        listenerHover();
+      });
+      if (nowChatUid) nowChatUid(props.user.relationUid);
+    }
 );
 
 const ws = ref(webSocketService);
 watch(
-  () => ws.value?.pushCount,
-  () => {
-    const data = ws.value.newMessage;
-    if (Object.keys(props.user).length === 0 || props.user.relationUid !== data.receiveUid) return;
-    emit('sendCallBack', { val: truncate(data.message), type: data.type });
-    if (data.state === 2) {
-      let newData = chatData.value.filter((item: message) => item.id === data.mid)[0];
-      newData.sendState = 2;
-      newData.message = '对方撤回了一条消息';
-    } else {
-      const quoteObj = {
-        action: 0,
-        quoteId: 0,
-        quoteType: 0,
-        quoteMessage: ''
-      };
-      pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, 1, quoteObj, data.state);
-      scrollToBottom();
+    () => ws.value?.pushCount,
+    () => {
+      const data = ws.value.newMessage;
+      if (Object.keys(props.user).length === 0 || props.user.relationUid !== data.receiveUid) return;
+      emit('sendCallBack', {val: truncate(data.message), type: data.type});
+      if (data.state === 2) {
+        let newData = chatData.value.filter((item: message) => item.id === data.mid)[0];
+        newData.sendState = 2;
+        newData.message = '对方撤回了一条消息';
+      } else {
+        const quoteObj = {
+          action: 0,
+          quoteId: 0,
+          quoteType: 0,
+          quoteMessage: ''
+        };
+        pushDataOneCom(data.mid, data.receiveUid, props.user.uid, data.type, data.message, 1, quoteObj, data.state);
+        scrollToBottom();
+      }
     }
-  }
 );
 
 // 监听悬浮是否存在滚动条

@@ -203,6 +203,11 @@
 }
 
 // 内边距
+.pd-1 {
+  padding: 0.0625rem;
+  box-sizing: border-box;
+}
+
 .pd-4 {
   padding: 0.25rem;
   box-sizing: border-box;
@@ -360,7 +365,7 @@
   justify-content: space-between;
 }
 
-.flex-center-onely {
+.flex-center-only {
   display: flex;
   justify-content: center;
 }
@@ -521,4 +526,8 @@
 
 .pos-r {
   position: relative;
+}
+
+.pos-a {
+  position: absolute;
 }
