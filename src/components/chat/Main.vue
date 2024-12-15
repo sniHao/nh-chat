@@ -66,7 +66,8 @@
       </div>
     </div>
     <!-- 聊天框 -->
-    <Frame :user='nowUser' :isPhoneUnfold='isPhoneUnfold' @sendCallBack='sendCallBack' @closeChat='closeChat'></Frame>
+    <Frame :user='nowUser' :userList="userList" :isPhoneUnfold='isPhoneUnfold' @sendCallBack='sendCallBack'
+           @closeChat='closeChat'></Frame>
   </div>
   <!-- 弹框 -->
   <n-modal v-model:show='showModal'>

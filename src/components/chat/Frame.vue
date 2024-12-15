@@ -6,6 +6,7 @@
         <div class='mt-10 ft-16' :style='`color:${computedStyle.fontColorOpt}`'>选择好友，一起聊聊吧！</div>
       </div>
     </template>
+
     <template v-else>
       <Loader class='loader-abs ml-2' :style='`background-color: ${param.style.mainColor}`'
               v-if='loadingMessage'></Loader>
@@ -60,13 +61,13 @@
                       <n-image v-else class='chat-image' :src='item.message'/>
                     </div>
                   </div>
-                  <div class='w-100 flex' v-if='item.quote.action === 2'>
+                  <div class='w-100 flex' v-if='item.action === 2'>
                     <div class='quote quote-left pd-4 ft-over flex-center'
                          :style='`background-color: ${computedStyle.fontColorOpt35}`'
                          :title='item.quoteMessage'>
-                      <template v-for='(ite, index) in getQuoteView(item.quote.quoteMessage)' :key='index'>
+                      <template v-for='(ite, index) in getQuoteView(item.quoteMessage)' :key='index'>
                         <span v-if='index === 0'>{{ ite }}</span>
-                        <span class="ft-over" v-if='item.quote.quoteType === 0 && index === 1'
+                        <span class="ft-over" v-if='item.quoteType === 0 && index === 1'
                               :title='ite'>{{ ite }}</span>
                         <n-image v-else-if='index === 1' class='quote-image' :src='ite'/>
                       </template>
@@ -107,13 +108,13 @@
                       </div>
                     </div>
                   </div>
-                  <div class='w-100 flex-right' v-if='item.quote.action === 2'>
+                  <div class='w-100 flex-right' v-if='item.action === 2'>
                     <div class='quote quote-right pd-4  ft-over flex-center'
                          :style='`background-color: ${computedStyle.fontColorOpt35}`'
-                         :title='item.quote.quoteMessage'>
-                      <template v-for='(ite, index) in getQuoteView(item.quote.quoteMessage)' :key='index'>
+                         :title='item.quoteMessage'>
+                      <template v-for='(ite, index) in getQuoteView(item.quoteMessage)' :key='index'>
                         <span v-if='index === 0'>{{ ite }}</span>
-                        <span class="ft-over" v-if='item.quote.quoteType === 0 && index === 1'
+                        <span class="ft-over" v-if='item.quoteType === 0 && index === 1'
                               :title='ite'>{{ ite }}</span>
                         <n-image v-else-if='index === 1' class='quote-image' :src='ite'/>
                       </template>
@@ -132,14 +133,17 @@
                   @isActionEmit='isActionEmit' @isQuoteEmit='isQuoteEmit' @sendImageEmit='sendImageEmit'></FrameInput>
     </template>
     <FrameRightBtn :user='props.user' :needListener='needListener' :chatData='chatData'
-                   :moreCheckState='moreCheckState' @nowCheckDataEmit='nowCheckDataEmit'
+                   :moreCheckState='moreCheckState' :userList="userList" @nowCheckDataEmit='nowCheckDataEmit'
                    @isActionEmit='isActionEmit' @isQuoteEmit='isQuoteEmit' @delMessageEmit='delMessageEmit'
-                   @moreCheckStateEmit='moreCheckStateEmit'
+                   @moreCheckStateEmit='moreCheckStateEmit' @sendMessageTransmitEmit='sendMessageTransmitEmit'
                    @revocationMessageEmit='revocationMessageEmit'></FrameRightBtn>
   </div>
 </template>
 
 <script setup lang='ts'>
+import {createDiscreteApi} from "naive-ui";
+
+const {notification} = createDiscreteApi(['notification']);
 import {countTimeDiff, cutChatTime, getTimeFormat} from '@/utils/TimeUtil';
 import {eqChatDataStatic} from '@/utils/staticUtils';
 import {throttle} from '@/utils/domUtils';
@@ -167,7 +171,11 @@ const props = defineProps({
   isPhoneUnfold: {
     type: Boolean,
     default: false
-  }
+  },
+  userList: {
+    type: Array,
+    default: [] as Relation[]
+  },
 });
 const emit = defineEmits(['sendCallBack', 'closeChat']);
 
@@ -288,6 +296,37 @@ const isQuoteEmit = (data: {
 }) => {
   isQuote.value = data;
 };
+
+// 发送消息前置处理
+const sendInfoPre = (sendVal: string): boolean => {
+  if (sendVal.length === 0) return false;
+  if (sendVal.split('\n').length > 20) {
+    notification['error']({
+      content: '超出长度20行的限制',
+      duration: 2500,
+      keepAliveOnHover: true
+    });
+    return false;
+  }
+  return true;
+};
+// 发送图片前置校验
+const upLoadCheck = (file: File | null | undefined) => {
+  if (!file) {
+    tips('error', '文件异常👾');
+    return false;
+  }
+  if ((file?.size ?? 0) / 1024 / 1024 > 4) {
+    tips('error', '图片太大了吧，大小不能超过4M🤯');
+    return false;
+  }
+  if (file?.type !== 'image/png' && file?.type !== 'image/jpeg') {
+    tips('error', '只能发送png或jpeg格式的图片文件');
+    return false;
+  }
+  return true;
+};
+
 // 发送消息
 const isQuote = ref({
   id: 0,
@@ -296,31 +335,35 @@ const isQuote = ref({
 });
 const isAction = ref(0);
 const clearSendVal = ref(false);
-const sendInfo = (message: string) => {
+const sendInfo = (message: string, relationUid: number, action: number) => {
+  if (!sendInfoPre(message)) return;
   const quoteObj = {
-    action: isAction.value,
+    action: action,
     quoteId: isQuote.value.id,
     quoteType: isQuote.value.type,
     quoteMessage: isQuote.value.message
   };
-  const pointer = pushDataOneCom(-88, props.user.uid, props.user.relationUid, 0, message, 0, quoteObj);
+  let pointer = -99;
+  if (relationUid === props.user.relationUid) pointer = pushDataOneCom(-88, props.user.uid, relationUid, 0, message, 0, quoteObj);
   emit('sendCallBack', {val: truncate(message), type: 0});
   clearSendVal.value = true;
   scrollToBottom();
   sendMessage({
-    receiveUid: props.user.relationUid,
+    receiveUid: relationUid,
     message: message,
     type: 0,
-    action: isAction.value,
-    quote: isQuote.value.id
+    action: action,
+    quoteId: isQuote.value.id
   })
       .then((res: Result) => {
         if (res.code !== 200) {
           res.data = randomNumber();
           if (param.experienceMode && firstMessage.value) simReissue(3, message);
         }
-        chatData.value[pointer].id = res.data;
-        chatData.value[pointer].state = res.code === 200 ? 1 : 2;
+        if (pointer !== -99) {
+          chatData.value[pointer].id = res.data;
+          chatData.value[pointer].state = res.code === 200 ? 1 : 2;
+        }
       })
       .finally(() => {
         firstMessage.value = false;
@@ -330,7 +373,13 @@ const sendInfo = (message: string) => {
 
 // 发送消息回调
 const sendMessageEmit = (data: string) => {
-  sendInfo(data);
+  sendInfo(data, props.user.relationUid, isAction.value);
+};
+// 发送消息回调-转发
+const sendMessageTransmitEmit = (data: { type: number, message: string, uid: number }) => {
+  if (data.type === 1) {
+    getImage(data.message).then((res: any) => beforeUpload(res, data.uid, 1))
+  } else sendInfo(data.message, data.uid, 1);
 };
 
 // 推送单条消息
@@ -348,51 +397,67 @@ const pushDataOneCom = (id: number, sendUid: number, receiveUid: number, type: n
         tab: false,
         state: state,
         check: false,
-        quote: quoteObj
+        action: quoteObj.action,
+        quoteId: quoteObj.quoteId,
+        quoteType: quoteObj.quoteType,
+        quoteMessage: quoteObj.quoteMessage
       })
   );
   return chatData.value.length - 1;
 };
 
+// 通过url获取图片文件
+const getImage = (url: string) => {
+  return new Promise(async (resolve) => {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const file = new File([blob], 'chat-image.png', {type: blob.type});
+    resolve(file);
+  })
+};
+
 // 发送失败重试
 const reissue = async (message: string, type: number) => {
   if (type === 1) {
-    const response = await fetch(message);
-    const blob = await response.blob();
-    const file = new File([blob], 'chat-image', {type: blob.type});
-    await beforeUpload(file);
+    getImage(message).then((res: any) => beforeUpload(res, props.user.relationUid, isAction.value))
     return;
   }
-  sendInfo(message);
+  sendInfo(message, props.user.relationUid, isAction.value);
 };
 
 // 发送图片回调
 const sendImageEmit = (file: File) => {
-  beforeUpload(file);
+  beforeUpload(file, props.user.relationUid, isAction.value);
 };
 
 // 发送图片
-const beforeUpload = async (file: File): Promise<boolean> => {
+const beforeUpload = async (file: File, relationUid: number, action: number): Promise<boolean> => {
+  const result = upLoadCheck(file);
+  if (!result) return false;
   const reader = new FileReader();
   reader.onload = function (e: any) {
     const fd = new FormData();
     fd.append('file', file);
-    fd.append('action', isAction.value + '');
+    fd.append('action', action + '');
     fd.append('quoteId', isQuote.value.id + '');
+    fd.append('receiveUid', relationUid + '');
     const quoteObj = {
       action: isAction.value,
       quoteId: isQuote.value.id,
       quoteType: isQuote.value.type,
       quoteMessage: isQuote.value.message
     };
-    const pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0, quoteObj);
+    let pointer = -99;
+    if (relationUid === props.user.relationUid) pointer = pushDataOneCom(-88, props.user.uid, props.user.receiveUid, 1, e.target.result, 0, quoteObj);
     emit('sendCallBack', {val: truncate('[图片]'), type: 1});
     scrollToBottom();
     clearQuote();
-    sendMessageImage(fd, props.user.relationUid).then((res) => {
+    sendMessageImage(fd).then((res) => {
       if (res.code !== 200) res.data = randomNumber();
-      chatData.value[pointer].id = res.data;
-      chatData.value[pointer].state = res.code === 200 ? 1 : 2;
+      if (pointer !== -99) {
+        chatData.value[pointer].id = res.data;
+        chatData.value[pointer].state = res.code === 200 ? 1 : 2;
+      }
     });
   };
   reader.readAsDataURL(file as any);

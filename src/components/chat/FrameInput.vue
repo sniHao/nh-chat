@@ -165,47 +165,13 @@ const valChange = () => {
 
 // 发送消息
 const sendInfo = () => {
-  if (!sendInfoPre()) return;
   emit('sendMessageEmit', sendVal.value);
   sendVal.value = '';
-};
-
-// 发送消息前置处理
-const sendInfoPre = (): boolean => {
-  if (sendVal.value.length === 0) return false;
-  if (sendVal.value.split('\n').length > 20) {
-    notification['error']({
-      content: '超出长度20行的限制',
-      duration: 2500,
-      keepAliveOnHover: true
-    });
-    return false;
-  }
-  return true;
-};
-
-// 发送图片前置校验
-const upLoadCheck = (file: File | null | undefined) => {
-  if (!file) {
-    tips('error', '文件异常👾');
-    return false;
-  }
-  if ((file?.size ?? 0) / 1024 / 1024 > 4) {
-    tips('error', '图片太大了吧，大小不能超过4M🤯');
-    return false;
-  }
-  if (file?.type !== 'image/png' && file?.type !== 'image/jpeg') {
-    tips('error', '只能发送png或jpeg格式的图片文件');
-    return false;
-  }
-  return true;
 };
 
 // 发送图片
 const beforeUpload = (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }) => {
   const file = data.file.file as File;
-  const result = upLoadCheck(file);
-  if (!result) return false;
   emit('sendImageEmit', file);
 };
 
@@ -219,8 +185,6 @@ const listenerCopy = () => {
       if (items[i].type.startsWith('image/')) {
         const file = items[i].getAsFile();
         if (file) {
-          const result = upLoadCheck(file);
-          if (!result) return false;
           emit('sendImageEmit', file);
           event.preventDefault();
         }
@@ -274,6 +238,8 @@ onMounted(() => {
 }
 
 .cb-input {
+
+  min-height: $px-160;
 
   .cb-input-main {
     height: calc(100% - $px-32 - $px-32);

@@ -3,11 +3,34 @@
                :style='`color:${param.style.fontColor}`'
                :bgColor='computedStyle.mainColorOpt'
                @choose='chooseRight'></RightButton>
+  <!-- 弹框 -->
+  <n-modal v-model:show='showTransmit'>
+    <n-card style='width: 400px; max-height: 480px;--n-border-radius:10px' :bordered='false' size='huge' role='dialog'
+            aria-modal='true'
+            class='over-auto'>
+      <template v-if='listUser.length === 0'>
+        <div class='flex-down-center'>
+          <Svg :width='64' :height='64' name='no-user' viewBox='0 0 1139 1024'></Svg>
+          <span class='ft-16 ft-color-tips mt-12'>通讯录空空的</span>
+        </div>
+      </template>
+      <div class='flex-center-zy mb-18' v-else v-for='(item, index) in listUser' :key='index'>
+        <div class="flex-center w-70">
+          <div class='user-head flex-center-center' :style="'background-color:' + tranColor(item.photo)"
+               v-html='computePhoto(item.photo)'></div>
+          <div class='w-70 ml-12 ft-over' :title=" item.name ">{{ item.name }}</div>
+        </div>
+        <n-button v-if="!item?.ok" round strong type='primary' color='#9300ff' @click='transmitMessage(item)'>转发
+        </n-button>
+        <n-button v-else round strong disabled type='primary' color='#9300ff'>已转发</n-button>
+      </div>
+    </n-card>
+  </n-modal>
 </template>
 
 <script setup lang='ts'>
-import { countTimeDiff, getTimeFormat } from '@/utils/TimeUtil';
-import { tips, copyImage, copyText } from '@/utils/OtherUtils';
+import {countTimeDiff, getTimeFormat} from '@/utils/TimeUtil';
+import {tips, copyImage, copyText, tranColor, computePhoto} from '@/utils/OtherUtils';
 import RightButton from '../of/RightButton.vue';
 
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
@@ -29,13 +52,23 @@ const props = defineProps({
   moreCheckState: {
     type: Boolean,
     default: false
+  },
+  userList: {
+    type: Array,
+    default: [] as Relation[]
   }
 });
-const emit = defineEmits(['isActionEmit', 'isQuoteEmit', 'delMessageEmit', 'moreCheckStateEmit', 'nowCheckDataEmit', 'revocationMessageEmit']);
+const emit = defineEmits(['isActionEmit', 'isQuoteEmit', 'delMessageEmit', 'moreCheckStateEmit',
+  'nowCheckDataEmit', 'revocationMessageEmit', 'sendMessageTransmitEmit']);
 
 watch(() => props.needListener, () => {
   if (props.needListener) addListener();
 });
+
+const listUser = ref()
+watch(() => props.userList, () => {
+  listUser.value = props.userList;
+}, {deep: true});
 // ===================================右键操作===================================//
 const tapAndHold = ref(false);
 const addListener = () => {
@@ -91,9 +124,9 @@ const listenerMessage = (e: MouseEvent) => {
   rightBtnLeft.value = e.x;
   rightBtnTop.value = e.y;
   czList.value = [
-    { id: 0, name: '复制内容', incident: () => copyMessage() },
-    { id: 4, name: '引用', incident: () => quoteMessage(nowCheckData.value) },
-    { id: 5, name: '转发', incident: () => transmit() },
+    {id: 0, name: '复制内容', incident: () => copyMessage()},
+    {id: 4, name: '引用', incident: () => quoteMessage(nowCheckData.value)},
+    {id: 5, name: '转发', incident: () => transmit(nowCheckData.value)},
     {
       id: 1,
       name: '删除消息',
@@ -107,7 +140,7 @@ const listenerMessage = (e: MouseEvent) => {
       incident: () => revocationMessageGo()
     });
   }
-  czList.value.push({ id: 3, name: '多选', incident: () => moreChecked() });
+  czList.value.push({id: 3, name: '多选', incident: () => moreChecked()});
 };
 
 // 获取父级dom
@@ -137,12 +170,35 @@ const quoteMessage = (item: message) => {
 
 const clearQuote = () => {
   emit('isActionEmit', 0);
-  emit('isQuoteEmit', { id: 0, type: 0, message: '' });
+  emit('isQuoteEmit', {id: 0, type: 0, message: ''});
 };
 
 // 消息转发
-const transmit = () => {
+const showTransmit = ref(false);
+const transmitData = ref()
+const transmit = (data: message) => {
+  transmitData.value = data;
+  showTransmit.value = true;
 };
+
+watchEffect(() => {
+  if (!showTransmit.value && listUser.value && listUser.value.length !== 0) {
+    listUser.value.filter((item: any) => {
+      item['ok'] = false
+      return item
+    })
+  }
+})
+
+const transmitMessage = (item: any) => {
+  item['ok'] = true
+  tips('success', "消息已转发至：" + item.name);
+  emit('sendMessageTransmitEmit', {
+    type: transmitData.value.type,
+    message: transmitData.value.message,
+    uid: item.relationUid
+  })
+}
 // 撤回消息
 const revocationMessageGo = () => {
   emit('revocationMessageEmit', nowCheckData.value);
