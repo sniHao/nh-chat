@@ -27,5 +27,8 @@ public class MessageVo {
 
     private String message; //内容
 
-    private MessageQuoteVo quote; //引用消息
+    private int action; //消息动作
+    private Long quoteId; //引用消息id
+    private int quoteType; //引用消息类型
+    private String quoteMessage; //引用消息内容
 }

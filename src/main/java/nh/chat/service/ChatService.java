@@ -94,17 +94,19 @@ public class ChatService {
         asyncCom.clearRead(uid, receiveUid);
         MPJLambdaWrapper<Chat> qw = setEqChatCom(uid, receiveUid);
         Page<MessageVo> messageVoPage = chatMapper.selectJoinPage(new Page<>(page, 20), MessageVo.class, qw);
-        List<Long> quotes = messageVoPage.getRecords().stream().filter(item -> item.getQuote().getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value())
-                .map(ite -> ite.getQuote().getQuoteId()).toList();
-        List<MessageVo> messageVos = eqAllQuoteMessage(quotes);
+        List<Long> quotes = messageVoPage.getRecords().stream().filter(item -> item.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value())
+                .map(MessageVo::getQuoteId).toList();
+        List<MessageVo> messageVos;
+        if (!quotes.isEmpty()) messageVos = eqAllQuoteMessage(quotes);
+        else messageVos = new ArrayList<>();
         List<MessageVo> list = new ArrayList<>(messageVoPage.getRecords().stream().filter(item -> {
             if (item.getSendState() == ChatCode.MESSAGE_REVOCATION.value() ||
                     item.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) item.setMessage("撤回了一条消息");
-            if (item.getQuote().getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()) {
-                List<MessageVo> diffMessage = messageVos.stream().filter(ite -> Objects.equals(ite.getQuote().getQuoteId(), item.getId())).toList();
+            if (item.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value() && !messageVos.isEmpty()) {
+                List<MessageVo> diffMessage = messageVos.stream().filter(ite -> Objects.equals(ite.getId(), item.getQuoteId())).toList();
                 if (!diffMessage.isEmpty()) {
-                    item.getQuote().setQuoteType(diffMessage.get(0).getType());
-                    item.setMessage(eqQuoteMessage(item.getSendUid(), diffMessage.get(0)));
+                    item.setQuoteType(diffMessage.get(0).getType());
+                    item.setQuoteMessage(eqQuoteMessage(item.getSendUid(), diffMessage.get(0)));
                 }
             }
             return true;
@@ -210,10 +212,21 @@ public class ChatService {
         if (dto.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()) {
             if (Objects.isNull(dto.getQuoteId())) throw new ChatException("消息异常，引用消息id不能为空");
             LambdaQueryWrapper<Chat> eq = new LambdaQueryWrapper<Chat>()
-                    .select(Chat::getSendUid, Chat::getReceiveUid).eq(Chat::getId, dto.getQuoteId());
+                    .select(Chat::getSendUid, Chat::getReceiveUid)
+                    .eq(Chat::getId, dto.getQuoteId());
             Chat chat = chatMapper.selectOne(eq);
-            if (!chat.getReceiveUid().equals(dto.getQuoteId()) && !chat.getSendUid().equals(uid))
-                throw new ChatException("消息异常，无权限引用该消息");
+            if (Objects.isNull(chat)) throw new ChatException("引用消息不存在");
+            if (chat.getSendUid().equals(uid)) {
+                if (chat.getSendState() != ChatCode.MESSAGE_HEALTH.value()) throw new ChatException("引用消息不存在");
+                return;
+            }
+            if (chat.getReceiveUid().equals(uid)) {
+                if (chat.getSendState() == ChatCode.MESSAGE_REVOCATION.value() ||
+                        chat.getReceiveState() != ChatCode.MESSAGE_HEALTH.value())
+                    throw new ChatException("引用消息不存在");
+                return;
+            }
+            throw new ChatException("消息异常，无权限引用该消息");
         }
     }
 

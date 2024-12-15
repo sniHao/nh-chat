@@ -60,8 +60,9 @@ public class ChatController {
     @RateLimiter(time = 50, count = 30, limitType = LimiterType.IP)
     @Operation(summary = "发送图片消息【*：需要校验对方用户是否存在】")
     @PostMapping("sendMessageImage")
-    public Result<?> sendMessageImage(@RequestAttribute("uid") Long uid, @RequestBody SendMessageDto sendMessageDto) throws ChatException {
-        if (Objects.isNull(sendMessageDto.getReceiveUid()) || Objects.isNull(sendMessageDto.getFile())) throw new ChatException("参数异常");
+    public Result<?> sendMessageImage(@RequestAttribute("uid") Long uid, SendMessageDto sendMessageDto) throws ChatException {
+        if (Objects.isNull(sendMessageDto.getReceiveUid()) || Objects.isNull(sendMessageDto.getFile()))
+            throw new ChatException("参数异常");
         return Result.success("发送成功", chatService.sendMessageImage(uid, sendMessageDto));
     }
 
