@@ -806,6 +806,7 @@ onBeforeUnmount(() => {
 }
 
 .cb-head {
+  z-index: 6;
   height: $px-48;
 
   .cb-head-controls {

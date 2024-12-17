@@ -238,7 +238,7 @@ onMounted(() => {
 }
 
 .cb-input {
-
+  z-index: 6;
   min-height: $px-160;
 
   .cb-input-main {
