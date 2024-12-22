@@ -11,8 +11,7 @@
       <Loader class='loader-abs ml-2' :style='`background-color: ${param.style.mainColor}`'
               v-if='loadingMessage'></Loader>
       <div class='cb-head flex-center' :style='`box-shadow: 0 0 .4px .4px ${computedStyle.fontColorOpt}`'>
-        <div class='cb-head-controls'></div>
-        <div class='w-100 flex-center-center'>{{ user.name }}</div>
+        <div class='w-100 flex-center ml-12 ft-over hover-pointer' @click="clickUser(user.uid)">{{ user.name }}</div>
         <n-popover trigger='click' placement='bottom'>
           <template #trigger>
             <div class='cb-head-controls flex-center-only mr-4 hover-pointer'>
@@ -53,8 +52,8 @@
                   <div class='cbb-main flex'>
                     <n-checkbox :checked='item.check' @update.self:checked='moreCheckedCallBack(item)'
                                 v-if='moreCheckState'></n-checkbox>
-                    <div class='user-head flex-center-center mr-4' :style="'background-color:' + tranColor(user.photo)"
-                         v-html='computePhoto(user.photo)'></div>
+                    <div class='user-head flex-center-center mr-4 hover-pointer' :style="'background-color:' + tranColor(user.photo)"
+                         v-html='computePhoto(user.photo)' @click="clickUser(user.uid)"></div>
                     <div class='cbbm-box cbbm-box-left flex'
                          :style='`background-color: ${param.style.leftChatBgColor}`'>
                       <span v-if='item.type === 0'>{{ item.message }}</span>
@@ -177,7 +176,12 @@ const props = defineProps({
     default: [] as Relation[]
   },
 });
-const emit = defineEmits(['sendCallBack', 'closeChat']);
+const emit = defineEmits(['sendCallBack', 'closeChat', 'clickUser']);
+
+// 点击用户昵称和头像回调
+const clickUser = (user: Relation) => {
+  emit('clickUser', user);
+};
 
 // 删除消息
 const delMessageEmit = (ids: number[]) => {
@@ -703,10 +707,6 @@ onBeforeUnmount(() => {
 :deep(.chat-image img) {
   max-width: 100%;
   max-height: $px-320;
-}
-
-.user-head {
-  border-radius: $px-6;
 }
 
 .cbbm-box-left {

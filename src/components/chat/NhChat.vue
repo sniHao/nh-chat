@@ -240,7 +240,7 @@ body {
 .user-head {
   width: $px-42;
   height: $px-42;
-  border-radius: 50%;
+  border-radius: $px-6;
   background-color: rgb(255 255 255 / 12%);
   color: white;
   white-space: nowrap;

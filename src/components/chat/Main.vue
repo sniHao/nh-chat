@@ -74,7 +74,7 @@
     </div>
     <!-- 聊天框 -->
     <Frame :user='nowUser' :userList="userList" :isPhoneUnfold='isPhoneUnfold' @sendCallBack='sendCallBack'
-           @closeChat='closeChat'></Frame>
+           @closeChat='closeChat' @clickUser="clickUser"></Frame>
   </div>
   <!-- 弹框 -->
   <n-modal v-model:show='showModal'>
@@ -125,7 +125,7 @@ const webSocketService = inject<WebSocketService>('webSocketService') as WebSock
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
 const computedStyle = inject<Ref<any>>('computedStyle') as any;
-const emit = defineEmits(['searchUser']);
+const emit = defineEmits(['searchUser', 'clickUser']);
 // ===================================其他功能===================================//
 // 基本样式
 const mainClass = () => {
@@ -156,6 +156,11 @@ const ofNewInfo = () => {
   setTimeout(() => {
     newInfo.value = false;
   }, 600);
+};
+
+// 点击用户返回ID
+const clickUser = (id: number) => {
+  emit('clickUser', id);
 };
 // ===================================聊天Frame.vue回调===================================//
 // 发送消息回调
@@ -495,7 +500,7 @@ onBeforeUnmount(() => {
 }
 
 .user-main {
-  width: calc(100% - 3rem - 0.375rem);
+  width: calc(100% - $px-48 - $px-5);
 }
 
 .user:last-child .user-box:first-child {
