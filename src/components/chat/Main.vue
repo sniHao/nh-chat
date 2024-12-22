@@ -20,7 +20,7 @@
           <n-input-group-label class='hover-pointer' @click='goSearch'
                                :style='`--n-group-label-text-color:${param.style.fontColor};
                                --n-group-label-border:1px solid ${param.style.fontColor};
-                               --n-group-label-color:${param.style.mainColor}`'>搜索
+                               --n-group-label-color:${param.style.mainColor}`'>搜 索
           </n-input-group-label>
         </n-input-group>
       </div>
@@ -34,7 +34,6 @@
         </template>
         <div v-else class='user-list-sc'>
           <div class='pd-zy-12 hover-pointer user' :class='userClass(item)' v-for='item in userList'
-               :style='item.top===1?"background-color: "+ computedStyle.rightChatColorOpt:""'
                :key='item.id' @click='showChat(item)'>
             <div class='user-box pd-sx-6 flex-center-zy'
                  :style='`border-bottom: 1px solid ${computedStyle.fontColorOpt35}`'>
@@ -42,15 +41,23 @@
                 <div class='user-head flex-center-center' :style="'background-color:' + tranColor(item.photo)"
                      v-html='computePhoto(item.photo)'></div>
               </n-badge>
-              <div class='user-main'>
+              <div class='user-main' :style="`color:${param.style.fontColor}`">
                 <div class='flex-center-zy'>
-                  <div class='ft-16 ft-b'>{{ item.name }}</div>
-                  <div class='ft-13' :title='item.lastMessageDate'>
-                    {{ reckonTime(item.lastMessageDate) }}
+                  <div class="ft-16 ft-b w-auto" :title="item.name">
+                    {{ item.name }}
+                  </div>
+                  <div v-if="item.top === 1" class="ml-8 ft-13 pd-zy-6" style="white-space: nowrap;border-radius: 10px"
+                       :style="`border:2px solid ${param.style.leftChatBgColor};color:${param.style.leftChatBgColor}`">
+                    置顶
                   </div>
                 </div>
-                <div class='ft-13 ft-over'>
-                  {{ item.lastMessage }}
+                <div class="ft-13 flex-center mt-4">
+                  <div class="ft-over w-auto" :title="item.lastMessage">
+                    {{ item.lastMessage }}
+                  </div>
+                  <div class="ml-8" :title='item.lastMessageDate' style="white-space: nowrap;">
+                    {{ reckonTime(item.lastMessageDate) }}
+                  </div>
                 </div>
               </div>
             </div>

@@ -479,6 +479,13 @@
   width: 50%;
 }
 
+.w-auto {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .move-down-2 {
   transform: translateY(0.125rem);
   vertical-align: middle;
