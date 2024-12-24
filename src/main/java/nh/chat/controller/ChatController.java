@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Objects;
 
 @RestController
@@ -34,7 +33,7 @@ public class ChatController {
     @Operation(summary = "发起私信-通讯关系调整")
     @Parameter(name = "receiveUid", description = "接收用户")
     @GetMapping("goChat/{receiveUid}")
-    public Result<?> goChat(@RequestAttribute("uid") Long uid, @PathVariable("receiveUid") Long receiveUid) throws ChatException {
+    public Result<?> goChat(@RequestAttribute("uid") Long uid, @PathVariable("receiveUid") Long receiveUid) {
         return Result.success("ok", chatService.goChat(uid, receiveUid));
     }
 
@@ -61,7 +60,8 @@ public class ChatController {
     @Operation(summary = "发送图片消息【*：需要校验对方用户是否存在】")
     @PostMapping("sendMessageImage")
     public Result<?> sendMessageImage(@RequestAttribute("uid") Long uid, @RequestBody SendMessageDto sendMessageDto) throws ChatException {
-        if (Objects.isNull(sendMessageDto.getReceiveUid()) || Objects.isNull(sendMessageDto.getFile())) throw new ChatException("参数异常");
+        if (Objects.isNull(sendMessageDto.getReceiveUid()) || Objects.isNull(sendMessageDto.getFile()))
+            throw new ChatException("参数异常");
         return Result.success("发送成功", chatService.sendMessageImage(uid, sendMessageDto));
     }
 
@@ -87,7 +87,7 @@ public class ChatController {
     @Operation(summary = "撤回消息")
     @Parameter(name = "mid", description = "消息id")
     @PutMapping("revocationMessage/{mid}")
-    public Result<?> revocationMessage(@RequestAttribute("uid") Long uid, @PathVariable Long mid) throws ChatException, IOException {
+    public Result<?> revocationMessage(@RequestAttribute("uid") Long uid, @PathVariable Long mid) throws ChatException {
         chatService.revocationMessage(uid, mid);
         return Result.success("已撤回");
     }
@@ -97,5 +97,13 @@ public class ChatController {
     @PostMapping("delMessage")
     public Result<?> delMessage(@RequestAttribute("uid") Long uid, @RequestBody Long[] mIds) throws ChatException {
         return Result.success("已删除", chatService.delMessage(uid, mIds));
+    }
+
+    @Operation(summary = "清除消息未读数")
+    @Parameter(name = "receiveUid", description = "通讯录用户")
+    @PutMapping("clearNotRead/{receiveUid}")
+    public Result<?> clearNotRead(@RequestAttribute("uid") Long uid, @PathVariable("receiveUid") Long receiveUid) {
+        chatService.clearNotRead(uid, receiveUid);
+        return Result.success("ok");
     }
 }

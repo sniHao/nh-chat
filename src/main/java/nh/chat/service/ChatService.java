@@ -26,7 +26,6 @@ import nh.chat.utils.FileUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -260,7 +259,7 @@ public class ChatService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void revocationMessage(Long uid, Long mid) throws ChatException, IOException {
+    public void revocationMessage(Long uid, Long mid) throws ChatException {
         Chat chat = eqChatReceiveUid(uid, mid);
         int upResult = chatMapper.update(setEqChat(uid, mid).set(Chat::getSendState, ChatCode.MESSAGE_REVOCATION.value()));
         if (upResult == 0) throw new ChatException("消息异常，撤回失败");
@@ -299,5 +298,9 @@ public class ChatService {
         String message = eqLastMessage(newUid, receiveUid);
         asyncCom.messageRelation(receiveUid, newUid, message, ChatCode.MESSAGE_TYPE_NORMAL.value(), true, 0);
         return "message";
+    }
+
+    public void clearNotRead(Long uid, Long receiveUid) {
+        asyncCom.clearRead(uid, receiveUid);
     }
 }

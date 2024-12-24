@@ -44,16 +44,6 @@ public class AsyncCom {
     }
 
     /**
-     * 清除未读数
-     *
-     * @param id 通讯录id
-     */
-    @Async
-    public void clearNotRead(Long id) {
-        relationMapper.update(new LambdaUpdateWrapper<Relation>().eq(Relation::getId, id).set(Relation::getNotRead, 0));
-    }
-
-    /**
      * 消息处理
      *
      * @param sendUid    发送id
@@ -61,6 +51,7 @@ public class AsyncCom {
      * @param message    消息
      * @param type       类型
      * @param clearRead  是否清除未读数
+     * @param addRead  未读数
      */
     @Async
     public void messageRelation(Long sendUid, Long receiveUid, String message, int type, Boolean clearRead, int addRead) {
