@@ -43,7 +43,10 @@ public class ChatService {
         LambdaQueryWrapper<Relation> qw = new LambdaQueryWrapper<Relation>()
                 .eq(Relation::getUid, uid).eq(Relation::getState, ChatCode.MESSAGE_HEALTH.value())
                 .orderByDesc(Relation::getLastMessageDate);
-        return NhBeanCopy.BEANCOPY.relationVos(relationMapper.selectList(qw));
+        return NhBeanCopy.BEANCOPY.relationVos(relationMapper.selectList(qw)).stream().filter(item -> {
+            if (chatSocket.wsState(item.getRelationUid())) item.setWsState(1);
+            return true;
+        }).toList();
     }
 
     public RelationVo goChat(Long uid, Long receiveUid) {

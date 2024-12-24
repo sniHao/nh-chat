@@ -24,6 +24,16 @@ public class ChatSocket extends TextWebSocketHandler {
     private static final ConcurrentHashMap<Long, WebSocketSession> webSocketMap = new ConcurrentHashMap<>();
 
     /**
+     * 判断用户是否在线
+     *
+     * @param uid 用户id
+     * @return 是否在线
+     */
+    public Boolean wsState(Long uid) {
+        return webSocketMap.containsKey(uid);
+    }
+
+    /**
      * 建立连接 @OnOpen
      *
      * @param session 会话

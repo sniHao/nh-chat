@@ -25,4 +25,5 @@ public class RelationVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date lastMessageDate; //最后一条消息时间
 
+    private int wsState = 0; //是否在线 (0:不在线  1:在线)
 }
