@@ -65,7 +65,8 @@ export const staticUserData = (): Relation[] => {
       top: i,
       lastMessageDate: getTimeFormat(new Date(new Date().getTime() - 1000 * 60 * i)),
       name: '体验官H-' + (i + 1),
-      photo: photo[i]
+      photo: photo[i],
+      state: i
     });
   }
   return data;

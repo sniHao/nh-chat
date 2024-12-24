@@ -82,7 +82,7 @@ const computedStyle = computed(() => {
     'fontColorOpt': setFilterColor(props.style.fontColor),
     'fontColorOpt95': setFilterColor(props.style.fontColor, 0.95),
     'fontColorOpt35': setFilterColor(props.style.fontColor, 0.35),
-    'rightChatColorOpt': setFilterColor(props.style.rightChatBgColor,0.5)
+    'rightChatColorOpt': setFilterColor(props.style.rightChatBgColor, 0.5)
   };
 });
 provide('computedStyle', computedStyle);
@@ -180,6 +180,23 @@ onUnmounted(() => {
 body {
   padding: 0;
   margin: 0;
+}
+
+.offline-ft {
+  color: #b3b7c3;
+}
+
+.online-ft {
+  color: #03e903;
+}
+
+.offline {
+  background-color: #b3b7c3;
+}
+
+
+.online {
+  background-color: #03e903;
 }
 
 .home-bg-color {

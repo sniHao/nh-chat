@@ -10,13 +10,13 @@
       <div class='pd-12' :class="isPhoneUnfold ? 'shrink' : ''">
         <n-input-group>
           <n-input
-              :style='`--n-border:1px solid ${computedStyle.fontColorOpt};--n-border-hover: 1px solid ${computedStyle.fontColorOpt};
+            :style='`--n-border:1px solid ${computedStyle.fontColorOpt};--n-border-hover: 1px solid ${computedStyle.fontColorOpt};
               --n-border-focus: 1px solid ${computedStyle.fontColorOpt};
               --n-placeholder-color:${computedStyle.fontColorOpt};
               --n-text-color:${param.style.fontColor}`'
-              :placeholder='param.inputTips'
-              v-model:value='searchVal'
-              clearable/>
+            :placeholder='param.inputTips'
+            v-model:value='searchVal'
+            clearable />
           <n-input-group-label class='hover-pointer' @click='goSearch'
                                :style='`--n-group-label-text-color:${param.style.fontColor};
                                --n-group-label-border:1px solid ${param.style.fontColor};
@@ -39,23 +39,26 @@
                  :style='`border-bottom: 1px solid ${computedStyle.fontColorOpt35}`'>
               <n-badge :value='item.notRead' :max='99' :offset='[-5, 5]'>
                 <div class='user-head flex-center-center' :style="'background-color:' + tranColor(item.photo)"
-                     v-html='computePhoto(item.photo)'></div>
+                     v-html='computePhoto(item.photo)'>
+                </div>
+                <div class='online-com' :style='`border: 4px solid ${param.style.mainColor}`'
+                     :class="item.state === 0?'offline':'online'"></div>
               </n-badge>
-              <div class='user-main' :style="`color:${param.style.fontColor}`">
+              <div class='user-main' :style='`color:${param.style.fontColor}`'>
                 <div class='flex-center-zy'>
-                  <div class="ft-16 ft-b w-auto" :title="item.name">
+                  <div class='ft-16 ft-b w-auto' :title='item.name'>
                     {{ item.name }}
                   </div>
-                  <div v-if="item.top === 1" class="ml-8 ft-13 pd-zy-6" style="white-space: nowrap;border-radius: 10px"
-                       :style="`border:2px solid ${param.style.leftChatBgColor};color:${param.style.leftChatBgColor}`">
+                  <div v-if='item.top === 1' class='ml-8 ft-13 pd-zy-6' style='white-space: nowrap;border-radius: 10px'
+                       :style='`border:2px solid ${param.style.leftChatBgColor};color:${param.style.leftChatBgColor}`'>
                     置顶
                   </div>
                 </div>
-                <div class="ft-13 flex-center mt-4">
-                  <div class="ft-over w-auto" :title="item.lastMessage">
+                <div class='ft-13 flex-center mt-4'>
+                  <div class='ft-over w-auto' :title='item.lastMessage'>
                     {{ item.lastMessage }}
                   </div>
-                  <div class="ml-8" :title='item.lastMessageDate' style="white-space: nowrap;">
+                  <div class='ml-8' :title='item.lastMessageDate' style='white-space: nowrap;'>
                     {{ reckonTime(item.lastMessageDate) }}
                   </div>
                 </div>
@@ -73,8 +76,8 @@
       </div>
     </div>
     <!-- 聊天框 -->
-    <Frame :user='nowUser' :userList="userList" :isPhoneUnfold='isPhoneUnfold' @sendCallBack='sendCallBack'
-           @closeChat='closeChat' @clickUser="clickUser"></Frame>
+    <Frame :user='nowUser' :userList='userList' :isPhoneUnfold='isPhoneUnfold' @sendCallBack='sendCallBack'
+           @closeChat='closeChat' @clickUser='clickUser'></Frame>
   </div>
   <!-- 弹框 -->
   <n-modal v-model:show='showModal'>
@@ -97,12 +100,12 @@
     </n-card>
   </n-modal>
   <n-modal
-      v-model:show='showDelModel'
-      preset='dialog'
-      title='是否确认删除该聊天'
-      positive-text='确认'
-      negative-text='点错啦'
-      @positive-click='confirmDelChat'></n-modal>
+    v-model:show='showDelModel'
+    preset='dialog'
+    title='是否确认删除该聊天'
+    positive-text='确认'
+    negative-text='点错啦'
+    @positive-click='confirmDelChat'></n-modal>
   <!-- 右键封装 -->
   <RightButton v-if='showRightBtn' :left='rightBtnLeft' :top='rightBtnTop' :list='czList'
                :style='`color:${param.style.fontColor}`'
@@ -111,10 +114,10 @@
 </template>
 
 <script setup lang='ts'>
-import {eqRelation, goChat, delChat, topChat, clearNotRead} from '@/api/index';
-import {tips, tranColor, setUser, truncate, computePhoto} from '@/utils/OtherUtils';
-import {countTimeDiff, reckonTime, getTimeFormat} from '@/utils/TimeUtil';
-import {staticUserData, welcome} from '@/utils/staticUtils';
+import { eqRelation, goChat, delChat, topChat, clearNotRead } from '@/api/index';
+import { tips, tranColor, setUser, truncate, computePhoto } from '@/utils/OtherUtils';
+import { countTimeDiff, reckonTime, getTimeFormat } from '@/utils/TimeUtil';
+import { staticUserData, welcome } from '@/utils/staticUtils';
 import RightButton from '../of/RightButton.vue';
 import Frame from './Frame.vue';
 import NullChat from '../svg/NullChat.vue';
@@ -176,7 +179,7 @@ const sendCallBack = (res: { val: string; type: number; uid: number }) => {
     }
   }
   if (res.uid) {
-    if (ofNewMessage) ofNewMessage({message: message, type: res.type, receiveUid: res.uid});
+    if (ofNewMessage) ofNewMessage({ message: message, type: res.type, receiveUid: res.uid });
     ofNewInfo();
   }
   sortData();
@@ -247,18 +250,18 @@ const staticUser = () => {
 const userList = ref([] as Relation[]);
 const eqUserList = () => {
   eqRelation()
-      .then((res: Result): void => {
-        if (res.code !== 200 && param.experienceMode) {
-          welcome();
-          staticUser();
-          return;
-        }
-        setUser(res.data, param.eqUserInfo).then((res: any) => {
-          userList.value = res;
-          sortData();
-        });
-      })
-      .finally(() => addListener());
+    .then((res: Result): void => {
+      if (res.code !== 200 && param.experienceMode) {
+        welcome();
+        staticUser();
+        return;
+      }
+      setUser(res.data, param.eqUserInfo).then((res: any) => {
+        userList.value = res;
+        sortData();
+      });
+    })
+    .finally(() => addListener());
 };
 
 // ===================================右键操作===================================//
@@ -326,7 +329,7 @@ const listenerUser = (e: MouseEvent) => {
       name: top === 0 ? '置顶聊天' : '取消置顶',
       incident: () => topChatGo(top === 0 ? 1 : 0)
     },
-    {id: 0, name: '删除聊天', incident: () => delChatGo()}
+    { id: 0, name: '删除聊天', incident: () => delChatGo() }
   ];
 };
 
@@ -388,11 +391,11 @@ const closeRightBtnCom = (state: boolean) => {
 // ===================================组件初始化操作===================================//
 const goUid = ref(sessionStorage.getItem('go_chat_uid'));
 watch(
-    () => goUid.value,
-    () => {
-      if (!goUid.value) return;
-      upChat();
-    }
+  () => goUid.value,
+  () => {
+    if (!goUid.value) return;
+    upChat();
+  }
 );
 // 跳聊天
 const upChat = () => {
@@ -406,19 +409,20 @@ const upChat = () => {
 // 来新消息了
 const ws = ref(webSocketService);
 watch(
-    () => ws.value?.pushCount,
-    () => {
-      const data = ws.value.newMessage;
-      let newData = userList.value.filter((item) => item.relationUid === data.receiveUid)[0];
-      newData.lastMessage = truncate(data.message) ?? '-';
-      if (Object.keys(nowUser.value).length === 0 || nowUser.value.relationUid !== data.receiveUid) {
-        if (data.state !== 2) newData.notRead++;
-        ofNewInfo();
-      } else {
-        ws.value.send(JSON.stringify(nowUser.value.id));
-        clearNotRead(nowUser.value.relationUid)
-      }
+  () => ws.value?.pushCount,
+  () => {
+    const data = ws.value.newMessage;
+    let newData = userList.value.filter((item) => item.relationUid === data.receiveUid)[0];
+    if (!newData) return eqUserList();
+    newData.lastMessage = truncate(data.message) ?? '-';
+    if (Object.keys(nowUser.value).length === 0 || nowUser.value.relationUid !== data.receiveUid) {
+      if (data.state !== 2) newData.notRead++;
+      ofNewInfo();
+    } else {
+      ws.value.send(JSON.stringify(nowUser.value.id));
+      clearNotRead(nowUser.value.relationUid);
     }
+  }
 );
 
 // 监听悬浮是否存在滚动条
@@ -446,6 +450,14 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang='scss' scoped>
+.online-com {
+  border-radius: 50%;
+  width: $px-10;
+  height: $px-10;
+  position: absolute;
+  bottom: -$px-5;
+  right: -$px-5;
+}
 
 .shrink {
   width: $px-36 !important;
@@ -494,6 +506,9 @@ onBeforeUnmount(() => {
 
 .user:hover {
   background-color: $bg-color-hover;
+  .online{
+    border: $px-4 solid #4a505d !important;
+  }
 }
 
 .check {
