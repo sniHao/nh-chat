@@ -34,3 +34,5 @@ export const revocationMessage = (mid: number) => request({url: 'chat/revocation
 
 export const delMessage = (data: number[]) => request({url: 'chat/delMessage', method: 'post', data});
 
+export const clearNotRead = (receiveUid: number) => request({url: 'chat/clearNotRead/' + receiveUid, method: 'put'});
+

@@ -111,7 +111,7 @@
 </template>
 
 <script setup lang='ts'>
-import {eqRelation, goChat, delChat, topChat} from '@/api/index';
+import {eqRelation, goChat, delChat, topChat, clearNotRead} from '@/api/index';
 import {tips, tranColor, setUser, truncate, computePhoto} from '@/utils/OtherUtils';
 import {countTimeDiff, reckonTime, getTimeFormat} from '@/utils/TimeUtil';
 import {staticUserData, welcome} from '@/utils/staticUtils';
@@ -416,6 +416,7 @@ watch(
         ofNewInfo();
       } else {
         ws.value.send(JSON.stringify(nowUser.value.id));
+        clearNotRead(nowUser.value.relationUid)
       }
     }
 );

@@ -92,7 +92,6 @@
                       </div>
                       <!-- 消息状态 -->
                       <div class='flex-end mr-6'>
-                        <!-- 失败 -->
                         <Svg
                             class='hover-pointer'
                             name='message-fail'
@@ -101,7 +100,6 @@
                             :height='24'
                             v-if='item.state === 2'
                             @click='reissue(item.message, item.type)'></Svg>
-                        <!-- 加载中 -->
                         <Svg class='message-loading' name='message-loading' fill='#d2d2d2' :width='24' :height='24'
                              v-if='item.state === 0'></Svg>
                       </div>
