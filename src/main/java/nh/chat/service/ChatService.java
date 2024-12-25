@@ -15,6 +15,7 @@ import nh.chat.bean.vo.MessageVo;
 import nh.chat.bean.vo.PushMessage;
 import nh.chat.bean.vo.RelationVo;
 import nh.chat.common.AsyncCom;
+import nh.chat.common.SocketCom;
 import nh.chat.constant.ChatCode;
 import nh.chat.exception.ChatException;
 import nh.chat.mapper.ChatMapper;
@@ -37,6 +38,7 @@ public class ChatService {
     private final ChatSocket chatSocket;
     private final AsyncCom asyncCom;
     private final FileUtil fileUtil;
+    private final SocketCom socketCom;
 
 
     public List<RelationVo> eqRelation(Long uid) {
@@ -157,24 +159,6 @@ public class ChatService {
         return view + messageVo.getMessage();
     }
 
-    /**
-     * 推送消息公共方法
-     *
-     * @param cid        消息id
-     * @param uid        用户id
-     * @param receiveUid 接收用户id
-     * @param state      消息状态
-     * @param message    消息内容
-     * @param type       类型
-     */
-    public void pushCom(Long cid, Long uid, Long receiveUid, int state, String message, int type) {
-        PushMessage pushMessage = new PushMessage(cid, uid, state, type, message);
-        try {
-            chatSocket.sendMessage(receiveUid, JSONObject.toJSONString(pushMessage));
-        } catch (Exception ignored) {
-        }
-    }
-
     public Long sendMessageCom(Long uid, Long receiveUid, String message, int type, int action, Long quoteId) {
         // 通讯录最后消息
         asyncCom.messageRelation(uid, receiveUid, message, type, false, 1);
@@ -185,7 +169,7 @@ public class ChatService {
         Long cid = Long.valueOf(RandomUtil.randomNumbers(12));
         chatMapper.insert(new Chat(cid, uid, receiveUid, mId, type, new Date(), action, quoteId));
         // 推消息
-        if (!uid.equals(receiveUid)) pushCom(cid, uid, receiveUid, ChatCode.MESSAGE_HEALTH.value(), message, type);
+        if (!uid.equals(receiveUid)) socketCom.pushCom(cid, uid, receiveUid, ChatCode.MESSAGE_HEALTH.value(), message, type);
         return cid;
     }
 
@@ -283,7 +267,7 @@ public class ChatService {
         if (chat.getReceiveState() == ChatCode.MESSAGE_HEALTH.value()) {
             asyncCom.messageRelation(uid, chat.getReceiveUid(), "对方撤回了一条消息", ChatCode.MESSAGE_TYPE_NORMAL.value(), false, 0);
             if (!uid.equals(chat.getReceiveUid()))
-                pushCom(mid, uid, chat.getReceiveUid(), ChatCode.MESSAGE_REVOCATION.value(), "对方撤回了一条消息", ChatCode.MESSAGE_TYPE_NORMAL.value());
+                socketCom.pushCom(mid, uid, chat.getReceiveUid(), ChatCode.MESSAGE_REVOCATION.value(), "对方撤回了一条消息", ChatCode.MESSAGE_TYPE_NORMAL.value());
         }
     }
 

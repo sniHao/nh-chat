@@ -1,6 +1,10 @@
 package nh.chat.utils;
 
+import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
+import nh.chat.constant.ChatCode;
+import nh.chat.service.ChatService;
+import nh.chat.service.SocketService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -47,6 +51,8 @@ public class ChatSocket extends TextWebSocketHandler {
         WebSocketSession state = webSocketMap.get(uid);
         if (!Objects.isNull(state)) webSocketMap.remove(uid);
         webSocketMap.put(uid, session);
+        SocketService socketService = NhBeanUtil.getBean(SocketService.class);
+        socketService.userWsState(uid, ChatCode.USER_STATE_ONLINE.value());
     }
 
     /**
@@ -81,6 +87,9 @@ public class ChatSocket extends TextWebSocketHandler {
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         Long uid = (Long) session.getAttributes().get("uid");
-        if (uid != null) webSocketMap.remove(uid);
+        if (Objects.isNull(uid)) return;
+        webSocketMap.remove(uid);
+        SocketService socketService = NhBeanUtil.getBean(SocketService.class);
+        socketService.userWsState(uid, ChatCode.USER_STATE_OFFLINE.value());
     }
 }
