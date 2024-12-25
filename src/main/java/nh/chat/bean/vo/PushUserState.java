@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class PushUserState {
     private Long uid; // 用户Id
-    private int userState; // 用户状态
+    private int state; // 用户状态
 }
