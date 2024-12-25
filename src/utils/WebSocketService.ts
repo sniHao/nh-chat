@@ -8,7 +8,11 @@ export default class WebSocketService {
     receiveUid: -1,
     message: '',
     state: 0,
-    type: 0
+    type: 0,
+    pushUserState: {
+      uid: -1,
+      state: 0,
+    }
   });
   public pushCount = ref(0);
   constructor(private params: string) {}

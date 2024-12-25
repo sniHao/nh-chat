@@ -406,12 +406,23 @@ const upChat = () => {
   }, 50);
 };
 
+// 在线-离线推送
+const userLineState = (state: {uid:number, state:number}) => {
+  userList.value.filter((item: Relation) => {
+    if (item.relationUid === state.uid) {
+      item.state = state.state;
+      return true;
+    }
+  });
+}
+
 // 来新消息了
 const ws = ref(webSocketService);
 watch(
   () => ws.value?.pushCount,
   () => {
     const data = ws.value.newMessage;
+    if (data.mid !== -1 && data.pushUserState.uid !== -1) userLineState(data.pushUserState);
     let newData = userList.value.filter((item) => item.relationUid === data.receiveUid)[0];
     if (!newData) return eqUserList();
     newData.lastMessage = truncate(data.message) ?? '-';

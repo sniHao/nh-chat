@@ -12,8 +12,8 @@
               v-if='loadingMessage'></Loader>
       <div class='cb-head flex-center' :style='`box-shadow: 0 0 .4px .4px ${computedStyle.fontColorOpt}`'>
         <div class='w-100 flex-center ml-12 ft-over hover-pointer' @click="clickUser(user.uid)">
+          <div class='mr-4 ft-13 ls-1' :class="user.state === 0 ? 'offline-ft' : 'online-ft'">[{{user.state === 0 ? '离线' : '在线'}}]</div>
           <div>{{ user.name }}</div>
-          <div class='ml-4 ft-13' :class="user.state === 0?'offline-ft':'online-ft'">【{{user.state === 0 ? '离线' : '在线'}}】</div>
         </div>
         <n-popover trigger='click' placement='bottom'>
           <template #trigger>
