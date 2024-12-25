@@ -517,7 +517,7 @@ onBeforeUnmount(() => {
 
 .user:hover {
   background-color: $bg-color-hover;
-  .online{
+  .online-com{
     border: $px-4 solid #4a505d !important;
   }
 }
