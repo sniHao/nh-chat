@@ -7,7 +7,6 @@ import nh.chat.bean.vo.PushUserState;
 import nh.chat.utils.ChatSocket;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 
 /**
  * @Description:消息公共

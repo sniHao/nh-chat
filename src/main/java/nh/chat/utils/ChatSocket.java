@@ -1,9 +1,7 @@
 package nh.chat.utils;
 
-import cn.hutool.core.bean.BeanUtil;
 import lombok.extern.slf4j.Slf4j;
 import nh.chat.constant.ChatCode;
-import nh.chat.service.ChatService;
 import nh.chat.service.SocketService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;

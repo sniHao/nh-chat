@@ -1,7 +1,6 @@
 package nh.chat.service;
 
 import cn.hutool.core.util.RandomUtil;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -12,7 +11,6 @@ import nh.chat.bean.po.Chat;
 import nh.chat.bean.po.Message;
 import nh.chat.bean.po.Relation;
 import nh.chat.bean.vo.MessageVo;
-import nh.chat.bean.vo.PushMessage;
 import nh.chat.bean.vo.RelationVo;
 import nh.chat.common.AsyncCom;
 import nh.chat.common.SocketCom;
