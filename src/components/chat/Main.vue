@@ -42,7 +42,7 @@
                      v-html='computePhoto(item.photo)'>
                 </div>
                 <div class='online-com' :style='`border: 4px solid ${param.style.mainColor}`'
-                     :class="item.state === 0?'offline':'online'"></div>
+                     :class="item.wsState === 0?'offline':'online'"></div>
               </n-badge>
               <div class='user-main' :style='`color:${param.style.fontColor}`'>
                 <div class='flex-center-zy'>
@@ -410,7 +410,7 @@ const upChat = () => {
 const userLineState = (state: {uid:number, state:number}) => {
   userList.value.filter((item: Relation) => {
     if (item.relationUid === state.uid) {
-      item.state = state.state;
+      item.wsState = state.state;
       return true;
     }
   });
@@ -422,7 +422,7 @@ watch(
   () => ws.value?.pushCount,
   () => {
     const data = ws.value.newMessage;
-    if (data.mid !== -1 && data.pushUserState.uid !== -1) userLineState(data.pushUserState);
+    if (data.mid === -1) return userLineState(data.pushUserState);
     let newData = userList.value.filter((item) => item.relationUid === data.receiveUid)[0];
     if (!newData) return eqUserList();
     newData.lastMessage = truncate(data.message) ?? '-';

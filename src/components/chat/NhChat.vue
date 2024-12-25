@@ -110,6 +110,7 @@ watch(
 // 新消息处理
 let saveInfo = ref([] as any);
 const ofNewMessage = (msg: any) => {
+  if (msg.mid === -1) return;
   if (msg.message.length > 30) msg.message = msg.message.substring(0, 30) + '...';
   if (msg.type === 1) msg.message = '[图片]';
   setUser([msg], props.eqUserInfo).then((res: any) => {
@@ -162,15 +163,21 @@ const initModule = () => {
   sessionStorage.setItem('baseUrl', props.baseUrl);
 };
 
+const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+  ws.close();
+};
+
 onMounted(() => {
   initModule();
   ws.connect();
   resize();
   window.addEventListener('resize', resize);
+  window.addEventListener('beforeunload', handleBeforeUnload);
 });
 onUnmounted(() => {
   ws.close();
   window.removeEventListener('resize', resize);
+  window.removeEventListener('beforeunload', handleBeforeUnload);
 });
 </script>
 <style lang='scss'>

@@ -1,7 +1,7 @@
 {
   "name": "nh-chat",
   "private": false,
-  "version": "1.12.18",
+  "version": "1.12.20",
   "description": "Use a non-exaggerated chat frame.",
   "type": "module",
   "main": "dist/nh-chat.js",

@@ -42,7 +42,7 @@ declare global {
     lastMessageDate: string;
     name: string;
     photo: string;
-    state: number;
+    wsState: number;
   }
 
   interface message {
