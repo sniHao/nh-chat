@@ -160,8 +160,10 @@ const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
 const computedStyle = inject<Ref<any>>('computedStyle') as any;
 
-document.documentElement.style.setProperty('--left-after', param.style.leftChatBgColor);
-document.documentElement.style.setProperty('--right-after', param.style.rightChatBgColor);
+watchEffect(() => {
+  document.documentElement.style.setProperty('--left-after', param.style.leftChatBgColor);
+  document.documentElement.style.setProperty('--right-after', param.style.rightChatBgColor);
+})
 
 const props = defineProps({
   user: {
