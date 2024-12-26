@@ -4,6 +4,9 @@
 <h3 align="center">清晰的说明文档</h3>
 <h3 align="center">好用、不夸张的聊天框架🥰</h3>
 
+
+<p align="center"><a href="README-en.md">English</a> | 中文</p>
+
 ## 项目介绍👋
 
 本框架采用前沿技术路线，更大众化、代码简洁、注释详细。欢迎大家提出宝贵意见、贡献代码🤝
@@ -12,10 +15,10 @@
 
 代码开源地址：
 
-- [GitHub](https://github.com/sniHao/nh-chat)
-- [Gitee](https://gitee.com/snihao/nh-chat)
+- [GitHub](https://github.com/sniHao/nh-chat) ![github-sniHao-nh-chat](http://badge.devlive.org/api/badge/github/sniHao/nh-chat.svg?type=stars&style=rounded&rightColor=%2523C22D8F&logo=https%3A%2F%2Fgitee.com%2Fsnihao%2Fnh-chat%2Fraw%2Fmaster%2Fsrc%2Fassets%2Fimages%2Fmd-name.png)
+- [Gitee](https://gitee.com/snihao/nh-chat) ![gitee-snihao-nh-chat](http://badge.devlive.org/api/badge/gitee/snihao/nh-chat.svg?type=stars&style=rounded&rightColor=%2523F8610F&logo=https%3A%2F%2Fgitee.com%2Fsnihao%2Fnh-chat%2Fraw%2Fmaster%2Fsrc%2Fassets%2Fimages%2Fmd-name.png)
 
-代码体验地址：[https://www.snihao.top](https://www.snihao.top)
+项目体验地址：[https://www.snihao.top](https://www.snihao.top)
 
 ## 功能介绍😎
 
