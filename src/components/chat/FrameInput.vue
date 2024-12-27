@@ -1,5 +1,6 @@
 <template>
   <div class='cb-input pd-1' :style='`box-shadow: 0 0 .4px .4px ${computedStyle.fontColorOpt}`'>
+    <!-- 多选操作 -->
     <div v-show='moreCheckState' class='flex-center-center h-100'>
       <div class='flex-down-center' @click='delMoreChecked'>
         <Svg :width='24' :height='24' :fill='computedStyle.fontColorOpt95' class='hover-pointer mb-2'
@@ -12,7 +13,19 @@
         <n-button text :color='computedStyle.fontColorOpt' size='large'>取消</n-button>
       </div>
     </div>
-    <div v-show="!moreCheckState">
+    <!-- 复制图片 -->
+    <div v-show='copyImage' class='flex-down-center flex-zy h-100 pd-sx-12'>
+      <n-image class='copy-image' :src='copyImageUrl' :style='`border: 2px solid ${computedStyle.fontColorOpt}`' />
+      <div class='flex mt-12'>
+        <n-button class='mr-16' type='primary' ghost @click='closeCopyImage' :color='param.style.leftChatBgColor'>
+          取 消
+        </n-button>
+        <n-button type='primary' @click='sendCopyImage' :color='param.style.rightChatBgColor'>
+          发 送
+        </n-button>
+      </div>
+    </div>
+    <div v-show='!moreCheckState && !copyImage'>
       <!-- 表情包图片等等 -->
       <div class='cb-input-controls flex-center'>
         <n-popover trigger='click' raw @update:show='handleUpdateShow'>
@@ -20,7 +33,7 @@
             <Svg :width='24' :height='24' class='hover-pointer ml-12' name='emoji'
                  :fill='computedStyle.fontColorOpt'></Svg>
           </template>
-          <EmoJi @choose='chooseEmoji'/>
+          <EmoJi @choose='chooseEmoji' />
         </n-popover>
         <n-upload :show-file-list='false' @before-upload='beforeUpload' accept='.png,.jpeg,.jpg'>
           <Svg :width='24' :height='24' class='hover-pointer ml-12' name='up-image'
@@ -31,16 +44,16 @@
       <div class='cb-input-main' :style='`background-color: ${param.style.mainColor};`'
            :class="isQuote.id!==0?'cb-input-main-quote':''">
         <n-input
-            id='nh-chat-input'
-            ref='inputInstRef'
-            :style='`--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset;
+          id='nh-chat-input'
+          ref='inputInstRef'
+          :style='`--n-border: unset; --n-border-hover: unset; --n-border-focus: unset; --n-box-shadow-focus: unset;
               --n-placeholder-color:${computedStyle.fontColorOpt};--n-text-color:${param.style.fontColor}`'
-            v-model:value='sendVal'
-            type='textarea'
-            @keydown.enter.native='handleKeyUp'
-            @input='valChange'
-            placeholder-style='color:red'
-            placeholder='说点啥...'/>
+          v-model:value='sendVal'
+          type='textarea'
+          @keydown.enter.native='handleKeyUp'
+          @input='valChange'
+          placeholder-style='color:red'
+          placeholder='说点啥...' />
       </div>
       <!-- 引用-->
       <template v-if='isQuote.id!==0'>
@@ -49,15 +62,15 @@
           <div class='w-70 flex-center' :style='`color:${computedStyle.fontColorOpt}`'>
             <template v-for='(quote, index) in getQuoteView(isQuote.message)' :key='index'>
               <span v-if='index === 0'>{{ quote }}</span>
-              <span class="ft-over" v-if='isQuote.type === 0 && index === 1'
+              <span class='ft-over' v-if='isQuote.type === 0 && index === 1'
                     :title='quote'>{{ quote }}</span>
-              <n-image v-else-if='index === 1' class='quote-image' :src='quote'/>
+              <n-image v-else-if='index === 1' class='quote-image' :src='quote' />
             </template>
           </div>
           <div class='hover-pointer' @click='clearQuote'>取消引用</div>
         </div>
       </template>
-      <div class="quote-message" v-else></div>
+      <div class='quote-message' v-else></div>
       <!-- 发送 -->
       <div class='cb-input-go flex-center-zy pd-zy-6' :style='`color:${computedStyle.fontColorOpt}`'>
         <div>{{ sendVal.length }} / {{ inputMaxNumber }}</div>
@@ -68,11 +81,11 @@
 </template>
 
 <script setup lang='ts'>
-import {createDiscreteApi} from 'naive-ui';
+import { createDiscreteApi } from 'naive-ui';
 
-const {notification} = createDiscreteApi(['notification']);
-import type {UploadFileInfo} from 'naive-ui';
-import {tips, getQuoteView} from '@/utils/OtherUtils';
+const { notification } = createDiscreteApi(['notification']);
+import type { UploadFileInfo } from 'naive-ui';
+import { getQuoteView } from '@/utils/OtherUtils';
 import Svg from '../of/Svg.vue';
 import EmoJi from '../of/EmoJi.vue';
 
@@ -114,7 +127,7 @@ const emit = defineEmits(['sendMessageEmit', 'sendImageEmit', 'isActionEmit', 'i
 //清除引用
 const clearQuote = () => {
   emit('isActionEmit', 0);
-  emit('isQuoteEmit', {com: '', id: 0, data: {}});
+  emit('isQuoteEmit', { com: '', id: 0, data: {} });
 };
 
 // 删除多选内容
@@ -176,6 +189,20 @@ const beforeUpload = (data: { file: UploadFileInfo; fileList: UploadFileInfo[] }
 };
 
 // 监听复制粘贴消息
+const copyImage = ref(false);
+const copyImageFile = ref();
+const copyImageUrl = ref('');
+
+const closeCopyImage = () => {
+  copyImage.value = false;
+  copyImageUrl.value = '';
+  copyImageFile.value = '';
+};
+const sendCopyImage = () => {
+  emit('sendImageEmit', copyImageFile.value);
+  closeCopyImage();
+};
+
 const listenerCopy = () => {
   const pasteArea = document.getElementById('nh-chat-input') as HTMLDivElement;
   pasteArea.addEventListener('paste', (event: ClipboardEvent) => {
@@ -185,7 +212,13 @@ const listenerCopy = () => {
       if (items[i].type.startsWith('image/')) {
         const file = items[i].getAsFile();
         if (file) {
-          emit('sendImageEmit', file);
+          copyImage.value = true;
+          copyImageFile.value = file;
+          const reader = new FileReader();
+          reader.onload = function(e: any) {
+            copyImageUrl.value = e.target.result;
+          };
+          reader.readAsDataURL(file as any);
           event.preventDefault();
         }
       }
@@ -206,6 +239,17 @@ onMounted(() => {
 </script>
 
 <style lang='scss' scoped>
+.copy-image {
+  max-width: $px-96;
+  max-height: $px-96;
+  border-radius: $px-4;
+}
+
+:deep(.copy-image img) {
+  max-width: 100%;
+  max-height: 100%;
+}
+
 :deep(.n-upload) {
   width: unset;
 }
