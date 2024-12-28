@@ -4,11 +4,11 @@
 
 <script setup lang='ts'>
 import WebSocketService from '@/utils/WebSocketService';
-import { createDiscreteApi } from 'naive-ui';
+import {createDiscreteApi} from 'naive-ui';
 
-const { notification } = createDiscreteApi(['notification']);
-import { useRouter } from 'vue-router';
-import { setUser, setFilterColor } from '@/utils/OtherUtils';
+const {notification} = createDiscreteApi(['notification']);
+import {useRouter} from 'vue-router';
+import {setUser, setFilterColor} from '@/utils/OtherUtils';
 import Main from '@/components/chat/Main.vue';
 
 const router = useRouter();
@@ -51,7 +51,7 @@ const props = defineProps({
   },
   userInfo: {
     type: Object as unknown as userInfo,
-    default: () => ({ uid: -1, name: '默认', photo: '默' })
+    default: () => ({uid: -1, name: '默认', photo: '默'})
   },
   socketUrl: {
     type: String,
@@ -82,6 +82,7 @@ const computedStyle = computed(() => {
     'fontColorOpt': setFilterColor(props.style.fontColor),
     'fontColorOpt95': setFilterColor(props.style.fontColor, 0.95),
     'fontColorOpt35': setFilterColor(props.style.fontColor, 0.35),
+    'leftChatColorOpt': setFilterColor(props.style.leftChatBgColor, 0.5),
     'rightChatColorOpt': setFilterColor(props.style.rightChatBgColor, 0.5)
   };
 });
@@ -99,13 +100,13 @@ const getNowChatUid = (uid: number) => {
 provide('getNowChatUid', getNowChatUid);
 
 watch(
-  () => ws.pushCount,
-  () => {
-    if (nowUid.value !== ws.newMessage.receiveUid) ofNewMessage(ws.newMessage);
-  },
-  {
-    deep: true
-  }
+    () => ws.pushCount,
+    () => {
+      if (nowUid.value !== ws.newMessage.receiveUid) ofNewMessage(ws.newMessage);
+    },
+    {
+      deep: true
+    }
 );
 // 新消息处理
 let saveInfo = ref([] as any);
@@ -122,21 +123,21 @@ const ofNewMessage = (msg: any) => {
     const n = notification['info']({
       content: '你收到了一条来自 ' + name + ' 的消息',
       meta: () =>
-        h('div', null, [
-          msg.message,
-          h(
-            'span',
-            {
-              onClick: (event) => {
-                event.stopPropagation();
-                n.destroy();
-                goChat(msg.receiveUid);
-              },
-              class: 'tips-link'
-            },
-            '查看详情'
-          )
-        ]),
+          h('div', null, [
+            msg.message,
+            h(
+                'span',
+                {
+                  onClick: (event) => {
+                    event.stopPropagation();
+                    n.destroy();
+                    goChat(msg.receiveUid);
+                  },
+                  class: 'tips-link'
+                },
+                '查看详情'
+            )
+          ]),
       duration: 3500,
       keepAliveOnHover: true
     });

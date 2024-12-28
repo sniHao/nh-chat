@@ -32,7 +32,7 @@ declare global {
     msg: string;
   }
 
-  interface Relation {
+  interface anyRelation {
     id: number;
     uid: number;
     relationUid: number;

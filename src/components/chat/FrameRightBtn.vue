@@ -14,15 +14,29 @@
           <span class='ft-16 ft-color-tips mt-12'>通讯录空空的</span>
         </div>
       </template>
-      <div class='flex-center-zy mb-18' v-else v-for='(item, index) in listUser' :key='index'>
+      <div class='flex-center-zy mb-12' v-else v-for='(item, index) in listUser' :key='index'
+           :class="item?.ok?'choose-transmit':''">
         <div class="flex-center w-70">
           <div class='user-head flex-center-center' :style="'background-color:' + tranColor(item.photo)"
                v-html='computePhoto(item.photo)'></div>
           <div class='w-70 ml-12 ft-over' :title=" item.name ">{{ item.name }}</div>
         </div>
-        <n-button v-if="!item?.ok" round strong type='primary' color='#9300ff' @click='transmitMessage(item)'>转发
+        <n-button v-if="!item?.ok" round strong type='primary' :color='param.style.leftChatBgColor'
+                  @click='transmitMessage(item)'>选 择
         </n-button>
-        <n-button v-else round strong disabled type='primary' color='#9300ff'>已转发</n-button>
+        <n-button v-else round strong type='primary' :color='computedStyle.leftChatColorOpt'
+                  @click="closeTransmit(item)">
+          取 消
+        </n-button>
+      </div>
+      <div class="flex-center mt-30">
+        <n-input round placeholder="顺带捎句话" class="mr-30" type="textarea" v-model:value='withVal' :autosize="{
+        minRows: 1,
+        maxRows: 3,
+      }"/>
+        <n-button round strong type='primary' :disabled="checkedUser.length === 0"
+                  :color='param.style.rightChatBgColor' @click="sendMessageTransmit">发 送
+        </n-button>
       </div>
     </n-card>
   </n-modal>
@@ -190,15 +204,43 @@ watchEffect(() => {
   }
 })
 
-const transmitMessage = (item: any) => {
-  item['ok'] = true
-  tips('success', "消息已转发至：" + item.name);
-  emit('sendMessageTransmitEmit', {
-    type: transmitData.value.type,
-    message: transmitData.value.message,
-    uid: item.relationUid
-  })
+// 选中用户-转发
+const checkedUser = ref([] as any[])
+const transmitMessage = (data: any) => {
+  data['ok'] = true
+  checkedUser.value.push(data)
 }
+// 取消选中用户-转发
+const closeTransmit = (data: any) => {
+  data['ok'] = false
+  checkedUser.value = checkedUser.value.filter((item: any) => item.id !== data.id)
+};
+
+// 转发
+const withVal = ref('')
+const sendMessageTransmit = () => {
+  showTransmit.value = false;
+  let names = ""
+  checkedUser.value.forEach((item, index) => {
+    names += item.name + (index !== checkedUser.value.length - 1 ? "、" : "。")
+    emit('sendMessageTransmitEmit', {
+      type: transmitData.value.type,
+      message: transmitData.value.message,
+      uid: item.relationUid
+    })
+    if (withVal.value !== '') {
+      emit('sendMessageTransmitEmit', {
+        type: 0,
+        message: withVal.value,
+        uid: item.relationUid
+      })
+    }
+  })
+  tips('success', "消息已转发至：" + names);
+  checkedUser.value = []
+  withVal.value = ''
+};
+
 // 撤回消息
 const revocationMessageGo = () => {
   emit('revocationMessageEmit', nowCheckData.value);
@@ -255,4 +297,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang='scss' scoped>
+.choose-transmit {
+  background-color: $bg-color-hover;
+}
 </style>
