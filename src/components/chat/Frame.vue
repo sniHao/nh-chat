@@ -12,7 +12,9 @@
               v-if='loadingMessage'></Loader>
       <div class='cb-head flex-center' :style='`box-shadow: 0 0 .4px .4px ${computedStyle.fontColorOpt}`'>
         <div class='w-100 flex-center ml-12 ft-over hover-pointer' @click="clickUser(user.uid)">
-          <div class='mr-4 ft-13 ls-1' :class="user.wsState === 0 ? 'offline-ft' : 'online-ft'">[{{user.wsState === 0 ? '离线' : '在线'}}]</div>
+          <div class='mr-4 ft-13 ls-1' :class="user.wsState === 0 ? 'offline-ft' : 'online-ft'">
+            [{{ user.wsState === 0 ? '离线' : '在线' }}]
+          </div>
           <div>{{ user.name }}</div>
         </div>
         <n-popover trigger='click' placement='bottom'>
@@ -55,7 +57,8 @@
                   <div class='cbb-main flex'>
                     <n-checkbox :checked='item.check' @update.self:checked='moreCheckedCallBack(item)'
                                 v-if='moreCheckState'></n-checkbox>
-                    <div class='user-head flex-center-center mr-4 hover-pointer' :style="'background-color:' + tranColor(user.photo)"
+                    <div class='user-head flex-center-center mr-4 hover-pointer'
+                         :style="'background-color:' + tranColor(user.photo)"
                          v-html='computePhoto(user.photo)' @click="clickUser(user.uid)"></div>
                     <div class='cbbm-box cbbm-box-left flex'
                          :style='`background-color: ${param.style.leftChatBgColor}`'>
@@ -580,6 +583,7 @@ const moreCheckedCallBack = (data: message, needFilter?: boolean) => {
 // ===================================组件初始化操作===================================//
 // 初始化数据
 const initData = () => {
+  isQuote.value = {id: 0, type: 0, message: ''};
   clearSendVal.value = false;
   chatData.value = [];
   loadingMessage.value = false;
