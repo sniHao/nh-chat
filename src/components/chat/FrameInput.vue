@@ -251,6 +251,9 @@ watch(() => props.clearSendVal, () => {
 watch(() => props.addSendVal, () => {
   if (props.addSendVal) sendVal.value = props.addSendVal;
 });
+watch(() => props.isQuote, () => {
+  if (props.isQuote.id !== 0) inputInstRef.value?.focus();
+});
 
 onMounted(() => {
   listenerCopy();
