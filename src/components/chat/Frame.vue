@@ -130,12 +130,12 @@
         </div>
       </div>
       <FrameInput :isQuote='isQuote' :clearSendVal='clearSendVal' :moreCheckState='moreCheckState'
-                  :saveChecked='saveChecked' :addSendVal='addSendVal'
+                  :saveChecked='saveChecked' :addSendVal='addSendVal' :user='user'
                   @sendMessageEmit='sendMessageEmit' @moreCheckStateEmit='moreCheckStateEmit'
                   @delMessageEmit='delMessageEmit' @cancelMoreCheckedEmit='cancelMoreCheckedEmit'
                   @isActionEmit='isActionEmit' @isQuoteEmit='isQuoteEmit' @sendImageEmit='sendImageEmit'></FrameInput>
     </template>
-    <FrameRightBtn :user='props.user' :needListener='needListener' :chatData='chatData'
+    <FrameRightBtn :user='user' :needListener='needListener' :chatData='chatData'
                    :moreCheckState='moreCheckState' :userList="userList" @nowCheckDataEmit='nowCheckDataEmit'
                    @isActionEmit='isActionEmit' @isQuoteEmit='isQuoteEmit' @delMessageEmit='delMessageEmit'
                    @moreCheckStateEmit='moreCheckStateEmit' @sendMessageTransmitEmit='sendMessageTransmitEmit'

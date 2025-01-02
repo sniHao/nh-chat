@@ -1,11 +1,12 @@
 <template>
   <!-- 单色svg -->
-  <svg class="icon" :class="class" :viewBox="viewBox" version="1.1" xmlns="http://www.w3.org/2000/svg" :width="width" :height="height">
-    <path v-for="(path, index) in nowPath" :key="index" :d="path" :fill="fill" />
+  <svg class='icon' :class='class' :viewBox='viewBox' version='1.1' xmlns='http://www.w3.org/2000/svg' :width='width'
+       :height='height'>
+    <path v-for='(path, index) in nowPath' :key='index' :d='path' :fill='fill' />
   </svg>
 </template>
 
-<script setup lang="ts">
+<script setup lang='ts'>
 const emit = defineEmits(['event']);
 const props = defineProps({
   width: {
@@ -35,6 +36,10 @@ const props = defineProps({
 });
 
 const paths = [
+  {
+    k: 'chat-history',
+    v: ['M512 85.271273a426.635636 426.635636 0 0 1 426.635636 426.682182A426.682182 426.682182 0 0 1 512 938.589091 426.682182 426.682182 0 0 1 85.317818 512h85.317818a341.364364 341.364364 0 1 0 59.112728-192h111.569454v85.317818h-256v-256h85.317818v106.682182A425.844364 425.844364 0 0 1 512 85.271273z m42.635636 213.317818v195.630545l138.379637 138.379637-60.369455 60.369454-163.328-163.374545V298.542545h85.317818z']
+  },
   {
     k: 'pointer',
     v: [
@@ -135,4 +140,4 @@ onMounted(() => {
 });
 </script>
 
-<style lang="scss" scoped></style>
+<style lang='scss' scoped></style>

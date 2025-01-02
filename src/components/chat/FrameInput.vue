@@ -27,18 +27,27 @@
     </div>
     <div v-show='!moreCheckState && !copyImage'>
       <!-- 表情包图片等等 -->
-      <div class='cb-input-controls flex-center'>
-        <n-popover trigger='click' raw @update:show='handleUpdateShow'>
-          <template #trigger>
-            <Svg :width='24' :height='24' class='hover-pointer ml-12' name='emoji'
+      <div class='cb-input-controls flex-center-zy pd-zy-12'>
+        <div class='flex-center'>
+          <n-popover trigger='click' raw @update:show='handleUpdateShow'>
+            <template #trigger>
+              <Svg :width='24' :height='24' class='hover-pointer' name='emoji'
+                   :fill='computedStyle.fontColorOpt'></Svg>
+            </template>
+            <EmoJi @choose='chooseEmoji' />
+          </n-popover>
+          <n-upload :show-file-list='false' @before-upload='beforeUpload' accept='.png,.jpeg,.jpg'>
+            <Svg :width='24' :height='24' class='hover-pointer ml-12' name='up-image'
                  :fill='computedStyle.fontColorOpt'></Svg>
+          </n-upload>
+        </div>
+        <n-popover trigger='hover'>
+          <template #trigger>
+            <Svg :width='26' :height='26' class='hover-pointer' name='chat-history'
+                 :fill='computedStyle.fontColorOpt' @click='goChatHistory(true)'></Svg>
           </template>
-          <EmoJi @choose='chooseEmoji' />
+          <span>聊天记录</span>
         </n-popover>
-        <n-upload :show-file-list='false' @before-upload='beforeUpload' accept='.png,.jpeg,.jpg'>
-          <Svg :width='24' :height='24' class='hover-pointer ml-12' name='up-image'
-               :fill='computedStyle.fontColorOpt'></Svg>
-        </n-upload>
       </div>
       <!-- 输入框 -->
       <div class='cb-input-main' :style='`background-color: ${param.style.mainColor};`'
@@ -77,6 +86,9 @@
         <div class='hover-pointer' @click='sendInfo'>按Enter键发送</div>
       </div>
     </div>
+    <!-- 弹框 -->
+    <FrameInputRecord :user='user' :showChatHistory='showChatHistory'
+                      @closeChatHistory='goChatHistory'></FrameInputRecord>
   </div>
 </template>
 
@@ -88,6 +100,7 @@ import type { UploadFileInfo } from 'naive-ui';
 import { getQuoteView } from '@/utils/OtherUtils';
 import Svg from '../of/Svg.vue';
 import EmoJi from '../of/EmoJi.vue';
+import FrameInputRecord from './FrameInputRecord.vue';
 
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
 const computedStyle = inject<Ref<any>>('computedStyle') as any;
@@ -123,6 +136,12 @@ const props = defineProps({
   }
 });
 const emit = defineEmits(['sendMessageEmit', 'sendImageEmit', 'isActionEmit', 'isQuoteEmit', 'moreCheckStateEmit', 'delMessageEmit', 'cancelMoreCheckedEmit']);
+
+// 聊天记录
+const showChatHistory = ref(false);
+const goChatHistory = (state: boolean) => {
+  showChatHistory.value = state;
+};
 
 //清除引用
 const clearQuote = () => {
