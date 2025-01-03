@@ -1,16 +1,19 @@
 package nh.chat.service;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import lombok.RequiredArgsConstructor;
+import nh.chat.bean.dto.ChatRecordDto;
 import nh.chat.bean.dto.SendMessageDto;
 import nh.chat.bean.po.Chat;
 import nh.chat.bean.po.Message;
 import nh.chat.bean.po.Relation;
 import nh.chat.bean.vo.MessageVo;
+import nh.chat.bean.vo.RecordVo;
 import nh.chat.bean.vo.RelationVo;
 import nh.chat.common.AsyncCom;
 import nh.chat.common.SocketCom;
@@ -40,9 +43,7 @@ public class ChatService {
 
 
     public List<RelationVo> eqRelation(Long uid) {
-        LambdaQueryWrapper<Relation> qw = new LambdaQueryWrapper<Relation>()
-                .eq(Relation::getUid, uid).eq(Relation::getState, ChatCode.MESSAGE_HEALTH.value())
-                .orderByDesc(Relation::getLastMessageDate);
+        LambdaQueryWrapper<Relation> qw = new LambdaQueryWrapper<Relation>().eq(Relation::getUid, uid).eq(Relation::getState, ChatCode.MESSAGE_HEALTH.value()).orderByDesc(Relation::getLastMessageDate);
         return NhBeanCopy.BEANCOPY.relationVos(relationMapper.selectList(qw)).stream().filter(item -> {
             if (chatSocket.wsState(item.getRelationUid())) item.setWsState(1);
             return true;
@@ -50,8 +51,7 @@ public class ChatService {
     }
 
     public RelationVo goChat(Long uid, Long receiveUid) {
-        LambdaQueryWrapper<Relation> qw = new LambdaQueryWrapper<Relation>()
-                .eq(Relation::getUid, uid).eq(Relation::getRelationUid, receiveUid);
+        LambdaQueryWrapper<Relation> qw = new LambdaQueryWrapper<Relation>().eq(Relation::getUid, uid).eq(Relation::getRelationUid, receiveUid);
         Relation relation = relationMapper.selectOne(qw);
         Date date = new Date();
         if (Objects.isNull(relation)) {
@@ -59,8 +59,7 @@ public class ChatService {
             relationMapper.insert(relationNew);
             return NhBeanCopy.BEANCOPY.relationVo(relationNew);
         }
-        LambdaUpdateWrapper<Relation> uw = new LambdaUpdateWrapper<Relation>()
-                .eq(Relation::getUid, uid).eq(Relation::getRelationUid, receiveUid);
+        LambdaUpdateWrapper<Relation> uw = new LambdaUpdateWrapper<Relation>().eq(Relation::getUid, uid).eq(Relation::getRelationUid, receiveUid);
         if (relation.getState() == ChatCode.MESSAGE_HEALTH.value()) {
             RelationVo relationVo = NhBeanCopy.BEANCOPY.relationVo(relation);
             relationVo.setNotRead(0);
@@ -82,28 +81,20 @@ public class ChatService {
      * @return MPJLambdaWrapper<Chat>
      */
     public MPJLambdaWrapper<Chat> setEqChatCom(Long uid, Long receiveUid) {
-        return new MPJLambdaWrapper<Chat>().selectAll(Chat.class)
-                .select(Message::getMessage).leftJoin(Message.class, Message::getId, Chat::getMid)
-                .and(i -> i.eq(Chat::getSendState, ChatCode.MESSAGE_HEALTH.value())
-                        .eq(Chat::getSendUid, uid).eq(Chat::getReceiveUid, receiveUid))
-                .or(i -> i.eq(Chat::getReceiveState, ChatCode.MESSAGE_HEALTH.value())
-                        .ne(Chat::getSendState, ChatCode.MESSAGE_REVOCATION.value())
-                        .eq(Chat::getSendUid, receiveUid).eq(Chat::getReceiveUid, uid))
-                .orderByDesc(Chat::getDate);
+        return new MPJLambdaWrapper<Chat>().selectAll(Chat.class).select(Message::getMessage).leftJoin(Message.class, Message::getId, Chat::getMid).and(i -> i.and(ii -> ii.eq(Chat::getSendState, ChatCode.MESSAGE_HEALTH.value()).eq(Chat::getSendUid, uid).eq(Chat::getReceiveUid, receiveUid)).or(ii -> ii.eq(Chat::getReceiveState, ChatCode.MESSAGE_HEALTH.value()).ne(Chat::getSendState, ChatCode.MESSAGE_REVOCATION.value()).eq(Chat::getSendUid, receiveUid).eq(Chat::getReceiveUid, uid))).orderByDesc(Chat::getDate);
     }
 
     public Map<String, Object> eqChat(Long uid, Long receiveUid, Long page) {
         asyncCom.clearRead(uid, receiveUid);
         MPJLambdaWrapper<Chat> qw = setEqChatCom(uid, receiveUid);
         Page<MessageVo> messageVoPage = chatMapper.selectJoinPage(new Page<>(page, 20), MessageVo.class, qw);
-        List<Long> quotes = messageVoPage.getRecords().stream().filter(item -> item.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value())
-                .map(MessageVo::getQuoteId).toList();
+        List<Long> quotes = messageVoPage.getRecords().stream().filter(item -> item.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()).map(MessageVo::getQuoteId).toList();
         List<MessageVo> messageVos;
         if (!quotes.isEmpty()) messageVos = eqAllQuoteMessage(quotes);
         else messageVos = new ArrayList<>();
         List<MessageVo> list = new ArrayList<>(messageVoPage.getRecords().stream().filter(item -> {
-            if (item.getSendState() == ChatCode.MESSAGE_REVOCATION.value() ||
-                    item.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value()) item.setMessage("撤回了一条消息");
+            if (item.getSendState() == ChatCode.MESSAGE_REVOCATION.value() || item.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value())
+                item.setMessage("撤回了一条消息");
             if (item.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value() && !messageVos.isEmpty()) {
                 List<MessageVo> diffMessage = messageVos.stream().filter(ite -> Objects.equals(ite.getId(), item.getQuoteId())).toList();
                 if (!diffMessage.isEmpty()) {
@@ -113,13 +104,25 @@ public class ChatService {
             }
             return true;
         }).toList());
+        return setChatResultCom(list, page, messageVoPage.getTotal());
+    }
+
+    /**
+     * 消息查询公共结果封装
+     *
+     * @param list  消息
+     * @param page  页码
+     * @param total 总数
+     * @return 结果
+     */
+    public Map<String, Object> setChatResultCom(List<?> list, Long page, Long total) {
         HashMap<String, Object> map = new HashMap<>();
         Collections.reverse(list);
         map.put("data", list);
         boolean next = false;
         if (list.size() > 0) {
-            if (page > 1) next = (page - 1) * 20 + list.size() < messageVoPage.getTotal();
-            else next = list.size() < messageVoPage.getTotal();
+            if (page > 1) next = (page - 1) * 20 + list.size() < total;
+            else next = list.size() < total;
         }
         map.put("next", next);
         return map;
@@ -132,9 +135,7 @@ public class ChatService {
      * @return 消息
      */
     public List<MessageVo> eqAllQuoteMessage(List<Long> quotes) {
-        MPJLambdaWrapper<Chat> eq = new MPJLambdaWrapper<Chat>().selectAll(Chat.class)
-                .select(Message::getMessage).leftJoin(Message.class, Message::getId, Chat::getMid)
-                .in(Chat::getId, quotes);
+        MPJLambdaWrapper<Chat> eq = new MPJLambdaWrapper<Chat>().selectAll(Chat.class).select(Message::getMessage).leftJoin(Message.class, Message::getId, Chat::getMid).in(Chat::getId, quotes);
         return chatMapper.selectJoinList(MessageVo.class, eq);
     }
 
@@ -167,7 +168,8 @@ public class ChatService {
         Long cid = Long.valueOf(RandomUtil.randomNumbers(12));
         chatMapper.insert(new Chat(cid, uid, receiveUid, mId, type, new Date(), action, quoteId));
         // 推消息
-        if (!uid.equals(receiveUid)) socketCom.pushCom(cid, uid, receiveUid, ChatCode.MESSAGE_HEALTH.value(), message, type);
+        if (!uid.equals(receiveUid))
+            socketCom.pushCom(cid, uid, receiveUid, ChatCode.MESSAGE_HEALTH.value(), message, type);
         return cid;
     }
 
@@ -195,9 +197,7 @@ public class ChatService {
             throw new ChatException("消息动作异常");
         if (dto.getAction() == ChatCode.MESSAGE_ACTION_QUOTE.value()) {
             if (Objects.isNull(dto.getQuoteId())) throw new ChatException("消息异常，引用消息id不能为空");
-            LambdaQueryWrapper<Chat> eq = new LambdaQueryWrapper<Chat>()
-                    .select(Chat::getSendUid, Chat::getReceiveUid)
-                    .eq(Chat::getId, dto.getQuoteId());
+            LambdaQueryWrapper<Chat> eq = new LambdaQueryWrapper<Chat>().select(Chat::getSendUid, Chat::getReceiveUid).eq(Chat::getId, dto.getQuoteId());
             Chat chat = chatMapper.selectOne(eq);
             if (Objects.isNull(chat)) throw new ChatException("引用消息不存在");
             if (chat.getSendUid().equals(uid)) {
@@ -205,8 +205,7 @@ public class ChatService {
                 return;
             }
             if (chat.getReceiveUid().equals(uid)) {
-                if (chat.getSendState() == ChatCode.MESSAGE_REVOCATION.value() ||
-                        chat.getReceiveState() != ChatCode.MESSAGE_HEALTH.value())
+                if (chat.getSendState() == ChatCode.MESSAGE_REVOCATION.value() || chat.getReceiveState() != ChatCode.MESSAGE_HEALTH.value())
                     throw new ChatException("引用消息不存在");
                 return;
             }
@@ -222,8 +221,7 @@ public class ChatService {
      * @return uw
      */
     public LambdaUpdateWrapper<Relation> setEqConditions(Long uid, Long relationId) {
-        return new LambdaUpdateWrapper<Relation>()
-                .eq(Relation::getUid, uid).eq(Relation::getId, relationId).eq(Relation::getState, ChatCode.MESSAGE_HEALTH.value());
+        return new LambdaUpdateWrapper<Relation>().eq(Relation::getUid, uid).eq(Relation::getId, relationId).eq(Relation::getState, ChatCode.MESSAGE_HEALTH.value());
     }
 
     public void topChat(Long uid, Long relationId, int state) throws ChatException {
@@ -244,13 +242,11 @@ public class ChatService {
      * @return uw
      */
     public LambdaUpdateWrapper<Chat> setEqChat(Long uid, Long mid) {
-        return new LambdaUpdateWrapper<Chat>()
-                .eq(Chat::getSendUid, uid).eq(Chat::getId, mid).eq(Chat::getSendState, ChatCode.MESSAGE_HEALTH.value());
+        return new LambdaUpdateWrapper<Chat>().eq(Chat::getSendUid, uid).eq(Chat::getId, mid).eq(Chat::getSendState, ChatCode.MESSAGE_HEALTH.value());
     }
 
     public Chat eqChatReceiveUid(Long uid, Long mid) throws ChatException {
-        LambdaQueryWrapper<Chat> qw = new LambdaQueryWrapper<Chat>().select(Chat::getReceiveUid, Chat::getReceiveState)
-                .eq(Chat::getId, mid).eq(Chat::getSendUid, uid).eq(Chat::getSendState, ChatCode.MESSAGE_HEALTH.value());
+        LambdaQueryWrapper<Chat> qw = new LambdaQueryWrapper<Chat>().select(Chat::getReceiveUid, Chat::getReceiveState).eq(Chat::getId, mid).eq(Chat::getSendUid, uid).eq(Chat::getSendState, ChatCode.MESSAGE_HEALTH.value());
         Chat chat = chatMapper.selectOne(qw);
         if (Objects.isNull(chat)) throw new ChatException("消息不存在");
         return chat;
@@ -278,8 +274,7 @@ public class ChatService {
 
     @Transactional(rollbackFor = Exception.class)
     public String delMessage(Long uid, Long[] mIds) throws ChatException {
-        LambdaQueryWrapper<Chat> qw = new LambdaQueryWrapper<Chat>().in(Chat::getId, Arrays.asList(mIds).toArray())
-                .and(i -> i.eq(Chat::getSendUid, uid).or(ii -> ii.eq(Chat::getReceiveUid, uid))).orderByDesc(Chat::getDate);
+        LambdaQueryWrapper<Chat> qw = new LambdaQueryWrapper<Chat>().in(Chat::getId, Arrays.asList(mIds).toArray()).and(i -> i.eq(Chat::getSendUid, uid).or(ii -> ii.eq(Chat::getReceiveUid, uid))).orderByDesc(Chat::getDate);
         List<Chat> chats = chatMapper.selectList(qw);
         if (chats.isEmpty()) throw new ChatException("消息不存在");
         List<Long> self = chats.stream().filter(item -> item.getSendUid().equals(uid)).map(Chat::getId).toList();
@@ -300,5 +295,27 @@ public class ChatService {
 
     public void clearNotRead(Long uid, Long receiveUid) {
         asyncCom.clearRead(uid, receiveUid);
+    }
+
+    public Map<String, Object> eqChatRecord(Long uid, ChatRecordDto chatRecordDto) {
+        MPJLambdaWrapper<Chat> qw = setEqChatCom(uid, chatRecordDto.getReceiveUid());
+        qw.and(i -> {
+            if (!Objects.isNull(chatRecordDto.getSearch())) i.like(Message::getMessage, chatRecordDto.getSearch());
+            if (chatRecordDto.getType() == ChatCode.RECORD_TEXT.value())
+                i.eq(Chat::getType, ChatCode.MESSAGE_TYPE_NORMAL.value());
+            if (chatRecordDto.getType() == ChatCode.RECORD_IMAGE.value())
+                i.eq(Chat::getType, ChatCode.MESSAGE_TYPE_IMAGE.value());
+            String date = DateUtil.format(DateUtil.date(chatRecordDto.getDate()), "yyyy-MM-dd");
+            if (!Objects.isNull(chatRecordDto.getDate()) && chatRecordDto.getDate() > 0) {
+                i.between(Chat::getDate, date + " 00:00:00", date + " 23:59:59");
+            }
+        });
+        Page<RecordVo> recordVoPage = chatMapper.selectJoinPage(new Page<>(chatRecordDto.getPage(), 20), RecordVo.class, qw);
+        ArrayList<RecordVo> list = new ArrayList<>(recordVoPage.getRecords().stream().filter(item -> {
+            if (item.getSendState() == ChatCode.MESSAGE_REVOCATION.value() || item.getReceiveState() == ChatCode.MESSAGE_REVOCATION.value())
+                item.setMessage("撤回了一条消息");
+            return true;
+        }).toList());
+        return setChatResultCom(list, chatRecordDto.getPage(), recordVoPage.getTotal());
     }
 }

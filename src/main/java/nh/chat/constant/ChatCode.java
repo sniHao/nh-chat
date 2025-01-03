@@ -13,7 +13,10 @@ public enum ChatCode {
     CHAT_TOP("置顶", 1),
     USER_STATE_OFFLINE("离线", 0),
     USER_STATE_ONLINE("在线", 1),
-    USER_STATE_WRITE("用户输入中", 2);
+    USER_STATE_WRITE("用户输入中", 2),
+    RECORD_ALL("全部",0),
+    RECORD_TEXT("文字",1),
+    RECORD_IMAGE("图片",2);
 
     private final String tips;
     private final Integer value;

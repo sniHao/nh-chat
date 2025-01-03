@@ -1,6 +1,7 @@
 package nh.chat.controller;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import nh.chat.bean.dto.ChatRecordDto;
 import nh.chat.bean.dto.SendMessageDto;
 import nh.chat.constant.ChatCode;
 import nh.chat.exception.ChatException;
@@ -105,5 +106,13 @@ public class ChatController {
     public Result<?> clearNotRead(@RequestAttribute("uid") Long uid, @PathVariable("receiveUid") Long receiveUid) {
         chatService.clearNotRead(uid, receiveUid);
         return Result.success("ok");
+    }
+
+    @Operation(summary = "查询聊天记录")
+    @PostMapping("eqChatRecord")
+    public Result<?> eqChatRecord(@RequestAttribute("uid") Long uid, @RequestBody ChatRecordDto chatRecordDto) throws ChatException {
+        if (Objects.isNull(chatRecordDto.getReceiveUid())) throw new ChatException("参数异常");
+        if (Objects.isNull(chatRecordDto.getPage())) chatRecordDto.setPage(1L);
+        return Result.success("ok", chatService.eqChatRecord(uid, chatRecordDto));
     }
 }
