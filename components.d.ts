@@ -32,6 +32,8 @@ declare module 'vue' {
     NRadioButton: typeof import('naive-ui')['NRadioButton']
     NRadioGroup: typeof import('naive-ui')['NRadioGroup']
     NScrollbar: typeof import('naive-ui')['NScrollbar']
+    NSpace: typeof import('naive-ui')['NSpace']
+    NSpin: typeof import('naive-ui')['NSpin']
     NullChat: typeof import('./src/components/svg/NullChat.vue')['default']
     NUpload: typeof import('naive-ui')['NUpload']
     RightButton: typeof import('./src/components/of/RightButton.vue')['default']

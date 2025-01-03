@@ -63,6 +63,17 @@ declare global {
     quoteMessage: string
   }
 
+  interface chatRecord {
+    id: number;
+    sendUid: number | undefined;
+    receiveUid: number;
+    type: number;
+    sendState: number;
+    receiveState: number;
+    date: string;
+    message: string;
+  }
+
   interface messageQuote {
     action: number,
     quoteId: number,

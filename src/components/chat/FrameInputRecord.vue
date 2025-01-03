@@ -7,8 +7,8 @@
         <!-- 搜索和筛选区域 -->
         <div class='chat-history-header pd-16'>
           <n-input-group>
-            <n-input v-model:value='record.search' placeholder='搜索聊天内容' clearable />
-            <n-button type='primary' ghost @click='searchHistory()'>搜 索</n-button>
+            <n-input v-model:value='record.search' placeholder='搜索聊天内容' clearable :on-clear='searchHistory' />
+            <n-button type='primary' ghost @click='searchHistory'>搜 索</n-button>
           </n-input-group>
 
           <div class='mt-12 flex-center-zy'>
@@ -26,24 +26,34 @@
 
         <!-- 聊天记录列表 -->
         <div class='chat-history-content pd-16'>
-          <div class='over-auto chat-history-box'>
+          <template v-show='loadingMessage'>
+            <div class='flex-center-center h-100'>
+              <div class='flex-down flex-center'>
+                <n-space>
+                  <n-spin size='large' />
+                </n-space>
+                <div class='mt-12 ft-16'>数据加载中...</div>
+              </div>
+            </div>
+          </template>
+          <div class='over-auto chat-history-box' v-show='!loadingMessage'>
             <div v-if='historyData.length === 0' class='flex-center-center h-100'>
               <n-empty description='暂无聊天记录' />
             </div>
             <div v-else class='flex-down'>
-              <div class='history-message pd-12 flex' v-for='i in 20'>
+              <div class='history-message pd-12 flex' v-for='(item,index) in historyData' :key='index'>
                 <div
                   class='user-head flex-center-center'
-                  :style="'background-color:' + tranColor(param.userInfo.photo)"
-                  v-html='computePhoto(param.userInfo.photo)'></div>
+                  :style="'background-color:' + tranColor(item.sendUid !== user.uid?user.photo:param.userInfo.photo)"
+                  v-html='computePhoto(item.sendUid !== user.uid?user.photo:param.userInfo.photo)'></div>
                 <div class='flex-down ml-18 w-auto'>
                   <div class='flex-center-zy'>
-                    <div class='ft-16'>昵称</div>
-                    <div class='ft-color-tips'>时间</div>
+                    <div class='ft-16'>{{ item.sendUid !== user.uid ? user.name : param.userInfo.name }}</div>
+                    <div class='ft-color-tips'>{{ cutChatTime(item.date) }}</div>
                   </div>
                   <div>
-                    <span class='history-message-span'>数数据数据数据据</span>
-                    <n-image class='chat-image' src='' />
+                    <span v-if='item.type === 0' class='history-message-span'>{{ item.message }}</span>
+                    <n-image v-else class='chat-image' :src='item.message' />
                   </div>
                 </div>
               </div>
@@ -57,16 +67,16 @@
 
 <script setup lang='ts'>
 import { createDiscreteApi } from 'naive-ui';
-import { getTimeFormat } from '@/utils/TimeUtil';
-import { tranColor, computePhoto } from '@/utils/OtherUtils';
+import { cutChatTime } from '@/utils/TimeUtil';
+import { tranColor, computePhoto, tips } from '@/utils/OtherUtils';
 import { throttle } from '@/utils/domUtils';
+import { eqChatRecord } from '@/api/index';
 
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
 
 const { notification } = createDiscreteApi(['notification']);
 
 import { NConfigProvider, zhCN, dateZhCN } from 'naive-ui';
-
 
 const props = defineProps({
   user: {
@@ -88,7 +98,7 @@ const loadingMessage = ref(false);
 const scrollToTop = () => {
   let scrollDom = document.getElementsByClassName('chat-history-box')[0];
   if (scrollDom.scrollTop < 30 && next.value && !loadingMessage.value) {
-    searchHistory(false);
+    searchHistory({ isOnePage: false, needBottom: false });
   }
 };
 
@@ -111,32 +121,76 @@ const scrollToBottom = () => {
 
 // 搜索历史记录
 const next = ref(false);
-const historyData = ref<any[]>([{}, {}]);
+const historyData = ref([] as chatRecord[]);
 const page = ref(1);
+
+// 定义默认值
+const definedVal = (obj: { isOnePage?: boolean, needBottom?: boolean, newData?: boolean }) => {
+  if (obj?.isOnePage === undefined) obj['isOnePage'] = true;
+  if (obj?.needBottom === undefined) obj['needBottom'] = true;
+  if (obj?.newData === undefined) obj['newData'] = false;
+  return obj;
+};
+
+// 填充数据
+const fillData = (newData: boolean = true, data: chatRecord[]) => {
+  if (newData) historyData.value = data;
+  else historyData.value.unshift(...data);
+};
 /**
  * 搜索历史记录
- * @param isOnePage 是否从第一页开始
+ * @param obj
  */
-const searchHistory = (isOnePage: boolean = true) => {
-  if (isOnePage) page.value = 1;
-  else page.value++;
+const searchHistory = (obj: { isOnePage?: boolean, needBottom?: boolean, newData?: boolean }) => {
+  obj = definedVal(obj ?? {});
+  loadingMessage.value = true;
+  eqChatRecord(setEqData(obj.isOnePage)).then((res: Result) => {
+    if (res.code !== 200) {
+      if (!param.experienceMode) return tips('error', res.msg);
+      // 体验数据
+      return;
+    }
+    next.value = res.data.next;
+    if (next.value) page.value++;
+    if (!obj.needBottom) {
+      const oldHeight = document.getElementsByClassName('chat-history-box')[0].scrollHeight || 0;
+      fillData(obj.newData, res.data.data);
+      setTimeout(() => {
+        let newDom = document.getElementsByClassName('chat-history-box')[0];
+        newDom.scrollTop = newDom.scrollHeight - oldHeight;
+      }, 100);
+    } else {
+      fillData(obj.newData, res.data.data);
+    }
+  }).finally(() => {
+    if (obj.needBottom) scrollToBottom();
+    loadingMessage.value = false;
+    setTimeout(() => {
+      listenerScrollToTop(true);
+    }, 150);
+  });
+};
 
-  scrollToBottom();
-  setTimeout(() => {
-    listenerScrollToTop(true);
-  }, 150);
+// 设置查询参数
+const setEqData = (isOnePage: boolean | undefined) => {
+  if (isOnePage) page.value = 1;
+  let newData = JSON.parse(JSON.stringify(record));
+  newData.receiveUid = props.user.relationUid;
+  newData.page = page.value;
+  newData.date = newData.date ?? 0;
+  return newData;
 };
 
 // 日期查询
 const upDate = (val: any) => {
   record.date = val;
-  searchHistory();
+  searchHistory({ newData: true });
 };
 
 // 类型查询
 const upType = (val: any) => {
   record.type = val;
-  searchHistory();
+  searchHistory({ newData: true });
 };
 
 // 筛选
@@ -153,8 +207,8 @@ const initData = () => {
 };
 
 const show = ref(false);
-watchEffect(() => {
-  if (!props.showChatHistory) return;
+watch(() => props.showChatHistory, (newVal) => {
+  if (!newVal) return show.value = false;
   initData();
   show.value = true;
   searchHistory();

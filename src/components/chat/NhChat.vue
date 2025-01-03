@@ -16,7 +16,8 @@ const router = useRouter();
 const props = defineProps({
   baseUrl: {
     type: String,
-    default: 'http://localhost:8087'
+    // default: 'http://localhost:8087'
+    default: 'https://www.snihao.top/nh'
   },
   inputTips: {
     type: String,
@@ -47,7 +48,7 @@ const props = defineProps({
   },
   eqUserInfo: {
     type: String,
-    default: ''
+    default: 'https://www.snihao.top/nh/user/eqUserBasics'
   },
   userInfo: {
     type: Object as unknown as userInfo,
@@ -55,7 +56,8 @@ const props = defineProps({
   },
   socketUrl: {
     type: String,
-    default: 'ws://localhost:8087/socket.chat/'
+    // default: 'ws://localhost:8087/socket.chat/'
+    default: 'wss://www.snihao.top/wss/socket.chat/'
   },
   token: {
     type: String,
