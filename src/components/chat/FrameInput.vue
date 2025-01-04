@@ -87,7 +87,7 @@
       </div>
     </div>
     <!-- 弹框 -->
-    <FrameInputRecord :user='user' :showChatHistory='showChatHistory'
+    <FrameInputRecord :user='user' :showChatHistory='showChatHistory' :chatData='chatData'
                       @closeChatHistory='goChatHistory'></FrameInputRecord>
   </div>
 </template>
@@ -133,7 +133,11 @@ const props = defineProps({
   addSendVal: {
     type: String,
     default: ''
-  }
+  },
+  chatData: {
+    type: Array,
+    default: () => []
+  },
 });
 const emit = defineEmits(['sendMessageEmit', 'sendImageEmit', 'isActionEmit', 'isQuoteEmit', 'moreCheckStateEmit', 'delMessageEmit', 'cancelMoreCheckedEmit']);
 

@@ -7,8 +7,8 @@
         <!-- 搜索和筛选区域 -->
         <div class='chat-history-header pd-16'>
           <n-input-group>
-            <n-input v-model:value='record.search' placeholder='搜索聊天内容' clearable :on-clear='searchHistory' />
-            <n-button type='primary' ghost @click='searchHistory'>搜 索</n-button>
+            <n-input v-model:value='record.search' placeholder='搜索聊天内容' clearable :on-clear='clearSearch'/>
+            <n-button type='primary' ghost @click='goSearch'>搜 索</n-button>
           </n-input-group>
 
           <div class='mt-12 flex-center-zy'>
@@ -19,33 +19,31 @@
             </n-radio-group>
 
             <n-config-provider :locale='zhCN' :date-locale='dateZhCN'>
-              <n-date-picker v-model:value='record.date' type='date' size='small' :on-update:value='upDate' clearable />
+              <n-date-picker v-model:value='record.date' type='date' size='small' :on-update:value='upDate' clearable/>
             </n-config-provider>
           </div>
         </div>
 
         <!-- 聊天记录列表 -->
-        <div class='chat-history-content pd-16'>
-          <template v-show='loadingMessage'>
-            <div class='flex-center-center h-100'>
-              <div class='flex-down flex-center'>
-                <n-space>
-                  <n-spin size='large' />
-                </n-space>
-                <div class='mt-12 ft-16'>数据加载中...</div>
-              </div>
+        <div class='chat-history-content pd-16 pos-r'>
+          <div class='flex-center-center h-100 pos-a chat-history-loading' v-if='loadingMessage'>
+            <div class='flex-down flex-center'>
+              <n-space>
+                <n-spin size='large'/>
+              </n-space>
+              <div class='mt-12 ft-16'>数据加载中...</div>
             </div>
-          </template>
-          <div class='over-auto chat-history-box' v-show='!loadingMessage'>
+          </div>
+          <div class='over-auto chat-history-box'>
             <div v-if='historyData.length === 0' class='flex-center-center h-100'>
-              <n-empty description='暂无聊天记录' />
+              <n-empty description='暂无聊天记录'/>
             </div>
             <div v-else class='flex-down'>
               <div class='history-message pd-12 flex' v-for='(item,index) in historyData' :key='index'>
                 <div
-                  class='user-head flex-center-center'
-                  :style="'background-color:' + tranColor(item.sendUid !== user.uid?user.photo:param.userInfo.photo)"
-                  v-html='computePhoto(item.sendUid !== user.uid?user.photo:param.userInfo.photo)'></div>
+                    class='user-head flex-center-center'
+                    :style="'background-color:' + tranColor(item.sendUid !== user.uid?user.photo:param.userInfo.photo)"
+                    v-html='computePhoto(item.sendUid !== user.uid?user.photo:param.userInfo.photo)'></div>
                 <div class='flex-down ml-18 w-auto'>
                   <div class='flex-center-zy'>
                     <div class='ft-16'>{{ item.sendUid !== user.uid ? user.name : param.userInfo.name }}</div>
@@ -53,7 +51,7 @@
                   </div>
                   <div>
                     <span v-if='item.type === 0' class='history-message-span'>{{ item.message }}</span>
-                    <n-image v-else class='chat-image' :src='item.message' />
+                    <n-image v-else class='chat-image' :src='item.message'/>
                   </div>
                 </div>
               </div>
@@ -66,17 +64,18 @@
 </template>
 
 <script setup lang='ts'>
-import { createDiscreteApi } from 'naive-ui';
-import { cutChatTime } from '@/utils/TimeUtil';
-import { tranColor, computePhoto, tips } from '@/utils/OtherUtils';
-import { throttle } from '@/utils/domUtils';
-import { eqChatRecord } from '@/api/index';
+import {createDiscreteApi} from 'naive-ui';
+import {cutChatTime} from '@/utils/TimeUtil';
+import {tranColor, computePhoto, tips} from '@/utils/OtherUtils';
+import {filterExperienceData} from '@/utils/staticUtils';
+import {throttle} from '@/utils/domUtils';
+import {eqChatRecord} from '@/api/index';
 
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
 
-const { notification } = createDiscreteApi(['notification']);
+const {notification} = createDiscreteApi(['notification']);
 
-import { NConfigProvider, zhCN, dateZhCN } from 'naive-ui';
+import {NConfigProvider, zhCN, dateZhCN} from 'naive-ui';
 
 const props = defineProps({
   user: {
@@ -86,6 +85,10 @@ const props = defineProps({
   showChatHistory: {
     type: Boolean,
     default: false
+  },
+  chatData: {
+    type: Array,
+    default: []
   }
 });
 const emit = defineEmits(['closeChatHistory']);
@@ -98,7 +101,7 @@ const loadingMessage = ref(false);
 const scrollToTop = () => {
   let scrollDom = document.getElementsByClassName('chat-history-box')[0];
   if (scrollDom.scrollTop < 30 && next.value && !loadingMessage.value) {
-    searchHistory({ isOnePage: false, needBottom: false });
+    searchHistory({isOnePage: false, needBottom: false});
   }
 };
 
@@ -137,6 +140,7 @@ const fillData = (newData: boolean = true, data: chatRecord[]) => {
   if (newData) historyData.value = data;
   else historyData.value.unshift(...data);
 };
+
 /**
  * 搜索历史记录
  * @param obj
@@ -147,7 +151,7 @@ const searchHistory = (obj: { isOnePage?: boolean, needBottom?: boolean, newData
   eqChatRecord(setEqData(obj.isOnePage)).then((res: Result) => {
     if (res.code !== 200) {
       if (!param.experienceMode) return tips('error', res.msg);
-      // 体验数据
+      historyData.value = filterExperienceData(props.chatData, record);
       return;
     }
     next.value = res.data.next;
@@ -158,14 +162,14 @@ const searchHistory = (obj: { isOnePage?: boolean, needBottom?: boolean, newData
       setTimeout(() => {
         let newDom = document.getElementsByClassName('chat-history-box')[0];
         newDom.scrollTop = newDom.scrollHeight - oldHeight;
-      }, 100);
+      }, 50);
     } else {
       fillData(obj.newData, res.data.data);
     }
   }).finally(() => {
     if (obj.needBottom) scrollToBottom();
-    loadingMessage.value = false;
     setTimeout(() => {
+      loadingMessage.value = false;
       listenerScrollToTop(true);
     }, 150);
   });
@@ -181,16 +185,28 @@ const setEqData = (isOnePage: boolean | undefined) => {
   return newData;
 };
 
+// 清除搜索查询
+const clearSearch = () => {
+  record.search = '';
+  searchHistory({newData: true});
+};
+
+// 搜索查询
+const goSearch = () => {
+  if (!record.search.trim()) return;
+  searchHistory({newData: true});
+};
+
 // 日期查询
 const upDate = (val: any) => {
   record.date = val;
-  searchHistory({ newData: true });
+  searchHistory({newData: true});
 };
 
 // 类型查询
 const upType = (val: any) => {
   record.type = val;
-  searchHistory({ newData: true });
+  searchHistory({newData: true});
 };
 
 // 筛选
@@ -201,6 +217,7 @@ const record = reactive({
 });
 
 const initData = () => {
+  historyData.value = [];
   record.type = 0;
   record.date = null;
   record.search = '';
@@ -258,6 +275,12 @@ onBeforeUnmount(() => {
 
   &-box {
     height: $px-400;
+  }
+
+  &-loading {
+    left: 0;
+    right: 0;
+    background-color: white;
   }
 }
 

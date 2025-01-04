@@ -130,7 +130,7 @@
         </div>
       </div>
       <FrameInput :isQuote='isQuote' :clearSendVal='clearSendVal' :moreCheckState='moreCheckState'
-                  :saveChecked='saveChecked' :addSendVal='addSendVal' :user='user'
+                  :saveChecked='saveChecked' :addSendVal='addSendVal' :user='user' :chatData='chatData'
                   @sendMessageEmit='sendMessageEmit' @moreCheckStateEmit='moreCheckStateEmit'
                   @delMessageEmit='delMessageEmit' @cancelMoreCheckedEmit='cancelMoreCheckedEmit'
                   @isActionEmit='isActionEmit' @isQuoteEmit='isQuoteEmit' @sendImageEmit='sendImageEmit'></FrameInput>
@@ -501,6 +501,7 @@ const simReissue = (id: number, repMessage: string) => {
 // ===================================获取聊天数据===================================//
 // 获取聊天数据
 const chatData = ref([] as any);
+provide('chatData', chatData.value);
 const page = ref(1);
 const next = ref(false);
 const eqChatData = () => {
@@ -536,10 +537,12 @@ const eqChatCom = (needBottom: boolean = true) => {
       .finally(() => {
         needListener.value = false;
         setTimeout(() => {
-          loadingMessage.value = false;
           needListener.value = true;
-          if (!needBottom) return;
+          if (!needBottom) return loadingMessage.value = false;
           scrollToBottom();
+          setTimeout(() => {
+            loadingMessage.value = false;
+          }, 100)
           listenerScrollToTop(true);
         }, 150);
       });
