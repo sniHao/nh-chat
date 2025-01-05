@@ -145,7 +145,7 @@ const fillData = (newData: boolean = true, data: chatRecord[]) => {
  * 搜索历史记录
  * @param obj
  */
-const searchHistory = (obj: { isOnePage?: boolean, needBottom?: boolean, newData?: boolean }) => {
+const searchHistory = (obj?: { isOnePage?: boolean, needBottom?: boolean, newData?: boolean }) => {
   obj = definedVal(obj ?? {});
   loadingMessage.value = true;
   eqChatRecord(setEqData(obj.isOnePage)).then((res: Result) => {

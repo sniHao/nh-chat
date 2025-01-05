@@ -74,7 +74,7 @@ export const staticUserData = (): Relation[] => {
 
 
 // 过滤静态数据
-export const filterExperienceData = (data: any, record: { search: string, type: number, date: number }) => {
+export const filterExperienceData = (data: any, record: { search: string, type: number, date: number | null }) => {
     let newData = [];
     for (let i = 0; i < data.length; i++) {
         if (record.search && !data[i].message.includes(record.search)) continue;
