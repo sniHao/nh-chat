@@ -36,16 +36,27 @@ public class ChatSocket extends TextWebSocketHandler {
     }
 
     /**
+     * 获取用户id
+     *
+     * @param session 会话
+     * @return 用户id
+     */
+    public Long getUid(WebSocketSession session) {
+        HttpHeaders headers = session.getHandshakeHeaders();
+        List<String> author = headers.get("Authorization");
+        if (Objects.isNull(author) || author.isEmpty()) return null;
+        return Long.valueOf(author.get(0));
+    }
+
+    /**
      * 建立连接 @OnOpen
      *
      * @param session 会话
      */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        HttpHeaders headers = session.getHandshakeHeaders();
-        List<String> author = headers.get("Authorization");
-        if (Objects.isNull(author) || author.isEmpty()) return;
-        Long uid = Long.valueOf(author.get(0));
+        Long uid = getUid(session);
+        if (Objects.isNull(uid)) return;
         WebSocketSession state = webSocketMap.get(uid);
         if (!Objects.isNull(state)) webSocketMap.remove(uid);
         webSocketMap.put(uid, session);
@@ -84,7 +95,7 @@ public class ChatSocket extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
-        Long uid = (Long) session.getAttributes().get("uid");
+        Long uid = getUid(session);
         if (Objects.isNull(uid)) return;
         webSocketMap.remove(uid);
         SocketService socketService = NhBeanUtil.getBean(SocketService.class);
