@@ -42,7 +42,7 @@
                      v-html='computePhoto(item.photo)'>
                 </div>
                 <div class='online-com' :style='`border: 4px solid ${param.style.mainColor}`'
-                     :class="item.wsState === 0?'offline':'online'"></div>
+                     :class="userStateClass(item)"></div>
               </n-badge>
               <div class='user-main' :style='`color:${param.style.fontColor}`'>
                 <div class='flex-center-zy'>
@@ -142,6 +142,14 @@ const mainClass = () => {
 const userClass = (item: Relation) => {
   return {
     check: item.id === checkId.value
+  };
+};
+
+const userStateClass = (item: Relation) => {
+  return {
+    offline: item.wsState === 0,
+    online: item.wsState !== 0,
+    onlineCheck: item.id === checkId.value
   };
 };
 
@@ -520,6 +528,10 @@ onBeforeUnmount(() => {
   .online-com{
     border: $px-4 solid #4a505d !important;
   }
+}
+
+.onlineCheck {
+  border: $px-4 solid #4a505d !important;
 }
 
 .check {
