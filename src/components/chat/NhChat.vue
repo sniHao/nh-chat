@@ -72,6 +72,10 @@ const props = defineProps({
   experienceMode: {
     type: Boolean,
     default: true
+  },
+  startChat: {
+    type: Object as unknown as { uid: number, status: Boolean },
+    default: {}
   }
 } as any);
 provide('param', props as chatProps);

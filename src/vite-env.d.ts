@@ -104,6 +104,9 @@ declare global {
     token: string,
     chatRoute: string,
     messageFlicker: boolean,
-    experienceMode: boolean
+    experienceMode: boolean,
+    startChat: {
+      uid: number, status: Boolean
+    }
   }
 }

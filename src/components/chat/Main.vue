@@ -42,7 +42,7 @@
                      v-html='computePhoto(item.photo)'>
                 </div>
                 <div class='online-com' :style='`border: 4px solid ${param.style.mainColor}`'
-                     :class="userStateClass(item)"></div>
+                     :class='userStateClass(item)'></div>
               </n-badge>
               <div class='user-main' :style='`color:${param.style.fontColor}`'>
                 <div class='flex-center-zy'>
@@ -266,6 +266,10 @@ const eqUserList = () => {
       }
       setUser(res.data, param.eqUserInfo).then((res: any) => {
         userList.value = res;
+        userList.value.filter(item => {
+          if (!item?.name) item.name = '未命名';
+          return item;
+        });
         sortData();
       });
     })
@@ -415,14 +419,18 @@ const upChat = () => {
 };
 
 // 在线-离线推送
-const userLineState = (state: {uid:number, state:number}) => {
+const userLineState = (state: { uid: number, state: number }) => {
   userList.value.filter((item: Relation) => {
     if (item.relationUid === state.uid) {
       item.wsState = state.state;
       return true;
     }
   });
-}
+};
+
+watchEffect(() => {
+  if (param.startChat.status) sendChat(param.startChat.uid);
+});
 
 // 来新消息了
 const ws = ref(webSocketService);
@@ -525,7 +533,8 @@ onBeforeUnmount(() => {
 
 .user:hover {
   background-color: $bg-color-hover;
-  .online-com{
+
+  .online-com {
     border: $px-4 solid #4a505d !important;
   }
 }
