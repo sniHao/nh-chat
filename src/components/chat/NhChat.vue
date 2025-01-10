@@ -42,10 +42,6 @@ const props = defineProps({
     type: Object as unknown as userInfo,
     default: () => ({uid: -1, name: '默认', photo: '默'})
   },
-  chatRoute: {
-    type: String,
-    default: '/'
-  },
   messageFlicker: {
     type: Boolean,
     default: true

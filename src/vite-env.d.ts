@@ -99,7 +99,6 @@ declare global {
       name: string;
       photo: string;
     },
-    chatRoute: string,
     messageFlicker: boolean,
     experienceMode: boolean,
     startChat: {

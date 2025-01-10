@@ -122,9 +122,8 @@ import RightButton from '../of/RightButton.vue';
 import Frame from './Frame.vue';
 import NullChat from '../svg/NullChat.vue';
 import Svg from '../of/Svg.vue';
-import WebSocketService from '@/utils/WebSocketService';
 
-const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
+const webSocketService = inject('webSocketService') as any;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
 const computedStyle = inject<Ref<any>>('computedStyle') as any;

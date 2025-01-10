@@ -152,13 +152,12 @@ import {eqChatDataStatic} from '@/utils/staticUtils';
 import {throttle} from '@/utils/domUtils';
 import {tranColor, truncate, tips, computePhoto, randomNumber, getQuoteView} from '@/utils/OtherUtils';
 import {eqChat, sendMessage, sendMessageImage, revocationMessage, delMessage} from '@/api/index';
-import WebSocketService from '@/utils/WebSocketService';
 import Svg from '../of/Svg.vue';
 import Loader from '../of/Loader.vue';
 import FrameInput from './FrameInput.vue';
 import FrameRightBtn from './FrameRightBtn.vue';
 
-const webSocketService = inject<WebSocketService>('webSocketService') as WebSocketService;
+const webSocketService = inject('webSocketService') as any;
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
 const computedStyle = inject<Ref<any>>('computedStyle') as any;
