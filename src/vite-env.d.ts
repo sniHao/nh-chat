@@ -94,14 +94,11 @@ declare global {
     },
     system: {},
     searchUserResult: [],
-    eqUserInfo: string,
     userInfo: {
       uid: number;
       name: string;
       photo: string;
     },
-    socketUrl: string,
-    token: string,
     chatRoute: string,
     messageFlicker: boolean,
     experienceMode: boolean,

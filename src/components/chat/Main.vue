@@ -128,6 +128,7 @@ const webSocketService = inject<WebSocketService>('webSocketService') as WebSock
 const isSmallWin = inject<Ref<boolean>>('isSmallWin') || ref(false);
 const param = inject<Ref<chatProps>>('param') as chatProps | any;
 const computedStyle = inject<Ref<any>>('computedStyle') as any;
+const eqUserInfoUrl = inject('eqUserInfoUrl') as string;
 const emit = defineEmits(['searchUser', 'clickUser']);
 // ===================================其他功能===================================//
 // 基本样式
@@ -213,7 +214,7 @@ const goSearch = () => {
 const sendChat = (uid: number) => {
   goChat(uid).then((res: Result) => {
     if (res.code !== 200) return tips('error', res.msg);
-    setUser([res.data], param.eqUserInfo).then((data: any) => {
+    setUser([res.data], eqUserInfoUrl).then((data: any) => {
       addTopList(data[0]);
       showChat(data[0]);
       sortData();
@@ -264,7 +265,7 @@ const eqUserList = () => {
         staticUser();
         return;
       }
-      setUser(res.data, param.eqUserInfo).then((res: any) => {
+      setUser(res.data, eqUserInfoUrl).then((res: any) => {
         userList.value = res;
         userList.value.filter(item => {
           if (!item?.name) item.name = '未命名';
@@ -464,11 +465,21 @@ const listenerHover = () => {
   });
 };
 
+// 是否跳转聊天
+const goLink = () => {
+  const id = sessionStorage.getItem('go_chat_uid');
+  if (id) {
+    sendChat(+id);
+    sessionStorage.removeItem('go_chat_uid');
+  }
+};
+
 onMounted(() => {
   if (goUid.value) upChat();
   eqUserList();
   closeRightBtnCom(true);
   listenerHover();
+  goLink();
 });
 onBeforeUnmount(() => {
   clearListener();

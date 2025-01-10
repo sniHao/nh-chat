@@ -1,5 +1,6 @@
 import { App } from "vue";
 import NhChat from "./chat/NhChat.vue";
+import { install } from "../plugin";
 
 export default {
   install(app: App) {
@@ -13,7 +14,7 @@ export default {
  * 为了将来支持类似这样按需使用 import {Vv3Test} from "vite-vue3-ts-test-fjc";
  * 有多少个组件就添加多少个组件
  */
-export { NhChat };
+export { NhChat,install };
 
 /**
  * 这里是重点，需要将这些组件在ts中声明为全局组件；
