@@ -51,7 +51,7 @@ const modifyKey = (obj: { [key: string]: any }, oldKey: string, newKey: string) 
 };
 
 // 设置标签标题闪烁效果
-let originalTitle:string;
+let originalTitle: string;
 let blinkInterval: number;
 let stopBlinkTimeout: number;
 
@@ -60,7 +60,7 @@ const startBlinking = () => {
     originalTitle = document.title;
     let isOriginalTitle = true;
     blinkInterval = window.setInterval(() => {
-      document.title = isOriginalTitle ? "新消息来啦" : originalTitle;
+      document.title = isOriginalTitle ? '新消息来啦' : originalTitle;
       isOriginalTitle = !isOriginalTitle;
     }, 500);
 
@@ -134,7 +134,12 @@ const install = (app: App) => {
 class WebSocketService {
   private socket: WebSocket | null = null;
   private reconnectInterval = 1000; // 初始重连间隔时间（毫秒）
+  private maxReconnectInterval = 30000; // 最大重连间隔时间（毫秒）
   private state = 0;
+  private reconnectAttempts = 0; // 重连尝试次数
+  private maxReconnectAttempts = 10; // 最大重连尝试次数
+  private heartbeatInterval = 5000; // 心跳间隔时间（毫秒）
+  private heartbeatTimer: number | null = null; // 心跳定时器
   public newMessage = reactive({
     mid: -1,
     receiveUid: -1,
@@ -156,6 +161,9 @@ class WebSocketService {
     this.socket = new WebSocket(this.params);
     this.socket.onopen = () => {
       this.state = this.socket?.readyState ?? 0;
+      this.reconnectInterval = 1000; // 重置重连间隔时间
+      this.reconnectAttempts = 0; // 重置重连尝试次数
+      this.startHeartbeat();
     };
     this.socket.onmessage = (event: MessageEvent) => {
       this.newMessage = JSON.parse(event.data);
@@ -163,6 +171,12 @@ class WebSocketService {
     };
     this.socket.onclose = () => {
       this.state = this.socket?.readyState ?? 0;
+      this.stopHeartbeat();
+      this.reconnect();
+    };
+    this.socket.onerror = () => {
+      this.state = this.socket?.readyState ?? 0;
+      this.stopHeartbeat();
       this.reconnect();
     };
   }
@@ -172,18 +186,37 @@ class WebSocketService {
   }
 
   reconnect() {
-    if (this.reconnectInterval === 30000 || this.state === 1) return;
+    if (this.reconnectAttempts >= this.maxReconnectAttempts || this.state === 1) return;
     setTimeout(() => {
+      this.stopHeartbeat();
       this.connect();
       this.reconnectInterval *= 2;
-      if (this.reconnectInterval > 30000) this.reconnectInterval = 30000;
+      if (this.reconnectInterval > this.maxReconnectInterval) this.reconnectInterval = this.maxReconnectInterval;
+      this.reconnectAttempts++;
     }, this.reconnectInterval);
+  }
+
+  // 开始心跳检测
+  startHeartbeat() {
+    if (typeof window === 'undefined') return;
+    this.heartbeatTimer = window.setInterval(() => {
+      if (!this.socket || this.socket.readyState !== WebSocket.OPEN) this.reconnect();
+    }, this.heartbeatInterval);
+  }
+
+  // 停止心跳检测
+  stopHeartbeat() {
+    if (this.heartbeatTimer !== null) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
   }
 
   // 关闭连接
   close(): void {
     if (this.socket) this.socket.close();
-  };
+    this.stopHeartbeat();
+  }
 }
 
 export { WebSocketService, install };
