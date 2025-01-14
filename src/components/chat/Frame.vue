@@ -7,7 +7,7 @@
       </div>
     </template>
 
-    <template v-else>
+    <template v-else-if='isPhoneUnfold || !isSmallWin'>
       <Loader class='loader-abs ml-2' :style='`background-color: ${param.style.mainColor}`'
               v-if='loadingMessage'></Loader>
       <div class='cb-head flex-center' :style='`box-shadow: 0 0 .4px .4px ${computedStyle.fontColorOpt}`'>
