@@ -1,6 +1,6 @@
 <template>
   <div class='chat-main flex'
-       :style='`width:${param.width};max-width:60rem;height:${param.height};
+       :style='`width:${param.width};height:${param.height};
        background-color:${param.style.mainColor};box-shadow: 0 0 0 1.5px ${computedStyle.fontColorOpt};
        color:${param.style.fontColor}`'
        :class='mainClass()'>

@@ -63,7 +63,6 @@ const startBlinking = () => {
       document.title = isOriginalTitle ? '新消息来啦' : originalTitle;
       isOriginalTitle = !isOriginalTitle;
     }, 500);
-
     // 2秒后停止闪烁
     stopBlinkTimeout = window.setTimeout(() => {
       stopBlinking();
@@ -79,7 +78,6 @@ const stopBlinking = () => {
   }
 };
 
-// 假设这是你的初始化代码
 if (typeof window !== 'undefined') {
   window.addEventListener('beforeunload', stopBlinking);
 }

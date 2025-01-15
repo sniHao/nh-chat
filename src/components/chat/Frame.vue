@@ -6,7 +6,6 @@
         <div class='mt-10 ft-16' :style='`color:${computedStyle.fontColorOpt}`'>选择好友，一起聊聊吧！</div>
       </div>
     </template>
-
     <template v-else-if='isPhoneUnfold || !isSmallWin'>
       <Loader class='loader-abs ml-2' :style='`background-color: ${param.style.mainColor}`'
               v-if='loadingMessage'></Loader>

@@ -136,6 +136,10 @@ const listenerMessage = (e: MouseEvent) => {
   if (nowCheckData.value.state === 0) return;
   showRightBtnMessage.value = true;
   rightBtnLeft.value = e.x;
+  // 超出屏幕
+  if (typeof window !== 'undefined') {
+    if (e.x + 128 > window.innerWidth) rightBtnLeft.value = window.innerWidth - 128;
+  }
   rightBtnTop.value = e.y;
   czList.value = [
     {id: 0, name: '复制内容', incident: () => copyMessage()},
