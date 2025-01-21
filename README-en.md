@@ -95,6 +95,7 @@ Download address：[SDK package](https://www.snihao.top/im/sdk/nh.zip)
 ### SQL file installation
 
 Download the following SQL file and import it into your database。
+
 Download address：[SQL File](https://www.snihao.top/im/sql/nh-chat.sql)
 
 ## Last word☕

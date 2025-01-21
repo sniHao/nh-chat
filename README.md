@@ -95,6 +95,7 @@ npm i nh-chat
 ### SQL文件安装
 
 下载下面的SQL文件，导入到你的数据库中。
+
 下载地址：[SQL文件](https://www.snihao.top/im/sql/nh-chat.sql)
 
 ## 最后唠叨☕
