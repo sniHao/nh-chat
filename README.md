@@ -13,10 +13,7 @@
 该框架完全开源，可以在任何地方使用，也可以二次开发🤩在个人或商用时，希望您能著名来源，谢谢。
 开发该框架的目的，为了方便在个人或企业项目中，更方便快捷的接入功能较完善的消息模块。
 
-代码开源地址：
-
-- [GitHub](https://github.com/sniHao/nh-chat) ![github-sniHao-nh-chat](http://badge.devlive.org/api/badge/github/sniHao/nh-chat.svg?type=stars&style=rounded&rightColor=%2523C22D8F&logo=https%3A%2F%2Fgitee.com%2Fsnihao%2Fnh-chat%2Fraw%2Fmaster%2Fsrc%2Fassets%2Fimages%2Fmd-name.png)
-- [Gitee](https://gitee.com/snihao/nh-chat) ![gitee-snihao-nh-chat](http://badge.devlive.org/api/badge/gitee/snihao/nh-chat.svg?type=stars&style=rounded&rightColor=%2523F8610F&logo=https%3A%2F%2Fgitee.com%2Fsnihao%2Fnh-chat%2Fraw%2Fmaster%2Fsrc%2Fassets%2Fimages%2Fmd-name.png)
+代码开源地址：[GitHub](https://github.com/sniHao/nh-chat) &nbsp;&nbsp;&nbsp;[Gitee](https://gitee.com/snihao/nh-chat)
 
 项目体验地址：[https://www.snihao.top](https://www.snihao.top)
 

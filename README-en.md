@@ -13,10 +13,7 @@ This framework adopts the cutting-edge technology route, more popular, concise c
 The framework is completely open source, can be used anywhere, can also be developed twice 🤩 in personal or commercial time, hope you can be famous source, thank you.
 The purpose of developing this framework is to make it convenient to access more functional message modules in individual or enterprise projects.
 
-Code open source address：
-
-- [GitHub](https://github.com/sniHao/nh-chat) ![github-sniHao-nh-chat](http://badge.devlive.org/api/badge/github/sniHao/nh-chat.svg?type=stars&style=rounded&rightColor=%2523C22D8F&logo=https%3A%2F%2Fgitee.com%2Fsnihao%2Fnh-chat%2Fraw%2Fmaster%2Fsrc%2Fassets%2Fimages%2Fmd-name.png)
-- [Gitee](https://gitee.com/snihao/nh-chat) ![gitee-snihao-nh-chat](http://badge.devlive.org/api/badge/gitee/snihao/nh-chat.svg?type=stars&style=rounded&rightColor=%2523F8610F&logo=https%3A%2F%2Fgitee.com%2Fsnihao%2Fnh-chat%2Fraw%2Fmaster%2Fsrc%2Fassets%2Fimages%2Fmd-name.png)
+Code open source address：[GitHub](https://github.com/sniHao/nh-chat) &nbsp;&nbsp;&nbsp;[Gitee](https://gitee.com/snihao/nh-chat)
 
 Project experience address：[https://www.snihao.top](https://www.snihao.top)
 
