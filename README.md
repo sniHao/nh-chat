@@ -4,6 +4,14 @@
 <h3 align="center">清晰的说明文档</h3>
 <h3 align="center">好用、不夸张的聊天框架🥰</h3>
 
+<div align="center">
+  <a href="https://github.com/sniHao/nh-chat">
+    <img src="https://img.shields.io/github/stars/sniHao/nh-chat?logo=github" alt="GitHub Stars">
+  </a>
+  <a href="https://gitee.com/snihao/nh-chat">
+    <img src="https://gitee.com/snihao/nh-chat/badge/star.svg?theme=dark&style=for-the-badge" alt="Gitee Stars">
+  </a>
+</div>
 
 <p align="center"><a href="README-en.md">English</a> | 中文</p>
 
